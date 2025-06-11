@@ -49,6 +49,8 @@ class BulleSensorielle {
         // Navigation
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 const section = e.currentTarget.dataset.section;
                 this.navigateToSection(section);
             });
@@ -57,23 +59,36 @@ class BulleSensorielle {
         // Quick actions
         document.querySelectorAll('.quick-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 const action = e.currentTarget.dataset.action;
                 this.navigateToSection(action);
             });
         });
 
         // Theme toggle
-        document.getElementById('themeToggle').addEventListener('click', () => {
-            this.toggleTheme();
-        });
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            themeToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.toggleTheme();
+            });
+        }
 
-        // Sound controls
+        // Solution 4: Enhanced sound controls with better event handling
         document.querySelectorAll('.sound-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const soundId = e.currentTarget.dataset.sound;
+                e.preventDefault();
+                e.stopPropagation();
+                const soundId = btn.getAttribute('data-sound');
+                console.log(`Sound button clicked: ${soundId}`);
                 this.toggleSound(soundId);
             });
         });
+        
+        // Add visual playing indicator
+        this.addPlayingIndicators();
 
         // Volume controls
         document.querySelectorAll('.volume-slider').forEach(slider => {
@@ -88,6 +103,8 @@ class BulleSensorielle {
         // Visual controls
         document.querySelectorAll('.visual-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 const visual = e.currentTarget.dataset.visual;
                 this.setVisual(visual);
             });
@@ -96,6 +113,8 @@ class BulleSensorielle {
         // Timer controls
         document.querySelectorAll('.preset-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 const minutes = parseInt(e.currentTarget.dataset.time);
                 this.setTimerDuration(minutes);
             });
@@ -106,28 +125,40 @@ class BulleSensorielle {
             this.setTimerDuration(minutes);
         });
 
-        document.getElementById('startTimer').addEventListener('click', () => {
+        document.getElementById('startTimer').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             this.startTimer();
         });
 
-        document.getElementById('pauseTimer').addEventListener('click', () => {
+        document.getElementById('pauseTimer').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             this.pauseTimer();
         });
 
-        document.getElementById('stopTimer').addEventListener('click', () => {
+        document.getElementById('stopTimer').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             this.stopTimer();
         });
 
         // Profile management
-        document.getElementById('saveProfile').addEventListener('click', () => {
+        document.getElementById('saveProfile').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             this.showSaveModal();
         });
 
-        document.getElementById('cancelSave').addEventListener('click', () => {
+        document.getElementById('cancelSave').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             this.hideSaveModal();
         });
 
-        document.getElementById('confirmSave').addEventListener('click', () => {
+        document.getElementById('confirmSave').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             this.saveCurrentProfile();
         });
 
@@ -206,6 +237,15 @@ class BulleSensorielle {
         const purr = new Tone.Oscillator(25, 'sawtooth').toDestination();
         purr.volume.value = -25;
         this.sounds.set('cat', purr);
+
+        // Wind sound (audio file)
+        const windPlayer = new Tone.Player({
+            url: './sons/wind.mp3',
+            loop: true,
+            autostart: false
+        }).toDestination();
+        windPlayer.volume.value = -20;
+        this.sounds.set('wind', windPlayer);
     }
 
     /**
@@ -502,64 +542,220 @@ class BulleSensorielle {
     }
 
     /**
-     * Toggle sound on/off
+     * Toggle sound on/off with exclusive playback
+     * Solution 1: Complete rewrite with better state management
      */
     toggleSound(soundId) {
-        const soundBtn = document.querySelector(`[data-sound="${soundId}"]`);
+        console.log(`Toggling sound: ${soundId}`);
+        const soundBtn = document.querySelector(`button[data-sound="${soundId}"]`);
+        const soundControl = document.querySelector(`.sound-control[data-sound="${soundId}"]`);
         const sound = this.sounds.get(soundId);
 
-        if (!sound) return;
+        if (!sound || !soundBtn) {
+            console.error(`Sound or button not found for: ${soundId}`);
+            return;
+        }
 
-        if (this.activeSounds.has(soundId)) {
-            // Stop sound
-            this.stopSound(soundId);
-            soundBtn.classList.remove('active');
-            this.activeSounds.delete(soundId);
+        // Check if this sound is currently active
+        const isCurrentlyActive = this.activeSounds.has(soundId);
+        
+        if (isCurrentlyActive) {
+            // Stop the current sound
+            this.deactivateSound(soundId);
         } else {
-            // Start sound
-            this.startSound(soundId);
-            soundBtn.classList.add('active');
-            this.activeSounds.add(soundId);
+            // Stop all sounds first, then start the new one
+            this.deactivateAllSounds();
+            this.activateSound(soundId);
         }
     }
 
     /**
-     * Start a specific sound
+     * Solution 2: Dedicated activation/deactivation functions
+     * Activate a single sound with visual feedback
+     */
+    activateSound(soundId) {
+        console.log(`Activating sound: ${soundId}`);
+        const soundBtn = document.querySelector(`button[data-sound="${soundId}"]`);
+        const soundControl = document.querySelector(`.sound-control[data-sound="${soundId}"]`);
+        
+        if (!soundBtn || !soundControl) return;
+        
+        // Start the sound
+        this.startSound(soundId);
+        
+        // Add visual feedback
+        soundBtn.classList.add('active');
+        soundControl.classList.add('playing');
+        
+        // Update state
+        this.activeSounds.add(soundId);
+        
+        console.log(`Sound ${soundId} activated. Active sounds:`, Array.from(this.activeSounds));
+    }
+
+    /**
+     * Deactivate a single sound
+     */
+    deactivateSound(soundId) {
+        console.log(`Deactivating sound: ${soundId}`);
+        const soundBtn = document.querySelector(`button[data-sound="${soundId}"]`);
+        const soundControl = document.querySelector(`.sound-control[data-sound="${soundId}"]`);
+        
+        if (!soundBtn || !soundControl) return;
+        
+        // Stop the sound
+        this.stopSound(soundId);
+        
+        // Remove visual feedback
+        soundBtn.classList.remove('active');
+        soundControl.classList.remove('playing');
+        
+        // Hide playing indicator
+        const indicator = soundControl.querySelector('.playing-indicator');
+        if (indicator) {
+            indicator.style.display = 'none';
+        }
+        
+        // Update state
+        this.activeSounds.delete(soundId);
+        
+        console.log(`Sound ${soundId} deactivated. Active sounds:`, Array.from(this.activeSounds));
+    }
+
+    /**
+     * Deactivate all currently playing sounds
+     */
+    deactivateAllSounds() {
+        console.log('Deactivating all sounds');
+        
+        // Create a copy of active sounds to avoid modification during iteration
+        const soundsToStop = Array.from(this.activeSounds);
+        
+        soundsToStop.forEach(soundId => {
+            this.deactivateSound(soundId);
+        });
+        
+        // Ensure all visual states are cleared
+        document.querySelectorAll('.sound-btn.active').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        document.querySelectorAll('.sound-control.playing').forEach(control => {
+            control.classList.remove('playing');
+        });
+        
+        // Hide all playing indicators
+        document.querySelectorAll('.playing-indicator').forEach(indicator => {
+            indicator.style.display = 'none';
+        });
+        
+        // Clear the set
+        this.activeSounds.clear();
+        
+        console.log('All sounds deactivated');
+    }
+
+    /**
+     * Legacy function for compatibility
+     */
+    stopAllSounds() {
+        this.deactivateAllSounds();
+    }
+
+    /**
+     * Add visual playing indicators to sound controls
+     */
+    addPlayingIndicators() {
+        document.querySelectorAll('.sound-control').forEach(control => {
+            const soundId = control.getAttribute('data-sound');
+            if (!control.querySelector('.playing-indicator')) {
+                const indicator = document.createElement('div');
+                indicator.className = 'playing-indicator';
+                indicator.innerHTML = '♪ En cours de lecture';
+                indicator.style.cssText = `
+                    display: none;
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    background: rgba(34, 197, 94, 0.9);
+                    color: white;
+                    padding: 4px 8px;
+                    border-radius: 12px;
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                    z-index: 10;
+                `;
+                control.style.position = 'relative';
+                control.appendChild(indicator);
+            }
+        });
+    }
+
+    /**
+     * Enhanced start sound function with better error handling
      */
     startSound(soundId) {
         const sound = this.sounds.get(soundId);
-        if (!sound) return;
+        if (!sound) {
+            console.error(`Sound not found: ${soundId}`);
+            return false;
+        }
 
         try {
             if (sound.start) {
                 sound.start();
             } else if (sound.noise && sound.lfo) {
-                // For complex sounds like waves
+                // For complex sounds like waves and wind
                 sound.noise.start();
                 sound.lfo.start();
             }
+            
+            // Show playing indicator
+            const control = document.querySelector(`.sound-control[data-sound="${soundId}"]`);
+            const indicator = control?.querySelector('.playing-indicator');
+            if (indicator) {
+                indicator.style.display = 'block';
+            }
+            
+            console.log(`Sound ${soundId} started successfully`);
+            return true;
         } catch (error) {
-            console.log(`Sound ${soundId} already started or error:`, error);
+            console.error(`Error starting sound ${soundId}:`, error);
+            return false;
         }
     }
 
     /**
-     * Stop a specific sound
+     * Enhanced stop sound function with indicator management
      */
     stopSound(soundId) {
         const sound = this.sounds.get(soundId);
-        if (!sound) return;
+        if (!sound) {
+            console.error(`Sound not found: ${soundId}`);
+            return false;
+        }
 
         try {
             if (sound.stop) {
                 sound.stop();
             } else if (sound.noise && sound.lfo) {
-                // For complex sounds like waves
+                // For complex sounds like waves and wind
                 sound.noise.stop();
                 sound.lfo.stop();
             }
+            
+            // Hide playing indicator
+            const control = document.querySelector(`.sound-control[data-sound="${soundId}"]`);
+            const indicator = control?.querySelector('.playing-indicator');
+            if (indicator) {
+                indicator.style.display = 'none';
+            }
+            
+            console.log(`Sound ${soundId} stopped successfully`);
+            return true;
         } catch (error) {
-            console.log(`Sound ${soundId} already stopped or error:`, error);
+            console.error(`Error stopping sound ${soundId}:`, error);
+            return false;
         }
     }
 
@@ -796,8 +992,8 @@ class BulleSensorielle {
                 <p><strong>Créé le:</strong> ${profile.created}</p>
             </div>
             <div class="profile-actions-buttons">
-                <button class="profile-btn load" data-id="${profile.id}">Charger</button>
-                <button class="profile-btn delete" data-id="${profile.id}">Supprimer</button>
+                <button type="button" class="profile-btn load" data-id="${profile.id}">Charger</button>
+                <button type="button" class="profile-btn delete" data-id="${profile.id}">Supprimer</button>
             </div>
         `;
 
@@ -860,7 +1056,7 @@ class BulleSensorielle {
         const profile = this.profiles.find(p => p.id === profileId);
         if (!profile) return;
 
-        if (confirm(`Supprimer la bulle "${profile.name}" ?")) {
+        if (confirm(`Supprimer la bulle "${profile.name}" ?`)) {
             this.profiles = this.profiles.filter(p => p.id !== profileId);
             localStorage.setItem('sensoryProfiles', JSON.stringify(this.profiles));
             this.loadProfiles();

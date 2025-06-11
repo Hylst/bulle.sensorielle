@@ -44,6 +44,9 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 - ✅ Conversion volume linéaire vers échelle décibel
 - ✅ Superposition de plusieurs sons simultanés
 - ✅ Boutons on/off visuels pour chaque son
+- ✅ Lecture exclusive : un seul son à la fois (nouveau)
+- ✅ Mise en évidence visuelle du son en cours de lecture
+- ✅ Son de vent apaisant ajouté (audio file)
 
 #### ✨ Générateur Visuel Apaisant
 - ✅ Système de rendu Canvas avec requestAnimationFrame

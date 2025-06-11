@@ -319,6 +319,19 @@ body {
   box-shadow: 0 10px 30px var(--shadow-medium);
 }
 
+/* Solution 3: Enhanced visual feedback for playing sounds */
+.sound-control.playing {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
+  border: 2px solid rgba(34, 197, 94, 0.3);
+  box-shadow: 0 0 25px rgba(34, 197, 94, 0.2), 0 8px 25px var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+.sound-control.playing:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 30px rgba(34, 197, 94, 0.3), 0 12px 35px var(--shadow-medium);
+}
+
 .sound-btn {
   width: 100%;
   background: none;
@@ -341,6 +354,8 @@ body {
 .sound-btn.active {
   background: var(--accent-green);
   color: white;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.4), 0 4px 15px var(--shadow-medium);
+  transform: scale(1.02);
 }
 
 .sound-icon {
