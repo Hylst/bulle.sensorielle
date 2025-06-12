@@ -2,6 +2,69 @@
 
 Tous les changements notables de ce projet seront documentés dans ce fichier.
 
+## [Version 2.7.0] - 2024-12-22
+
+### 🔧 Refonte majeure des profils "Mes Bulles"
+- **Sauvegarde sélective** : Ne sauvegarde que les derniers éléments cliqués de chaque section
+- **Gestion des valeurs NULL** : Les éléments non cliqués sont sauvegardés comme NULL
+- **Suivi intelligent** : Tracking automatique du dernier son, visuel et minuteur sélectionnés
+- **Chargement optimisé** : Navigation automatique vers la section Visuels lors du chargement
+- **Démarrage automatique** : Le minuteur se lance automatiquement si sauvegardé
+- **Compatibilité rétroactive** : Support des anciens profils avec migration automatique
+
+### ✨ Nouvelles fonctionnalités de sauvegarde
+- **Son unique** : Sauvegarde du dernier son cliqué avec son volume
+- **Visuel unique** : Sauvegarde du dernier visuel sélectionné
+- **Minuteur intelligent** : Sauvegarde et démarrage automatique de la durée
+- **Messages détaillés** : Résumé des éléments sauvegardés et chargés
+- **Interface adaptée** : Affichage optimisé des profils avec gestion des valeurs NULL
+
+### 🎯 Améliorations comportementales
+- **Navigation contextuelle** : Redirection vers Visuels si un visuel est chargé
+- **Feedback enrichi** : Messages informatifs sur les éléments chargés
+- **Gestion d'erreurs** : Robustesse accrue avec logs détaillés
+- **Performance** : Chargement plus rapide avec moins d'éléments à traiter
+
+## [Version 2.6.1] - 2024-12-22
+
+### 🔧 Corrections importantes
+- **Fonctionnalité "Mes Bulles" corrigée** : Le bouton "Charger" fonctionne maintenant correctement
+- **Navigation automatique** : Chargement d'un profil navigue automatiquement vers la section Sons
+- **Feedback visuel amélioré** : Indicateur de chargement sur le bouton "Charger"
+- **Gestion d'erreurs renforcée** : Messages d'erreur clairs si un profil est introuvable
+- **Logs de débogage** : Ajout de logs détaillés pour le chargement des profils
+- **Synchronisation UI** : Mise à jour automatique du bouton pause/play global lors du chargement
+
+### 🔧 Améliorations UX
+- **Messages informatifs** : Messages de la mascotte plus détaillés lors du chargement
+- **Délai optimisé** : Petit délai pour assurer le chargement correct de l'interface
+- **Sélecteurs améliorés** : Correction des sélecteurs CSS pour les sliders de volume
+- **États des boutons** : Désactivation temporaire du bouton pendant le chargement
+
+## [Version 2.6.0] - 2024-12-22
+
+### 🔧 Améliorations majeures du responsive
+- **Breakpoints étendus** : Ajout de points de rupture pour tablettes (1024px), paysage mobile (640px) et très petits écrans (360px)
+- **Navigation optimisée** : Adaptation intelligente de la taille des boutons et espacement selon l'écran
+- **Interface tactile améliorée** : Cibles de touch plus grandes (24px minimum) et états actifs optimisés
+- **Grilles adaptatives** : Colonnes flexibles pour tous les composants (sons, conseils, profils)
+- **Typographie responsive** : Taille de police fluide avec clamp() pour une lisibilité optimale
+- **Accessibilité renforcée** : Support du mode contraste élevé et réduction de mouvement
+
+### 🔧 Améliorations techniques
+- **Meta tags mobiles** : Configuration optimale pour les appareils mobiles et PWA
+- **Touch scrolling iOS** : Défilement fluide sur tous les appareils Apple
+- **États hover intelligents** : Désactivation automatique sur les appareils tactiles
+- **Styles d'impression** : Mise en page optimisée pour l'impression
+- **Prévention du scroll horizontal** : Élimination des débordements sur petits écrans
+
+### 📱 Responsive par appareil
+- **Desktop (>1024px)** : Mise en page complète avec toutes les fonctionnalités
+- **Tablette (768-1024px)** : Interface adaptée avec navigation compacte
+- **Mobile paysage (640-768px)** : Optimisation pour l'orientation horizontale
+- **Mobile portrait (<640px)** : Interface mobile-first avec navigation verticale
+- **Petits mobiles (<360px)** : Adaptation pour les très petits écrans
+
 ## [Version 2.5.1] - 2024-12-22
 
 ### 🔧 Enhanced Pause/Play Functionality

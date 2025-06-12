@@ -15,6 +15,11 @@ class BulleSensorielle {
         this.soundStates = new Map(); // Track individual sound states
         this.pausedSounds = new Set(); // Track which sounds were paused by user
         this.audioInitialized = false;
+        
+        // Track last clicked elements for profile saving
+        this.lastClickedSound = null;
+        this.lastClickedVisual = null;
+        this.lastClickedTimerDuration = null;
         this.timer = {
             duration: 0,
             remaining: 0,
@@ -89,6 +94,10 @@ class BulleSensorielle {
                 e.stopPropagation();
                 const soundId = btn.getAttribute('data-sound');
                 console.log(`Sound button clicked: ${soundId}`);
+                
+                // Track last clicked sound for profile saving
+                this.lastClickedSound = soundId;
+                
                 await this.toggleSound(soundId);
             });
         });
@@ -112,6 +121,10 @@ class BulleSensorielle {
                 e.preventDefault();
                 e.stopPropagation();
                 const visual = e.currentTarget.dataset.visual;
+                
+                // Track last clicked visual for profile saving
+                this.lastClickedVisual = visual;
+                
                 this.setVisual(visual);
             });
         });
@@ -122,12 +135,20 @@ class BulleSensorielle {
                 e.preventDefault();
                 e.stopPropagation();
                 const minutes = parseInt(e.currentTarget.dataset.time);
+                
+                // Track last clicked timer duration for profile saving
+                this.lastClickedTimerDuration = minutes;
+                
                 this.setTimerDuration(minutes);
             });
         });
 
         document.getElementById('customMinutes').addEventListener('change', (e) => {
             const minutes = parseInt(e.target.value);
+            
+            // Track last clicked timer duration for profile saving
+            this.lastClickedTimerDuration = minutes;
+            
             this.setTimerDuration(minutes);
         });
 
@@ -300,6 +321,24 @@ class BulleSensorielle {
         }).toDestination();
         feuPlayer.volume.value = -20;
         this.sounds.set('feu', feuPlayer);
+
+        // Underwater sound (audio file)
+        const underwaterPlayer = new Tone.Player({
+            url: './sons/underwater.mp3',
+            loop: true,
+            autostart: false
+        }).toDestination();
+        underwaterPlayer.volume.value = -20;
+        this.sounds.set('underwater', underwaterPlayer);
+
+        // Bubble sound for UI feedback (non-looping)
+        const bubblePlayer = new Tone.Player({
+            url: './sons/bubble.mp3',
+            loop: false,
+            autostart: false
+        }).toDestination();
+        bubblePlayer.volume.value = -10;
+        this.sounds.set('bubble', bubblePlayer);
     }
 
     /**
@@ -1476,6 +1515,31 @@ class BulleSensorielle {
     }
 
     /**
+     * Play bubble sound for UI feedback
+     */
+    async playBubbleSound() {
+        try {
+            // Ensure audio context is initialized
+            await this.initializeAudioContext();
+            
+            const bubbleSound = this.sounds.get('bubble');
+            if (bubbleSound) {
+                // Stop the sound if it's already playing
+                if (bubbleSound.state === 'started') {
+                    bubbleSound.stop();
+                }
+                // Start the bubble sound
+                bubbleSound.start();
+                console.log('Bubble sound played');
+            } else {
+                console.warn('Bubble sound not found');
+            }
+        } catch (error) {
+            console.error('Error playing bubble sound:', error);
+        }
+    }
+
+    /**
      * Set volume for a specific sound
      */
     setVolume(soundId, volume) {
@@ -1649,7 +1713,7 @@ class BulleSensorielle {
     }
 
     /**
-     * Save current profile
+     * Save current profile - only saves last clicked elements from each section
      */
     saveCurrentProfile() {
         const name = document.getElementById('profileName').value.trim();
@@ -1661,24 +1725,38 @@ class BulleSensorielle {
         const profile = {
             id: Date.now(),
             name: name,
-            sounds: Array.from(this.activeSounds),
-            volumes: {},
-            visual: this.currentVisual,
-            timerDuration: this.timer.duration / 60,
+            sound: this.lastClickedSound || null,
+            soundVolume: null,
+            visual: this.lastClickedVisual || null,
+            timerDuration: this.lastClickedTimerDuration || null,
             created: new Date().toLocaleDateString()
         };
 
-        // Save volumes
-        document.querySelectorAll('.volume-slider').forEach(slider => {
-            profile.volumes[slider.dataset.sound] = slider.value;
-        });
+        // Save volume only for the last clicked sound
+        if (this.lastClickedSound) {
+            const slider = document.querySelector(`.volume-slider[data-sound="${this.lastClickedSound}"]`);
+            if (slider) {
+                profile.soundVolume = parseInt(slider.value);
+            }
+        }
 
         this.profiles.push(profile);
         localStorage.setItem('sensoryProfiles', JSON.stringify(this.profiles));
         
+        // Play bubble sound for feedback
+        this.playBubbleSound();
+        
         this.hideSaveModal();
         this.loadProfiles();
-        this.showMascotMessage(`Bulle "${name}" sauvegardée !`, 3000);
+        
+        // Create summary message
+        let savedElements = [];
+        if (profile.sound) savedElements.push(`Son: ${profile.sound}`);
+        if (profile.visual) savedElements.push(`Visuel: ${profile.visual}`);
+        if (profile.timerDuration) savedElements.push(`Minuteur: ${profile.timerDuration}min`);
+        
+        const summary = savedElements.length > 0 ? savedElements.join(', ') : 'Aucun élément';
+        this.showMascotMessage(`🎵 Bulle "${name}" sauvegardée !\n✨ Éléments: ${summary}`, 4000);
     }
 
     /**
@@ -1710,12 +1788,18 @@ class BulleSensorielle {
     createProfileCard(profile) {
         const card = document.createElement('div');
         card.className = 'profile-card';
+        
+        // Handle both old and new profile formats for backward compatibility
+        const soundInfo = profile.sound ? `${profile.sound}` : (profile.sounds && profile.sounds.length > 0 ? profile.sounds.join(', ') : 'Aucun');
+        const visualInfo = profile.visual || 'Aucun';
+        const timerInfo = profile.timerDuration ? `${profile.timerDuration} min` : 'Aucun';
+        
         card.innerHTML = `
             <div class="profile-name">${profile.name}</div>
             <div class="profile-details">
-                <p><strong>Sons:</strong> ${profile.sounds.length > 0 ? profile.sounds.join(', ') : 'Aucun'}</p>
-                <p><strong>Visual:</strong> ${profile.visual}</p>
-                <p><strong>Minuteur:</strong> ${profile.timerDuration} min</p>
+                <p><strong>Son:</strong> ${soundInfo}</p>
+                <p><strong>Visuel:</strong> ${visualInfo}</p>
+                <p><strong>Minuteur:</strong> ${timerInfo}</p>
                 <p><strong>Créé le:</strong> ${profile.created}</p>
             </div>
             <div class="profile-actions-buttons">
@@ -1725,8 +1809,24 @@ class BulleSensorielle {
         `;
 
         // Add event listeners
-        card.querySelector('.load').addEventListener('click', () => {
+        card.querySelector('.load').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Visual feedback for loading
+            const loadBtn = e.target;
+            const originalText = loadBtn.textContent;
+            loadBtn.textContent = 'Chargement...';
+            loadBtn.disabled = true;
+            
+            // Load the profile
             this.loadProfile(profile.id);
+            
+            // Reset button after a delay
+            setTimeout(() => {
+                loadBtn.textContent = originalText;
+                loadBtn.disabled = false;
+            }, 1000);
         });
 
         card.querySelector('.delete').addEventListener('click', () => {
@@ -1737,43 +1837,92 @@ class BulleSensorielle {
     }
 
     /**
-     * Load a saved profile
+     * Load a saved profile - handles new selective loading behavior
      */
     loadProfile(profileId) {
         const profile = this.profiles.find(p => p.id === profileId);
-        if (!profile) return;
+        if (!profile) {
+            console.error(`Profile not found: ${profileId}`);
+            this.showMascotMessage('Erreur: Bulle introuvable', 2000);
+            return;
+        }
 
-        // Stop all current sounds
+        console.log(`Loading profile: ${profile.name}`, profile);
+
+        // Play bubble sound for feedback
+        this.playBubbleSound();
+
+        // Stop all current sounds first
         this.activeSounds.forEach(soundId => {
             this.stopSound(soundId);
-            document.querySelector(`[data-sound="${soundId}"]`).classList.remove('active');
+            const soundBtn = document.querySelector(`[data-sound="${soundId}"]`);
+            if (soundBtn) {
+                soundBtn.classList.remove('active');
+            }
         });
         this.activeSounds.clear();
 
-        // Load sounds
-        profile.sounds.forEach(soundId => {
-            this.activeSounds.add(soundId);
-            this.startSound(soundId);
-            document.querySelector(`[data-sound="${soundId}"]`).classList.add('active');
-        });
+        // Navigate to visuals section first if visual is saved
+        if (profile.visual) {
+            this.navigateToSection('visuels');
+        }
 
-        // Load volumes
-        Object.entries(profile.volumes).forEach(([soundId, volume]) => {
-            const slider = document.querySelector(`[data-sound="${soundId}"]`);
-            if (slider) {
-                slider.value = volume;
-                slider.nextElementSibling.textContent = `${volume}%`;
-                this.setVolume(soundId, volume);
+        // Small delay to ensure section is loaded before applying changes
+        setTimeout(() => {
+            let loadedElements = [];
+            
+            // Load sound if saved (backward compatibility with old format)
+            const soundToLoad = profile.sound || (profile.sounds && profile.sounds[0]);
+            if (soundToLoad) {
+                console.log(`Loading sound: ${soundToLoad}`);
+                this.activeSounds.add(soundToLoad);
+                this.startSound(soundToLoad);
+                const soundBtn = document.querySelector(`[data-sound="${soundToLoad}"]`);
+                if (soundBtn) {
+                    soundBtn.classList.add('active');
+                    loadedElements.push(`Son: ${soundToLoad}`);
+                } else {
+                    console.warn(`Sound button not found for: ${soundToLoad}`);
+                }
+                
+                // Load volume (backward compatibility)
+                const volume = profile.soundVolume || (profile.volumes && profile.volumes[soundToLoad]);
+                if (volume) {
+                    const slider = document.querySelector(`.volume-slider[data-sound="${soundToLoad}"]`);
+                    if (slider) {
+                        slider.value = volume;
+                        const valueDisplay = slider.nextElementSibling;
+                        if (valueDisplay) {
+                            valueDisplay.textContent = `${volume}%`;
+                        }
+                        this.setVolume(soundToLoad, volume);
+                        console.log(`Volume set for ${soundToLoad}: ${volume}%`);
+                    }
+                }
             }
-        });
 
-        // Load visual
-        this.setVisual(profile.visual);
+            // Load visual if saved
+            if (profile.visual) {
+                this.setVisual(profile.visual);
+                loadedElements.push(`Visuel: ${profile.visual}`);
+                console.log(`Visual set: ${profile.visual}`);
+            }
 
-        // Load timer duration
-        this.setTimerDuration(profile.timerDuration);
+            // Load and start timer if saved
+            if (profile.timerDuration) {
+                this.setTimerDuration(profile.timerDuration);
+                // Auto-start the timer
+                this.startTimer();
+                loadedElements.push(`Minuteur: ${profile.timerDuration}min (démarré)`);
+                console.log(`Timer duration set and started: ${profile.timerDuration} minutes`);
+            }
 
-        this.showMascotMessage(`Bulle "${profile.name}" chargée !`, 3000);
+            // Update global pause button state
+            this.updateGlobalPauseButtonState(false);
+
+            const summary = loadedElements.length > 0 ? loadedElements.join(', ') : 'Aucun élément';
+            this.showMascotMessage(`🎵 Bulle "${profile.name}" chargée !\n✨ ${summary}`, 4000);
+        }, 100);
     }
 
     /**

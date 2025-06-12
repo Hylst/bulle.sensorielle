@@ -2,7 +2,10 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>Bulle Sensorielle - Mon Sanctuaire Numérique</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -202,6 +205,16 @@
                                 </button>
                                 <div class="volume-control">
                                     <input type="range" class="volume-slider" min="0" max="100" value="50" data-sound="feu">
+                                    <span class="volume-value">50%</span>
+                                </div>
+                            </div>
+                            <div class="sound-control" data-sound="underwater">
+                                <button type="button" class="sound-btn" data-sound="underwater">
+                                    <span class="sound-icon">🫧</span>
+                                    <span class="sound-name">Sous l'eau</span>
+                                </button>
+                                <div class="volume-control">
+                                    <input type="range" class="volume-slider" min="0" max="100" value="50" data-sound="underwater">
                                     <span class="volume-value">50%</span>
                                 </div>
                             </div>
