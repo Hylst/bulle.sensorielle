@@ -4,6 +4,12 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 
 ## [1.0.0] - 2024-12-19
 
+- Ajout de sons de la nature basés sur des fichiers audio (campagne, forêt, océan, pluie, chat, feu) en remplacement des sons synthétisés.
+- Ajout de nouvelles mélodies (Berceuse, Ballade) basées sur des fichiers audio en complément des mélodies synthétisées existantes (Piano Doux, Lo-Fi Calme).
+- Restauration des mélodies Piano Doux et Lo-Fi Calme originales.
+- Génération automatique de fichiers audio fonctionnels pour Berceuse et Ballade.
+- Compatibilité Chrome : Initialisation audio sur interaction utilisateur.
+
 ### ✅ Terminé (Done)
 
 #### 🏗️ Architecture de Base

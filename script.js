@@ -300,6 +300,18 @@ class BulleSensorielle {
         lofi.volume.value = -18;
         this.sounds.set('lofi', lofi);
 
+        // Berceuse melody
+        const berceuse = new Tone.Player("sons/berceuse.mp3").toDestination();
+        berceuse.loop = true;
+        berceuse.volume.value = -10;
+        this.sounds.set('berceuse', berceuse);
+
+        // Ballade melody
+        const ballade = new Tone.Player("sons/ballade.mp3").toDestination();
+        ballade.loop = true;
+        ballade.volume.value = -10;
+        this.sounds.set('ballade', ballade);
+
         // Start gentle melodies
         this.startMelodyPatterns();
     }

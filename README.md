@@ -16,7 +16,7 @@
 ### 🎵 Mixeur Sonore
 - **Bruits Ambiants** : Bruit blanc, rose, brun
 - **Sons de la Nature** : Pluie douce, vagues calmes, feu de camp, forêt d'été, ronronnement de chat
-- **Mélodies Douces** : Piano doux, musique lo-fi
+- **Mélodies Douces** : Piano doux, musique lo-fi, Berceuse, Ballade
 - Contrôles de volume individuels pour chaque son
 - Possibilité de superposer plusieurs sons
 
