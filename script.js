@@ -401,32 +401,86 @@ class BulleSensorielle {
     }
 
     /**
-     * Render breathing guidance circle
+     * Enhanced breathing guidance circle with better synchronization
      */
     renderBreathingCircle() {
         const { width, height } = this.canvas;
         const centerX = width / 2;
         const centerY = height / 2;
         const time = Date.now() * 0.001;
-        const breathCycle = Math.sin(time * 0.5) * 0.5 + 0.5;
-        const radius = 50 + breathCycle * 100;
-
-        // Create gradient
-        const gradient = this.ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
-        gradient.addColorStop(0, 'rgba(191, 219, 254, 0.8)');
-        gradient.addColorStop(1, 'rgba(233, 213, 255, 0.3)');
-
-        this.ctx.fillStyle = gradient;
+        
+        // Improved breathing cycle: 4 seconds inhale, 4 seconds exhale
+        const breathingPeriod = 8; // Total cycle duration in seconds
+        const cyclePosition = (time % breathingPeriod) / breathingPeriod;
+        
+        let breathCycle, phase, instruction;
+        if (cyclePosition < 0.5) {
+            // Inhale phase (0 to 0.5)
+            breathCycle = cyclePosition * 2; // 0 to 1
+            phase = 'inhale';
+            instruction = 'Inspire lentement...';
+        } else {
+            // Exhale phase (0.5 to 1)
+            breathCycle = 1 - ((cyclePosition - 0.5) * 2); // 1 to 0
+            phase = 'exhale';
+            instruction = 'Expire doucement...';
+        }
+        
+        // Smooth easing for more natural breathing
+        const easedCycle = 0.5 - 0.5 * Math.cos(breathCycle * Math.PI);
+        const radius = 60 + easedCycle * 120;
+        
+        // Multi-layer gradient for depth
+        const outerGradient = this.ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius + 40);
+        outerGradient.addColorStop(0, 'rgba(191, 219, 254, 0.1)');
+        outerGradient.addColorStop(0.7, 'rgba(233, 213, 255, 0.05)');
+        outerGradient.addColorStop(1, 'rgba(187, 247, 208, 0.02)');
+        
+        // Outer breathing aura
+        this.ctx.fillStyle = outerGradient;
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, radius + 40, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Main breathing circle
+        const mainGradient = this.ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+        if (phase === 'inhale') {
+            mainGradient.addColorStop(0, 'rgba(187, 247, 208, 0.9)');
+            mainGradient.addColorStop(0.6, 'rgba(191, 219, 254, 0.6)');
+            mainGradient.addColorStop(1, 'rgba(233, 213, 255, 0.2)');
+        } else {
+            mainGradient.addColorStop(0, 'rgba(233, 213, 255, 0.9)');
+            mainGradient.addColorStop(0.6, 'rgba(191, 219, 254, 0.6)');
+            mainGradient.addColorStop(1, 'rgba(187, 247, 208, 0.2)');
+        }
+        
+        this.ctx.fillStyle = mainGradient;
         this.ctx.beginPath();
         this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
         this.ctx.fill();
-
-        // Add breathing text
-        this.ctx.fillStyle = '#334155';
-        this.ctx.font = '24px Nunito';
+        
+        // Inner core with pulsing effect
+        const coreRadius = 20 + easedCycle * 15;
+        const coreGradient = this.ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, coreRadius);
+        coreGradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+        coreGradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+        
+        this.ctx.fillStyle = coreGradient;
+        this.ctx.beginPath();
+        this.ctx.arc(centerX, centerY, coreRadius, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Enhanced breathing text with timing
+        this.ctx.fillStyle = phase === 'inhale' ? '#065f46' : '#7c2d12';
+        this.ctx.font = 'bold 28px Nunito';
         this.ctx.textAlign = 'center';
-        const phase = breathCycle > 0.5 ? 'Inspire...' : 'Expire...';
-        this.ctx.fillText(phase, centerX, centerY + 8);
+        this.ctx.fillText(instruction, centerX, centerY - 10);
+        
+        // Breathing timer indicator
+        const timeLeft = phase === 'inhale' ? (4 - (cyclePosition * 8)) : ((cyclePosition - 0.5) * 8);
+        this.ctx.font = '18px Nunito';
+        this.ctx.fillStyle = '#64748b';
+        this.ctx.fillText(`${Math.ceil(timeLeft)}s`, centerX, centerY + 25);
     }
 
     /**
@@ -461,60 +515,294 @@ class BulleSensorielle {
     }
 
     /**
-     * Render star rain
+     * Enhanced star rain with beautiful gentle falling stars
      */
     renderStarRain() {
         const { width, height } = this.canvas;
         const time = Date.now() * 0.001;
 
-        // Create dark background for night mode
-        this.ctx.fillStyle = 'rgba(30, 41, 59, 0.1)';
+        // Create beautiful gradient night sky background
+        const skyGradient = this.ctx.createLinearGradient(0, 0, 0, height);
+        skyGradient.addColorStop(0, 'rgba(15, 23, 42, 0.95)');
+        skyGradient.addColorStop(0.5, 'rgba(30, 41, 59, 0.8)');
+        skyGradient.addColorStop(1, 'rgba(51, 65, 85, 0.6)');
+        this.ctx.fillStyle = skyGradient;
         this.ctx.fillRect(0, 0, width, height);
 
-        for (let i = 0; i < 50; i++) {
-            const x = (i * 137.5) % width;
-            const y = ((time * 20 + i * 50) % (height + 100)) - 50;
-            const size = 2 + Math.sin(time + i) * 1;
-            const opacity = 0.3 + Math.sin(time * 2 + i) * 0.3;
-
-            this.ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
-            this.ctx.beginPath();
-            this.ctx.arc(x, y, size, 0, Math.PI * 2);
-            this.ctx.fill();
+        // Initialize stars array if not exists
+        if (!this.stars) {
+            this.stars = [];
+            for (let i = 0; i < 80; i++) {
+                this.stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height - height,
+                    size: 1 + Math.random() * 3,
+                    speed: 0.5 + Math.random() * 1.5,
+                    twinkle: Math.random() * Math.PI * 2,
+                    color: Math.random() > 0.7 ? 'golden' : 'white'
+                });
+            }
         }
+
+        // Update and render stars
+        this.stars.forEach((star, index) => {
+            // Update position
+            star.y += star.speed;
+            star.x += Math.sin(time * 0.5 + index * 0.1) * 0.2; // Gentle horizontal drift
+            
+            // Reset star when it goes off screen
+            if (star.y > height + 50) {
+                star.y = -50;
+                star.x = Math.random() * width;
+            }
+            
+            // Twinkling effect
+            star.twinkle += 0.02;
+            const twinkleIntensity = 0.3 + 0.7 * (Math.sin(star.twinkle) * 0.5 + 0.5);
+            
+            // Star colors
+            let starColor;
+            if (star.color === 'golden') {
+                starColor = `rgba(255, 215, 0, ${twinkleIntensity})`;
+            } else {
+                starColor = `rgba(255, 255, 255, ${twinkleIntensity})`;
+            }
+            
+            // Draw star with glow effect
+            const glowSize = star.size * 3;
+            const glowGradient = this.ctx.createRadialGradient(star.x, star.y, 0, star.x, star.y, glowSize);
+            glowGradient.addColorStop(0, starColor);
+            glowGradient.addColorStop(0.3, star.color === 'golden' ? 'rgba(255, 215, 0, 0.3)' : 'rgba(255, 255, 255, 0.3)');
+            glowGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            
+            // Draw glow
+            this.ctx.fillStyle = glowGradient;
+            this.ctx.beginPath();
+            this.ctx.arc(star.x, star.y, glowSize, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            // Draw star core
+            this.ctx.fillStyle = starColor;
+            this.ctx.beginPath();
+            this.ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+            this.ctx.fill();
+            
+            // Draw star sparkle (cross shape)
+            if (twinkleIntensity > 0.7) {
+                this.ctx.strokeStyle = starColor;
+                this.ctx.lineWidth = 1;
+                this.ctx.beginPath();
+                // Vertical line
+                this.ctx.moveTo(star.x, star.y - star.size * 2);
+                this.ctx.lineTo(star.x, star.y + star.size * 2);
+                // Horizontal line
+                this.ctx.moveTo(star.x - star.size * 2, star.y);
+                this.ctx.lineTo(star.x + star.size * 2, star.y);
+                this.ctx.stroke();
+            }
+        });
+        
+        // Add shooting stars occasionally
+        if (Math.random() < 0.003) {
+            this.createShootingStar(width, height, time);
+        }
+        
+        // Render shooting stars
+        if (this.shootingStars) {
+            this.shootingStars = this.shootingStars.filter(shootingStar => {
+                shootingStar.x += shootingStar.vx;
+                shootingStar.y += shootingStar.vy;
+                shootingStar.life -= 0.02;
+                
+                if (shootingStar.life > 0) {
+                    // Draw shooting star trail
+                    const trailGradient = this.ctx.createLinearGradient(
+                        shootingStar.x, shootingStar.y,
+                        shootingStar.x - shootingStar.vx * 10, shootingStar.y - shootingStar.vy * 10
+                    );
+                    trailGradient.addColorStop(0, `rgba(255, 255, 255, ${shootingStar.life})`);
+                    trailGradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                    
+                    this.ctx.strokeStyle = trailGradient;
+                    this.ctx.lineWidth = 2;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(shootingStar.x, shootingStar.y);
+                    this.ctx.lineTo(shootingStar.x - shootingStar.vx * 10, shootingStar.y - shootingStar.vy * 10);
+                    this.ctx.stroke();
+                    
+                    return true;
+                }
+                return false;
+            });
+        }
+    }
+    
+    /**
+     * Create a shooting star effect
+     */
+    createShootingStar(width, height, time) {
+        if (!this.shootingStars) {
+            this.shootingStars = [];
+        }
+        
+        this.shootingStars.push({
+            x: Math.random() * width,
+            y: Math.random() * height * 0.3,
+            vx: 2 + Math.random() * 3,
+            vy: 1 + Math.random() * 2,
+            life: 1.0
+        });
     }
 
     /**
-     * Render rotating mandala
+     * Enhanced rotating mandala with hypnotizing patterns
      */
     renderRotatingMandala() {
         const { width, height } = this.canvas;
         const centerX = width / 2;
         const centerY = height / 2;
-        const time = Date.now() * 0.0005;
+        const time = Date.now() * 0.001;
+        const baseRadius = Math.min(width, height) * 0.35;
 
+        // Create deep cosmic background with gradient
+        const bgGradient = this.ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.max(width, height));
+        bgGradient.addColorStop(0, 'rgba(10, 5, 30, 0.95)');
+        bgGradient.addColorStop(0.5, 'rgba(20, 10, 50, 0.8)');
+        bgGradient.addColorStop(1, 'rgba(5, 0, 20, 0.9)');
+        this.ctx.fillStyle = bgGradient;
+        this.ctx.fillRect(0, 0, width, height);
+
+        // Save context for transformations
         this.ctx.save();
         this.ctx.translate(centerX, centerY);
-        this.ctx.rotate(time);
 
-        const petals = 8;
-        const radius = 100;
+        // Multiple rotating layers for depth
+        const layers = [
+            { petals: 8, speed: 0.3, size: 1.0, hueOffset: 0 },
+            { petals: 12, speed: -0.2, size: 0.8, hueOffset: 60 },
+            { petals: 16, speed: 0.15, size: 0.6, hueOffset: 120 },
+            { petals: 24, speed: -0.1, size: 0.4, hueOffset: 180 }
+        ];
 
-        for (let i = 0; i < petals; i++) {
-            const angle = (i / petals) * Math.PI * 2;
-            const x = Math.cos(angle) * radius;
-            const y = Math.sin(angle) * radius;
+        layers.forEach((layer, layerIndex) => {
+            this.ctx.save();
+            this.ctx.rotate(time * layer.speed);
 
-            const gradient = this.ctx.createRadialGradient(x, y, 0, x, y, 30);
-            gradient.addColorStop(0, 'rgba(233, 213, 255, 0.8)');
-            gradient.addColorStop(1, 'rgba(233, 213, 255, 0.2)');
+            // Draw geometric petals
+            for (let i = 0; i < layer.petals; i++) {
+                const angle = (i / layer.petals) * Math.PI * 2;
+                const petalRadius = baseRadius * layer.size;
+                const pulseEffect = 0.8 + 0.2 * Math.sin(time * 3 + i * 0.5 + layerIndex);
+                const currentRadius = petalRadius * pulseEffect;
+                
+                this.ctx.save();
+                this.ctx.rotate(angle);
+                
+                // Create complex petal shape
+                const hue = (time * 20 + layer.hueOffset + i * (360 / layer.petals)) % 360;
+                const saturation = 70 + 20 * Math.sin(time * 2 + i);
+                const lightness = 50 + 20 * Math.sin(time * 1.5 + i * 0.3);
+                
+                // Outer glow
+                const glowGradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, currentRadius);
+                glowGradient.addColorStop(0, `hsla(${hue}, ${saturation}%, ${lightness}%, 0.6)`);
+                glowGradient.addColorStop(0.7, `hsla(${hue}, ${saturation}%, ${lightness}%, 0.3)`);
+                glowGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                
+                this.ctx.fillStyle = glowGradient;
+                this.ctx.beginPath();
+                this.ctx.ellipse(currentRadius * 0.3, 0, currentRadius * 0.4, currentRadius * 0.15, 0, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                // Inner bright core
+                const coreGradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, currentRadius * 0.2);
+                coreGradient.addColorStop(0, `hsla(${hue}, 90%, 80%, 0.9)`);
+                coreGradient.addColorStop(1, `hsla(${hue}, 70%, 60%, 0.4)`);
+                
+                this.ctx.fillStyle = coreGradient;
+                this.ctx.beginPath();
+                this.ctx.ellipse(currentRadius * 0.3, 0, currentRadius * 0.2, currentRadius * 0.08, 0, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                // Geometric details
+                if (layerIndex < 2) {
+                    this.ctx.strokeStyle = `hsla(${hue}, 80%, 70%, 0.6)`;
+                    this.ctx.lineWidth = 1;
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, 0);
+                    this.ctx.lineTo(currentRadius * 0.6, 0);
+                    this.ctx.stroke();
+                    
+                    // Small decorative circles
+                    for (let j = 1; j <= 3; j++) {
+                        const circleRadius = currentRadius * 0.15 * j;
+                        const circleSize = 2 + Math.sin(time * 4 + i + j) * 1;
+                        this.ctx.fillStyle = `hsla(${hue + j * 30}, 80%, 70%, 0.7)`;
+                        this.ctx.beginPath();
+                        this.ctx.arc(circleRadius, 0, circleSize, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    }
+                }
+                
+                this.ctx.restore();
+            }
+            
+            this.ctx.restore();
+        });
 
-            this.ctx.fillStyle = gradient;
+        // Central sacred geometry
+        this.ctx.save();
+        this.ctx.rotate(time * 0.1);
+        
+        // Draw central flower of life pattern
+        const centerRadius = baseRadius * 0.15;
+        const centerHue = (time * 40) % 360;
+        
+        // Central circle
+        const centralGradient = this.ctx.createRadialGradient(0, 0, 0, 0, 0, centerRadius);
+        centralGradient.addColorStop(0, `hsla(${centerHue}, 90%, 80%, 0.9)`);
+        centralGradient.addColorStop(0.5, `hsla(${centerHue}, 70%, 60%, 0.6)`);
+        centralGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        
+        this.ctx.fillStyle = centralGradient;
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, centerRadius, 0, Math.PI * 2);
+        this.ctx.fill();
+        
+        // Surrounding circles in flower of life pattern
+        for (let i = 0; i < 6; i++) {
+            const angle = (i / 6) * Math.PI * 2;
+            const x = Math.cos(angle) * centerRadius * 0.8;
+            const y = Math.sin(angle) * centerRadius * 0.8;
+            const pulse = 0.7 + 0.3 * Math.sin(time * 4 + i);
+            
+            this.ctx.fillStyle = `hsla(${centerHue + i * 60}, 80%, 70%, ${0.6 * pulse})`;
             this.ctx.beginPath();
-            this.ctx.arc(x, y, 30, 0, Math.PI * 2);
+            this.ctx.arc(x, y, centerRadius * 0.4 * pulse, 0, Math.PI * 2);
             this.ctx.fill();
         }
-
+        
+        this.ctx.restore();
+        
+        // Outer ring with sacred symbols
+        this.ctx.save();
+        this.ctx.rotate(-time * 0.05);
+        
+        const outerRingRadius = baseRadius * 1.2;
+        for (let i = 0; i < 36; i++) {
+            const angle = (i / 36) * Math.PI * 2;
+            const x = Math.cos(angle) * outerRingRadius;
+            const y = Math.sin(angle) * outerRingRadius;
+            const size = 1 + Math.sin(time * 3 + i * 0.2) * 0.5;
+            const hue = (time * 15 + i * 10) % 360;
+            
+            this.ctx.fillStyle = `hsla(${hue}, 70%, 60%, 0.4)`;
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, size, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+        
+        this.ctx.restore();
         this.ctx.restore();
     }
 
@@ -769,6 +1057,9 @@ class BulleSensorielle {
                 indicator.style.display = 'block';
             }
             
+            // Start icon animation
+            this.startIconAnimation(soundId);
+            
             console.log(`Sound ${soundId} started successfully`);
             return true;
         } catch (error) {
@@ -803,11 +1094,40 @@ class BulleSensorielle {
                 indicator.style.display = 'none';
             }
             
+            // Stop icon animation
+            this.stopIconAnimation(soundId);
+            
             console.log(`Sound ${soundId} stopped successfully`);
             return true;
         } catch (error) {
             console.error(`Error stopping sound ${soundId}:`, error);
             return false;
+        }
+    }
+
+    /**
+     * Start icon animation for a specific sound
+     * Adds visual feedback when sound is playing
+     */
+    startIconAnimation(soundId) {
+        const soundControl = document.querySelector(`.sound-control[data-sound="${soundId}"]`);
+        if (soundControl) {
+            // Add playing class to trigger CSS animations
+            soundControl.classList.add('playing');
+            console.log(`Animation started for sound: ${soundId}`);
+        }
+    }
+
+    /**
+     * Stop icon animation for a specific sound
+     * Removes visual feedback when sound stops
+     */
+    stopIconAnimation(soundId) {
+        const soundControl = document.querySelector(`.sound-control[data-sound="${soundId}"]`);
+        if (soundControl) {
+            // Remove playing class to stop CSS animations
+            soundControl.classList.remove('playing');
+            console.log(`Animation stopped for sound: ${soundId}`);
         }
     }
 

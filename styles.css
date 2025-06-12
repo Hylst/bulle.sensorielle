@@ -360,6 +360,136 @@ body {
 
 .sound-icon {
   font-size: 2rem;
+  transition: all 0.3s ease;
+}
+
+/* Sound Icon Animations - Soothing and Fun for Children */
+
+/* Ambient Sounds Animations */
+.sound-control.playing[data-sound="white-noise"] .sound-icon,
+.sound-control.playing[data-sound="ocean"] .sound-icon {
+  animation: wave 2s ease-in-out infinite;
+}
+
+.sound-control.playing[data-sound="pink-noise"] .sound-icon {
+  animation: bloom 3s ease-in-out infinite;
+}
+
+.sound-control.playing[data-sound="brown-noise"] .sound-icon {
+  animation: sway 2.5s ease-in-out infinite;
+}
+
+/* Nature Sounds Animations */
+.sound-control.playing[data-sound="campagne"] .sound-icon {
+  animation: gentle-sway 3s ease-in-out infinite;
+}
+
+.sound-control.playing[data-sound="forest"] .sound-icon {
+  animation: tree-dance 4s ease-in-out infinite;
+}
+
+.sound-control.playing[data-sound="rain"] .sound-icon {
+  animation: rain-drop 1.5s ease-in-out infinite;
+}
+
+.sound-control.playing[data-sound="chat"] .sound-icon {
+  animation: purr 2s ease-in-out infinite;
+}
+
+.sound-control.playing[data-sound="feu"] .sound-icon {
+  animation: flicker 1.8s ease-in-out infinite;
+}
+
+/* Melodies Animations */
+.sound-control.playing[data-sound="piano"] .sound-icon {
+  animation: piano-keys 2.5s ease-in-out infinite;
+}
+
+.sound-control.playing[data-sound="lofi"] .sound-icon {
+  animation: headphone-bob 2s ease-in-out infinite;
+}
+
+.sound-control.playing[data-sound="berceuse"] .sound-icon {
+  animation: sleepy-float 3s ease-in-out infinite;
+}
+
+.sound-control.playing[data-sound="ballade"] .sound-icon {
+  animation: walking-rhythm 2.5s ease-in-out infinite;
+}
+
+/* Animation Keyframes */
+@keyframes wave {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-3px) rotate(-2deg); }
+  50% { transform: translateY(-5px) rotate(0deg); }
+  75% { transform: translateY(-3px) rotate(2deg); }
+}
+
+@keyframes bloom {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.1) rotate(5deg); }
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(0deg) translateX(0); }
+  25% { transform: rotate(-3deg) translateX(-2px); }
+  75% { transform: rotate(3deg) translateX(2px); }
+}
+
+@keyframes gentle-sway {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  33% { transform: translateX(-2px) rotate(-1deg); }
+  66% { transform: translateX(2px) rotate(1deg); }
+}
+
+@keyframes tree-dance {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-2deg) scale(1.02); }
+  50% { transform: rotate(0deg) scale(1.05); }
+  75% { transform: rotate(2deg) scale(1.02); }
+}
+
+@keyframes rain-drop {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.1); }
+}
+
+@keyframes purr {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.05) rotate(-1deg); }
+  75% { transform: scale(1.05) rotate(1deg); }
+}
+
+@keyframes flicker {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  25% { transform: scale(1.08) rotate(-2deg); opacity: 0.9; }
+  50% { transform: scale(1.1) rotate(0deg); opacity: 0.95; }
+  75% { transform: scale(1.08) rotate(2deg); opacity: 0.9; }
+}
+
+@keyframes piano-keys {
+  0%, 100% { transform: translateY(0) scale(1); }
+  25% { transform: translateY(-2px) scale(1.03); }
+  50% { transform: translateY(-4px) scale(1.05); }
+  75% { transform: translateY(-2px) scale(1.03); }
+}
+
+@keyframes headphone-bob {
+  0%, 100% { transform: rotate(0deg) translateY(0); }
+  25% { transform: rotate(-3deg) translateY(-1px); }
+  75% { transform: rotate(3deg) translateY(-1px); }
+}
+
+@keyframes sleepy-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  50% { transform: translateY(-6px) rotate(-2deg); opacity: 0.8; }
+}
+
+@keyframes walking-rhythm {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(-3px) rotate(-2deg); }
+  50% { transform: translateX(0) rotate(0deg); }
+  75% { transform: translateX(3px) rotate(2deg); }
 }
 
 .sound-name {

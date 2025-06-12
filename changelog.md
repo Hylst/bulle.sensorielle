@@ -2,6 +2,48 @@
 
 Tous les changements notables de ce projet seront documentés dans ce fichier.
 
+## [Version 2.3.0] - 2024-12-19
+
+### Ajouté
+- **Améliorations majeures des visuels apaisants** :
+  - Respiration Guidée avec synchronisation parfaite (cycle 8s) et transitions fluides
+  - Pluie d'Étoiles redessinée avec ciel nocturne, 80 étoiles scintillantes et étoiles filantes
+  - Mandala Rotatif hypnotisant avec 4 couches rotatives et géométrie sacrée
+  - Gradients dynamiques et effets de lueur pour tous les visuels
+- **Optimisations techniques** pour les animations complexes et performances améliorées
+
+## [Version 2.2.0] - 2024-12-19
+
+### Ajouté
+- **Animations d'icônes** : Chaque son dispose maintenant d'une animation unique et apaisante lors de sa lecture
+  - Animations spécialement conçues pour être amusantes et relaxantes pour les enfants
+  - Animations personnalisées pour chaque catégorie de sons :
+    - Bruits ambiants : vagues, floraison, balancement
+    - Sons de la nature : danse d'arbre, gouttes de pluie, scintillement de feu, ronronnement
+    - Mélodies : touches de piano, mouvement de casque, flottement endormi, rythme de marche
+- Système d'animation automatique déclenchée lors du démarrage/arrêt des sons
+
+### Technique
+- Ajout de 12 animations CSS personnalisées avec keyframes
+- Intégration des fonctions `startIconAnimation()` et `stopIconAnimation()` dans le système audio
+- Animations fluides avec transitions CSS pour une expérience utilisateur optimale
+
+## [Version 2.1.0] - 2024-12-19
+
+### Ajouté
+- Ajout des mélodies "Berceuse" et "Ballade" en complément des mélodies existantes
+- Génération de fichiers audio fonctionnels pour "Berceuse" et "Ballade" avec FFmpeg
+- Restauration des mélodies "Piano Doux" et "Lo-Fi Calme" précédemment supprimées
+- Mise à jour de la documentation pour refléter les quatre mélodies disponibles
+
+### Modifié
+- Section "Mélodies Douces" maintenant avec quatre options : Piano Doux, Lo-Fi Calme, Berceuse, Ballade
+- Correction de l'organisation des contrôles dans l'interface utilisateur
+
+### Corrigé
+- Problème de lecture des nouveaux sons "Berceuse" et "Ballade"
+- Placement incorrect des contrôles dans la section "Bruits Ambiants"
+
 ## [1.0.0] - 2024-12-19
 
 - Ajout de sons de la nature basés sur des fichiers audio (campagne, forêt, océan, pluie, chat, feu) en remplacement des sons synthétisés.
