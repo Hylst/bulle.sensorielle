@@ -9,6 +9,11 @@ class BulleSensorielle {
         this.sounds = new Map();
         this.activeSounds = new Set();
         this.currentVisual = 'breathing';
+        this.visualsPaused = false;
+        this.globalPaused = false;
+        this.lastClickedIcon = null;
+        this.soundStates = new Map(); // Track individual sound states
+        this.pausedSounds = new Set(); // Track which sounds were paused by user
         this.audioInitialized = false;
         this.timer = {
             duration: 0,
@@ -143,6 +148,23 @@ class BulleSensorielle {
             e.stopPropagation();
             this.stopTimer();
         });
+
+        // Global pause/play button
+        document.getElementById('globalPauseBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.toggleGlobalPlayPause();
+        });
+
+        // App symbol button
+        document.getElementById('appSymbolBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.resetAppIcon();
+        });
+
+        // Initialize app icon based on theme
+        this.updateAppIcon();
 
         // Profile management
         document.getElementById('saveProfile').addEventListener('click', (e) => {
@@ -371,7 +393,10 @@ class BulleSensorielle {
      */
     startVisualAnimation() {
         const animate = () => {
-            this.renderCurrentVisual();
+            // Only render if visuals are not paused
+            if (!this.visualsPaused) {
+                this.renderCurrentVisual();
+            }
             requestAnimationFrame(animate);
         };
         animate();
@@ -381,6 +406,11 @@ class BulleSensorielle {
      * Render the current visual
      */
     renderCurrentVisual() {
+        // Don't render if visuals are paused
+        if (this.visualsPaused) {
+            return;
+        }
+        
         const { width, height } = this.canvas;
         this.ctx.clearRect(0, 0, width, height);
 
@@ -870,6 +900,9 @@ class BulleSensorielle {
         const themeIcon = document.querySelector('.theme-icon');
         themeIcon.textContent = this.theme === 'dark' ? '☀️' : '🌙';
         
+        // Update app icon if no custom icon is set
+        this.updateAppIcon();
+        
         this.showMascotMessage(`Mode ${this.theme === 'dark' ? 'nuit' : 'jour'} activé !`, 2000);
     }
 
@@ -930,6 +963,15 @@ class BulleSensorielle {
         // Update state
         this.activeSounds.add(soundId);
         
+        // Update global pause/play button to show pause mode when sound starts
+        this.updateGlobalPauseButtonState(false); // false = not paused, show pause icon
+        
+        // Track last clicked icon for app symbol
+        const iconElement = soundBtn.querySelector('.sound-icon');
+        if (iconElement) {
+            this.setLastClickedIcon(iconElement.textContent);
+        }
+        
         console.log(`Sound ${soundId} activated. Active sounds:`, Array.from(this.activeSounds));
     }
 
@@ -959,6 +1001,12 @@ class BulleSensorielle {
         // Update state
         this.activeSounds.delete(soundId);
         
+        // Update global pause/play button based on remaining active sounds
+        if (this.activeSounds.size === 0) {
+            // No more active sounds, show play mode
+            this.updateGlobalPauseButtonState(true); // true = paused/stopped, show play icon
+        }
+        
         console.log(`Sound ${soundId} deactivated. Active sounds:`, Array.from(this.activeSounds));
     }
 
@@ -974,6 +1022,9 @@ class BulleSensorielle {
         soundsToStop.forEach(soundId => {
             this.deactivateSound(soundId);
         });
+        
+        // Ensure global pause button shows play mode when all sounds are stopped
+        this.updateGlobalPauseButtonState(true);
         
         // Ensure all visual states are cleared
         document.querySelectorAll('.sound-btn.active').forEach(btn => {
@@ -1000,6 +1051,278 @@ class BulleSensorielle {
      */
     stopAllSounds() {
         this.deactivateAllSounds();
+    }
+
+    /**
+     * Stop all visual animations
+     */
+    stopAllVisuals() {
+        // Stop visual animation by setting a flag
+        this.visualsPaused = true;
+        
+        // Clear canvas
+        const { width, height } = this.canvas;
+        this.ctx.clearRect(0, 0, width, height);
+        
+        // Reset visual controls
+        document.querySelectorAll('.visual-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+    }
+
+    /**
+     * Enhanced toggle global pause/play with improved state management
+     */
+    toggleGlobalPlayPause() {
+        this.globalPaused = !this.globalPaused;
+        
+        const pauseBtn = document.getElementById('globalPauseBtn');
+        const pauseIcon = pauseBtn.querySelector('.pause-icon');
+        
+        if (this.globalPaused) {
+            // Pause all sounds with enhanced methods
+            this.pauseAllSounds();
+            // Pause visuals
+            this.visualsPaused = true;
+            
+            pauseIcon.textContent = '▶️';
+            pauseBtn.setAttribute('title', 'Reprendre la lecture');
+            this.showMascotMessage('⏸️ Pause globale - Sons et visuels en pause', 2000);
+            console.log('Global pause activated with enhanced methods');
+        } else {
+            // Resume all sounds with enhanced methods
+            this.resumeAllSounds();
+            // Resume visuals
+            this.visualsPaused = false;
+            
+            pauseIcon.textContent = '⏸️';
+            pauseBtn.setAttribute('title', 'Mettre en pause');
+            this.showMascotMessage('▶️ Lecture reprise - Sons relancés', 2000);
+            console.log('Global play resumed with enhanced methods');
+        }
+        
+        // Add visual feedback animation
+        if (pauseBtn) {
+            pauseBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                pauseBtn.style.transform = 'scale(1)';
+            }, 150);
+        }
+        
+        // Update last clicked icon for app symbol
+        this.setLastClickedIcon(this.globalPaused ? '▶️' : '⏸️');
+    }
+
+    /**
+     * SOLUTION 1: Enhanced pause/resume with proper state tracking
+     * Pause all currently playing sounds with unified handling
+     */
+    pauseAllSounds() {
+        this.activeSounds.forEach(soundId => {
+            this.pauseSound(soundId);
+        });
+    }
+
+    /**
+     * Resume all paused sounds with unified handling
+     */
+    resumeAllSounds() {
+        this.activeSounds.forEach(soundId => {
+            this.resumeSound(soundId);
+        });
+    }
+
+    /**
+     * SOLUTION 2: Individual sound pause with type detection
+     */
+    pauseSound(soundId) {
+        const sound = this.sounds.get(soundId);
+        if (!sound) return false;
+
+        try {
+            // Handle Tone.js Player objects
+            if (sound.state && sound.state === 'started') {
+                sound.stop();
+                this.soundStates.set(soundId, 'paused');
+                this.pausedSounds.add(soundId);
+                console.log(`Tone.js sound ${soundId} paused`);
+                return true;
+            }
+            // Handle Tone.js Noise generators
+            else if (sound.state !== undefined) {
+                sound.stop();
+                this.soundStates.set(soundId, 'paused');
+                this.pausedSounds.add(soundId);
+                console.log(`Tone.js noise ${soundId} paused`);
+                return true;
+            }
+            // Handle HTML5 Audio objects
+            else if (sound.pause && !sound.paused) {
+                sound.pause();
+                this.soundStates.set(soundId, 'paused');
+                this.pausedSounds.add(soundId);
+                console.log(`HTML5 audio ${soundId} paused`);
+                return true;
+            }
+        } catch (error) {
+            console.error(`Error pausing sound ${soundId}:`, error);
+        }
+        return false;
+    }
+
+    /**
+     * SOLUTION 3: Individual sound resume with type detection
+     */
+    resumeSound(soundId) {
+        const sound = this.sounds.get(soundId);
+        if (!sound || !this.pausedSounds.has(soundId)) return false;
+
+        try {
+            // Handle Tone.js Player objects
+            if (sound.start && this.soundStates.get(soundId) === 'paused') {
+                sound.start();
+                this.soundStates.set(soundId, 'playing');
+                this.pausedSounds.delete(soundId);
+                console.log(`Tone.js sound ${soundId} resumed`);
+                return true;
+            }
+            // Handle HTML5 Audio objects
+            else if (sound.play && sound.paused) {
+                sound.play().catch(console.error);
+                this.soundStates.set(soundId, 'playing');
+                this.pausedSounds.delete(soundId);
+                console.log(`HTML5 audio ${soundId} resumed`);
+                return true;
+            }
+        } catch (error) {
+            console.error(`Error resuming sound ${soundId}:`, error);
+        }
+        return false;
+    }
+
+    /**
+     * SOLUTION 4: Smart sound state detection
+     */
+    isSoundPlaying(soundId) {
+        const sound = this.sounds.get(soundId);
+        if (!sound) return false;
+
+        // Check Tone.js objects
+        if (sound.state !== undefined) {
+            return sound.state === 'started';
+        }
+        // Check HTML5 Audio objects
+        else if (sound.paused !== undefined) {
+            return !sound.paused && sound.currentTime > 0;
+        }
+        return false;
+    }
+
+    /**
+     * Comprehensive debugging method for sound states
+     */
+    debugSoundStates() {
+        console.log('=== SOUND STATE DEBUG ===');
+        console.log('Active sounds:', Array.from(this.activeSounds));
+        console.log('Paused sounds:', Array.from(this.pausedSounds));
+        console.log('Global paused:', this.globalPaused);
+        
+        this.sounds.forEach((sound, soundId) => {
+            const isActive = this.activeSounds.has(soundId);
+            const isPaused = this.pausedSounds.has(soundId);
+            const state = this.soundStates.get(soundId) || 'unknown';
+            const actuallyPlaying = this.isSoundPlaying(soundId);
+            
+            console.log(`Sound ${soundId}:`, {
+                active: isActive,
+                paused: isPaused,
+                trackedState: state,
+                actuallyPlaying: actuallyPlaying,
+                soundType: sound.state !== undefined ? 'Tone.js' : 'HTML5'
+            });
+        });
+        console.log('========================');
+    }
+
+    /**
+     * Force reset all sound states (emergency fix)
+     */
+    resetAllSoundStates() {
+        console.log('Resetting all sound states...');
+        this.soundStates.clear();
+        this.pausedSounds.clear();
+        this.activeSounds.clear();
+        this.globalPaused = false;
+        
+        // Update UI
+        const pauseBtn = document.getElementById('globalPauseBtn');
+        if (pauseBtn) {
+            const pauseIcon = pauseBtn.querySelector('.pause-icon');
+            if (pauseIcon) {
+                pauseIcon.textContent = '⏸️';
+            }
+        }
+        
+        this.showMascotMessage('🔄 États des sons réinitialisés', 2000);
+    }
+
+    /**
+     * Update global pause/play button state based on sound activity
+     */
+    updateGlobalPauseButtonState(shouldShowPlay) {
+        const pauseBtn = document.getElementById('globalPauseBtn');
+        if (!pauseBtn) return;
+        
+        const pauseIcon = pauseBtn.querySelector('.pause-icon');
+        if (!pauseIcon) return;
+        
+        if (shouldShowPlay) {
+            // Show play icon (▶️) when no sounds are playing or all are paused
+            pauseIcon.textContent = '▶️';
+            pauseBtn.setAttribute('title', 'Reprendre la lecture');
+            this.globalPaused = true;
+        } else {
+            // Show pause icon (⏸️) when sounds are playing
+            pauseIcon.textContent = '⏸️';
+            pauseBtn.setAttribute('title', 'Mettre en pause');
+            this.globalPaused = false;
+        }
+        
+        // Update last clicked icon for app symbol
+        this.setLastClickedIcon(pauseIcon.textContent);
+        
+        console.log(`Global pause button updated: ${shouldShowPlay ? 'Play mode' : 'Pause mode'}`);
+    }
+
+    /**
+     * Update app icon based on current theme
+     */
+    updateAppIcon() {
+        const appIcon = document.getElementById('appIcon');
+        if (this.lastClickedIcon) {
+            appIcon.textContent = this.lastClickedIcon;
+        } else {
+            // Show day/night icon based on current theme
+            const isDark = document.body.classList.contains('dark-theme');
+            appIcon.textContent = isDark ? '🌙' : '☀️';
+        }
+    }
+
+    /**
+     * Reset app icon to theme-based default
+     */
+    resetAppIcon() {
+        this.lastClickedIcon = null;
+        this.updateAppIcon();
+        this.showMascotMessage('Icône réinitialisée', 1500);
+    }
+
+    /**
+     * Set last clicked icon
+     */
+    setLastClickedIcon(icon) {
+        this.lastClickedIcon = icon;
+        this.updateAppIcon();
     }
 
     /**
@@ -1032,7 +1355,7 @@ class BulleSensorielle {
     }
 
     /**
-     * Enhanced start sound function with better error handling
+     * Enhanced start sound function with better error handling and state tracking
      */
     startSound(soundId) {
         const sound = this.sounds.get(soundId);
@@ -1044,10 +1367,20 @@ class BulleSensorielle {
         try {
             if (sound.start) {
                 sound.start();
+                // Track state for Tone.js objects
+                this.soundStates.set(soundId, 'playing');
+                this.pausedSounds.delete(soundId);
+            } else if (sound.play) {
+                // Handle HTML5 Audio objects
+                sound.play().catch(console.error);
+                this.soundStates.set(soundId, 'playing');
+                this.pausedSounds.delete(soundId);
             } else if (sound.noise && sound.lfo) {
                 // For complex synthesized sounds (legacy)
                 sound.noise.start();
                 sound.lfo.start();
+                this.soundStates.set(soundId, 'playing');
+                this.pausedSounds.delete(soundId);
             }
             
             // Show playing indicator
@@ -1060,7 +1393,7 @@ class BulleSensorielle {
             // Start icon animation
             this.startIconAnimation(soundId);
             
-            console.log(`Sound ${soundId} started successfully`);
+            console.log(`Sound ${soundId} started successfully with state tracking`);
             return true;
         } catch (error) {
             console.error(`Error starting sound ${soundId}:`, error);
@@ -1069,7 +1402,7 @@ class BulleSensorielle {
     }
 
     /**
-     * Enhanced stop sound function with indicator management
+     * Enhanced stop sound function with indicator management and state tracking
      */
     stopSound(soundId) {
         const sound = this.sounds.get(soundId);
@@ -1081,10 +1414,21 @@ class BulleSensorielle {
         try {
             if (sound.stop) {
                 sound.stop();
+                // Track state for Tone.js objects
+                this.soundStates.set(soundId, 'stopped');
+                this.pausedSounds.delete(soundId);
+            } else if (sound.pause) {
+                // Handle HTML5 Audio objects
+                sound.pause();
+                sound.currentTime = 0;
+                this.soundStates.set(soundId, 'stopped');
+                this.pausedSounds.delete(soundId);
             } else if (sound.noise && sound.lfo) {
                 // For complex synthesized sounds (legacy)
                 sound.noise.stop();
                 sound.lfo.stop();
+                this.soundStates.set(soundId, 'stopped');
+                this.pausedSounds.delete(soundId);
             }
             
             // Hide playing indicator
@@ -1097,7 +1441,7 @@ class BulleSensorielle {
             // Stop icon animation
             this.stopIconAnimation(soundId);
             
-            console.log(`Sound ${soundId} stopped successfully`);
+            console.log(`Sound ${soundId} stopped successfully with state tracking`);
             return true;
         } catch (error) {
             console.error(`Error stopping sound ${soundId}:`, error);
@@ -1154,7 +1498,14 @@ class BulleSensorielle {
         document.querySelectorAll('.visual-btn').forEach(btn => {
             btn.classList.remove('active');
         });
-        document.querySelector(`[data-visual="${visualId}"]`).classList.add('active');
+        const activeBtn = document.querySelector(`[data-visual="${visualId}"]`);
+        activeBtn.classList.add('active');
+        
+        // Track last clicked icon for app symbol
+        const iconElement = activeBtn.querySelector('.visual-icon');
+        if (iconElement) {
+            this.setLastClickedIcon(iconElement.textContent);
+        }
         
         this.currentVisual = visualId;
         this.showMascotMessage(`Visual ${visualId} activé !`, 1500);
@@ -1234,6 +1585,10 @@ class BulleSensorielle {
     timerComplete() {
         this.timer.isRunning = false;
         clearInterval(this.timer.interval);
+        
+        // Stop all sounds and visuals when timer completes
+        this.stopAllSounds();
+        this.stopAllVisuals();
         
         // Play gentle completion sound
         const completionTone = new Tone.Synth({

@@ -2,6 +2,74 @@
 
 Tous les changements notables de ce projet seront documentés dans ce fichier.
 
+## [Version 2.5.1] - 2024-12-22
+
+### 🔧 Enhanced Pause/Play Functionality
+- **Smart Global Button State**: The global pause/play bubble now automatically updates based on sound activity:
+  - Shows pause icon (⏸️) when any sound starts playing
+  - Shows play icon (▶️) when all sounds are stopped
+  - Maintains proper state synchronization between individual sound controls and global control
+- **Improved User Experience**: Intuitive button behavior that reflects actual audio state
+- **State Tracking**: Enhanced sound state management for better reliability
+
+### 🏷️ Interface Updates
+- **Button Rename**: Changed "Mandala Rotatif" to "Géométrie vivante" for better clarity
+
+## [Version 2.5.0] - 2024-12-19
+
+### ✨ Nouvelles Fonctionnalités
+- **Bouton minuteur 1 minute** : Ajout d'un preset rapide pour des sessions courtes
+- **Trois boutons bulle** : Interface complète avec bulles thématiques
+  - Bulle thème (haut-gauche) : Basculer entre mode jour/nuit
+  - Bulle symbole app (haut-droite) : Affiche l'icône jour/nuit ou dernière icône cliquée
+  - Bulle pause/play (bas-droite) : Contrôle global de lecture
+- **Suivi des icônes** : La bulle symbole mémorise la dernière icône de son/visuel activée
+- **Animations oscillantes** : Toutes les bulles ont l'animation `float` pour un effet vivant
+
+### 🔧 Améliorations Techniques
+- Nouvelles fonctions `updateAppIcon()`, `resetAppIcon()`, `setLastClickedIcon()`
+- Suivi automatique des icônes dans `activateSound()` et `setVisual()`
+- Mise à jour automatique de l'icône app lors du changement de thème
+- Gestion d'état `lastClickedIcon` pour la persistance des icônes
+- Taille unifiée de 60px pour toutes les bulles
+
+### 🎨 Améliorations Interface
+- **Positionnement optimisé** : Bulles aux quatre coins avec espacement cohérent
+- **Style unifié** : Dégradés, ombres et animations identiques pour toutes les bulles
+- **Animations fluides** : Effet `float` sur toutes les bulles pour dynamisme
+- **Feedback visuel** : Messages mascotte pour interactions utilisateur
+- **Accessibilité** : Titres et labels appropriés pour tous les boutons
+
+### 🐛 Corrections
+- Correction de la visibilité du bouton pause global
+- Amélioration de la gestion des événements de clic
+- Optimisation des sélecteurs CSS pour les icônes
+
+## [Version 2.4.0] - 2024-12-19
+
+### ✨ Nouvelles Fonctionnalités
+- **Arrêt automatique au minuteur** : Les sons et visuels s'arrêtent automatiquement à la fin du minuteur
+- **Bouton pause/play global** : Nouveau bouton bulle flottant pour contrôler tous les sons et visuels
+- **Lecture continue par défaut** : Sons et visuels fonctionnent en continu jusqu'à arrêt manuel ou fin de minuteur
+- **Contrôle unifié** : Pause et reprise simultanée de tous les éléments actifs
+
+### 🔧 Améliorations Techniques
+- Ajout des fonctions `stopAllVisuals()`, `pauseAllSounds()`, `resumeAllSounds()`
+- Système de pause global avec états `visualsPaused` et `globalPaused`
+- Intégration du contrôle de pause dans la boucle d'animation des visuels
+- Gestion améliorée des états de lecture/pause pour tous les médias
+
+### 🎨 Améliorations Interface
+- Bouton pause/play flottant avec design bulle moderne
+- Gradient animé et effets hover pour le bouton de contrôle
+- Positionnement fixe en bas à droite pour accès facile
+- Icônes dynamiques (⏸️/▶️) selon l'état de lecture
+
+### 🐛 Corrections
+- **CSS Vendor Prefix** : Ajout de la propriété standard `appearance` pour compatibilité
+- Correction de la gestion des sons avec la nouvelle structure Set
+- Amélioration de la robustesse du système de pause/reprise
+
 ## [Version 2.3.0] - 2024-12-19
 
 ### Ajouté

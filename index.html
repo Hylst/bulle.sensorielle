@@ -11,11 +11,20 @@
     <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
 </head>
 <body>
-    <!-- Mascotte Guide -->
+    <!-- Mascot -->
     <div class="mascot" id="mascot">
-        <div class="mascot-bubble">🌙</div>
         <div class="mascot-message" id="mascotMessage">Bienvenue dans ta bulle sensorielle !</div>
     </div>
+
+    <!-- App Symbol Bubble (top-right) -->
+    <button type="button" class="app-symbol-btn" id="appSymbolBtn" title="Bulle Sensorielle">
+        <span class="app-icon" id="appIcon">🌙</span>
+    </button>
+
+    <!-- Global Pause/Play Button -->
+    <button type="button" class="global-pause-btn" id="globalPauseBtn" title="Mettre en pause">
+        <span class="pause-icon">⏸️</span>
+    </button>
 
     <!-- Toggle Theme Button -->
     <button type="button" class="theme-toggle" id="themeToggle" aria-label="Changer de thème">
@@ -267,7 +276,7 @@
                         </button>
                         <button type="button" class="visual-btn" data-visual="mandala">
                             <span class="visual-icon">🌸</span>
-                            <span>Mandala Rotatif</span>
+                            <span>Géométrie vivante</span>
                         </button>
                     </div>
                 </div>
@@ -287,6 +296,7 @@
                     </div>
                     <div class="timer-controls">
                         <div class="preset-times">
+                            <button type="button" class="preset-btn" data-time="1">1 min</button>
                             <button type="button" class="preset-btn" data-time="2">2 min</button>
                             <button type="button" class="preset-btn" data-time="5">5 min</button>
                             <button type="button" class="preset-btn" data-time="10">10 min</button>
