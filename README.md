@@ -48,6 +48,12 @@
 - **Mode Nuit** : Palette sombre à faible contraste
 - Basculement facile entre les thèmes
 
+### ℹ️ Bulle d'Information
+- **Accès rapide** : Bulle d'information en bas à gauche
+- **Modal apaisant** : Interface avec effets de bulles flottantes
+- **Informations complètes** : Présentation de l'application et conseils d'utilisation
+- **Créateur** : Informations sur Geoffroy, le créateur de l'application
+
 ## 🛠️ Technologies Utilisées
 
 - **HTML5** : Structure sémantique

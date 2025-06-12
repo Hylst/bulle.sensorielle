@@ -2,7 +2,75 @@
 
 Tous les changements notables de ce projet seront documentés dans ce fichier.
 
+## [Version 2.7.1] - 2024-12-22
+
+### 🔧 Corrections Critiques de Suppression
+- **Solution 1** : Création de cartes séparées pour éviter les conflits DOM entre accueil et section profils
+- **Solution 2** : Suppression immédiate des éléments DOM avant mise à jour des données
+- **Solution 3** : Rechargement sélectif uniquement si la suppression DOM échoue
+- **Attributs de traçage** : Ajout de `data-profile-id` et `data-location` pour un suivi précis
+- **Gestion d'état vide** : Mise à jour automatique de l'affichage quand aucun profil ne reste
+- **Logging renforcé** : Traces détaillées pour le débogage des suppressions
+
+### ✨ Nouvelle Fonctionnalité : Bulle d'Information
+- **Bulle interactive** : Bouton d'information en bas à gauche avec animation douce
+- **Modal apaisant** : Interface avec effets de bulles flottantes animées
+- **Contenu complet** : Présentation de l'application, fonctionnalités et conseils
+- **Informations créateur** : Section dédiée à Geoffroy, créateur de l'application
+- **Animations fluides** : 8 bulles animées avec mouvements aléatoires
+- **Contrôles intuitifs** : Fermeture par clic, Échap ou clic sur l'arrière-plan
+- **Design cohérent** : Intégration parfaite avec le thème de l'application
+
+### 🎨 Améliorations Visuelles
+- **Animation de pulsation** : Effet subtil sur la bulle d'information
+- **Dégradés harmonieux** : Couleurs cohérentes avec la palette de l'application
+- **Effets de flou** : Arrière-plan avec `backdrop-filter` pour un effet moderne
+- **Transitions fluides** : Animations d'ouverture et fermeture du modal
+
 ## [Version 2.7.0] - 2024-12-22
+
+### 🔧 Refonte majeure des profils "Mes Bulles"
+- **Sauvegarde sélective** : Ne sauvegarde que les derniers éléments cliqués de chaque section
+- **Gestion des valeurs NULL** : Les éléments non cliqués sont sauvegardés comme NULL
+- **Suivi intelligent** : Tracking automatique du dernier son, visuel et minuteur sélectionnés
+- **Chargement optimisé** : Navigation automatique vers la section Visuels lors du chargement
+- **Démarrage automatique** : Le minuteur se lance automatiquement si sauvegardé
+- **Compatibilité rétroactive** : Support des anciens profils avec migration automatique
+
+### ✨ Nouvelles fonctionnalités de sauvegarde
+- **Son unique** : Sauvegarde du dernier son cliqué avec son volume
+- **Visuel unique** : Sauvegarde du dernier visuel sélectionné
+- **Minuteur intelligent** : Sauvegarde et démarrage automatique de la durée
+- **Messages détaillés** : Résumé des éléments sauvegardés et chargés
+- **Interface adaptée** : Affichage optimisé des profils avec gestion des valeurs NULL
+
+### 🎯 Améliorations comportementales
+- **Navigation contextuelle** : Redirection vers Visuels si un visuel est chargé
+- **Feedback enrichi** : Messages informatifs sur les éléments chargés
+- **Gestion d'erreurs** : Robustesse accrue avec logs détaillés
+- **Performance** : Chargement plus rapide avec moins d'éléments à traiter
+
+## [Version 2.6.3] - 2024-12-22
+
+### 🔧 Corrections Critiques Supplémentaires
+- **Minuteur corrigé** : Le minuteur s'arrête maintenant correctement et ne va plus en négatif
+- **Suppression de profils corrigée** : Les profils sont maintenant correctement supprimés de l'affichage
+- **Nettoyage des états visuels** : Suppression complète des indicateurs visuels lors du chargement de profils
+- **Arrêt du minuteur lors du chargement** : Le minuteur en cours s'arrête automatiquement lors du chargement d'un profil
+- **Gestion des conflits sonores** : Nettoyage complet des états visuels des sons avant chargement
+- **Logging de débogage** : Ajout de logs détaillés pour la suppression et le chargement
+
+## [Version 2.6.2] - 2024-12-22
+ 
+### 🔧 Corrections Critiques
+- **Correction des boutons de profil** : Les boutons "Charger" et "Supprimer" fonctionnent maintenant correctement
+- **Feedback visuel amélioré** : Ajout d'animations pour les états de chargement et suppression
+- **Gestion d'erreurs robuste** : Meilleure gestion des erreurs lors du chargement des profils
+- **Navigation corrigée** : La navigation vers la section visuels fonctionne maintenant
+- **Prévention des erreurs null** : Protection contre les références nulles dans setVisual
+- **Logging amélioré** : Ajout de logs détaillés pour le débogage
+
+## [Version 2.6.1] - 2024-12-22
 
 ### 🔧 Refonte majeure des profils "Mes Bulles"
 - **Sauvegarde sélective** : Ne sauvegarde que les derniers éléments cliqués de chaque section
