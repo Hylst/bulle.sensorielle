@@ -1,12 +1,89 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+    <!-- Métadonnées de base -->
     <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <title>Bulle Sensorielle - Mon Sanctuaire Numérique</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- SEO et métadonnées -->
+    <title>Bulle Sensorielle - Sanctuaire Numérique Apaisant pour Enfants | Geoffroy Streit</title>
+    <meta name="description" content="Application web apaisante conçue pour les enfants de 6-12 ans avec sensibilités sensorielles (TSA, TDAH). Sons relaxants, visuels thérapeutiques et outils de régulation émotionnelle.">
+    <meta name="keywords" content="autisme, TDAH, sensibilités sensorielles, relaxation enfants, thérapie sensorielle, sons apaisants, application éducative, bien-être numérique, régulation émotionnelle">
+    <meta name="author" content="Geoffroy Streit">
+    <meta name="creator" content="Geoffroy Streit">
+    <meta name="publisher" content="Geoffroy Streit">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="French">
+    <meta name="revisit-after" content="7 days">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Bulle Sensorielle - Sanctuaire Numérique Apaisant">
+    <meta property="og:description" content="Application web thérapeutique pour enfants avec sensibilités sensorielles. Créez votre bulle de calme personnalisée avec sons et visuels apaisants.">
+    <meta property="og:image" content="./assets/og-image.jpg">
+    <meta property="og:url" content="https://bulle-sensorielle.app">
+    <meta property="og:site_name" content="Bulle Sensorielle">
+    <meta property="og:locale" content="fr_FR">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Bulle Sensorielle - Sanctuaire Numérique Apaisant">
+    <meta name="twitter:description" content="Application thérapeutique pour enfants avec sensibilités sensorielles. Sons relaxants et visuels apaisants.">
+    <meta name="twitter:image" content="./assets/twitter-card.jpg">
+    <meta name="twitter:creator" content="@geoffroystreit">
+    
+    <!-- Icônes et thème -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🫧</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🫧</text></svg>">
+    <meta name="theme-color" content="#E8F4FD">
+    <meta name="msapplication-TileColor" content="#E8F4FD">
+    
+    <!-- Données structurées JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Bulle Sensorielle",
+      "description": "Application web thérapeutique pour enfants avec sensibilités sensorielles (TSA, TDAH). Offre un sanctuaire numérique avec sons apaisants, visuels relaxants et outils de régulation émotionnelle.",
+      "url": "https://bulle-sensorielle.app",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "Web Browser",
+      "author": {
+        "@type": "Person",
+        "name": "Geoffroy Streit",
+        "email": "geoffroy.streit@gmail.com"
+      },
+      "creator": {
+        "@type": "Person",
+        "name": "Geoffroy Streit",
+        "email": "geoffroy.streit@gmail.com"
+      },
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "Enfants avec sensibilités sensorielles",
+        "suggestedMinAge": 6,
+        "suggestedMaxAge": 12
+      },
+      "featureList": [
+        "Mixeur de sons apaisants",
+        "Visuels thérapeutiques interactifs",
+        "Minuteur de pause sensorielle",
+        "Profils sensoriels personnalisés",
+        "Mode jour/nuit adaptatif"
+      ],
+      "inLanguage": "fr-FR",
+      "isAccessibleForFree": true,
+      "browserRequirements": "Navigateur web moderne avec support HTML5, CSS3 et JavaScript ES6+"
+    }
+    </script>
+    
+    <!-- Manifest PWA -->
+    <link rel="manifest" href="./manifest.json">
+    
+    <!-- Polices et ressources -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -70,8 +147,11 @@
                     </ul>
                     
                     <div class="creator-info">
-                        <p><strong>Créé avec 💙 par Geoffroy</strong></p>
-                        <p>Pour tous ceux qui cherchent un moment de paix dans leur journée</p>
+                        <p><strong>🧑‍💻 Créé avec 💙 par Geoffroy Streit</strong></p>
+                        <p><em>Développeur passionné par l'accessibilité numérique</em></p>
+                        <p>📧 <a href="mailto:geoffroy.streit@gmail.com" style="color: var(--accent-color); text-decoration: none;">geoffroy.streit@gmail.com</a></p>
+                        <p style="font-style: italic; margin-top: 1rem;">"Pour tous ceux qui cherchent un moment de paix dans leur journée"</p>
+                        <p style="font-size: 0.9em; opacity: 0.8;">Version 2.7.3 - Application web progressive</p>
                     </div>
                 </div>
             </div>

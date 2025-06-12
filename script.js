@@ -1,52 +1,136 @@
 /**
- * Bulle Sensorielle - Main JavaScript Application
- * A sensory sanctuary web app for children with sensory sensitivities
+ * 🫧 Bulle Sensorielle - Application JavaScript Principale
+ * 
+ * Une application web thérapeutique conçue avec tendresse pour créer un sanctuaire
+ * numérique apaisant destiné aux enfants ayant des sensibilités sensorielles.
+ * 
+ * Cette application offre un environnement sécurisant et personnalisable avec :
+ * - Mixeur de sons apaisants (bruits blancs, nature, mélodies douces)
+ * - Visuels thérapeutiques interactifs (respiration guidée, couleurs flottantes)
+ * - Minuteur de pause sensorielle avec visualisation progressive
+ * - Système de profils sensoriels personnalisés
+ * - Interface adaptative jour/nuit
+ * 
+ * @fileoverview Application web progressive pour enfants avec TSA, TDAH et sensibilités sensorielles
+ * @version 2.7.3
+ * @author Geoffroy Streit <geoffroy.streit@gmail.com>
+ * @created 2024
+ * @license MIT
+ * 
+ * @description Développée avec passion et bienveillance pour offrir un espace de calme
+ *              et de régulation émotionnelle accessible à tous les enfants.
+ * 
+ * Technologies utilisées :
+ * - JavaScript ES6+ (Vanilla)
+ * - Tone.js pour la synthèse audio avancée
+ * - Canvas API pour les animations visuelles fluides
+ * - LocalStorage pour la persistance des profils
+ * - CSS3 avec variables personnalisées pour l'accessibilité
+ * 
+ * @requires Tone.js
+ * @requires Modern browser with ES6+ support
+ * @requires Canvas API support
+ * @requires Web Audio API support
  */
 
+/**
+ * 🌟 Classe principale de l'application Bulle Sensorielle
+ * 
+ * Cette classe orchestre avec délicatesse tous les aspects de l'expérience sensorielle :
+ * la gestion audio thérapeutique, les animations visuelles apaisantes, la persistance
+ * des préférences utilisateur, et l'interface adaptative.
+ * 
+ * @class BulleSensorielle
+ * @description Cœur de l'application, conçue pour offrir une expérience utilisateur
+ *              fluide et accessible aux enfants avec sensibilités sensorielles
+ */
 class BulleSensorielle {
+    /**
+     * 🎭 Constructeur de la classe BulleSensorielle
+     * 
+     * Initialise avec tendresse tous les composants nécessaires pour créer
+     * un environnement numérique sécurisant et personnalisable.
+     * 
+     * @constructor
+     * @description Configure l'état initial de l'application avec des valeurs
+     *              par défaut optimisées pour l'accessibilité et le confort
+     */
     constructor() {
+        // 🏠 Navigation et état de l'interface
         this.currentSection = 'home';
-        this.sounds = new Map();
-        this.activeSounds = new Set();
-        this.currentVisual = 'breathing';
-        this.visualsPaused = false;
-        this.globalPaused = false;
-        this.lastClickedIcon = null;
-        this.soundStates = new Map(); // Track individual sound states
-        this.pausedSounds = new Set(); // Track which sounds were paused by user
-        this.audioInitialized = false;
         
-        // Track last clicked elements for profile saving
-        this.lastClickedSound = null;
-        this.lastClickedVisual = null;
-        this.lastClickedTimerDuration = null;
+        // 🎵 Gestion audio thérapeutique
+        this.sounds = new Map();              // Collection des objets audio Tone.js
+        this.activeSounds = new Set();        // Sons actuellement en lecture
+        this.soundStates = new Map();         // États individuels de chaque son
+        this.pausedSounds = new Set();        // Sons mis en pause par l'utilisateur
+        this.audioInitialized = false;       // État d'initialisation du contexte audio
+        
+        // ✨ Système visuel apaisant
+        this.currentVisual = 'breathing';     // Visual actuel (respiration par défaut)
+        this.visualsPaused = false;          // État de pause des animations
+        
+        // ⏸️ Contrôle global de l'application
+        this.globalPaused = false;           // Pause générale de tous les éléments
+        this.lastClickedIcon = null;         // Dernier élément interagi pour feedback
+        
+        // 💾 Système de profils sensoriels personnalisés
+        this.lastClickedSound = null;        // Dernier son sélectionné
+        this.lastClickedVisual = null;       // Dernier visuel sélectionné
+        this.lastClickedTimerDuration = null; // Dernière durée de minuteur
+        
+        // ⏰ Minuteur de pause sensorielle
         this.timer = {
-            duration: 0,
-            remaining: 0,
-            interval: null,
-            isRunning: false
+            duration: 0,                     // Durée totale en secondes
+            remaining: 0,                    // Temps restant
+            interval: null,                  // Référence de l'intervalle
+            isRunning: false                 // État de fonctionnement
         };
+        
+        // 🎨 Personnalisation et persistance
         this.profiles = JSON.parse(localStorage.getItem('sensoryProfiles') || '[]');
         this.theme = localStorage.getItem('theme') || 'light';
         
+        // 🚀 Lancement de l'initialisation
         this.init();
     }
 
     /**
-     * Initialize the application
+     * 🌅 Initialisation complète de l'application
+     * 
+     * Cette méthode orchestre avec délicatesse le démarrage de tous les composants
+     * de l'application pour créer une expérience utilisateur harmonieuse et accessible.
+     * 
+     * @async
+     * @method init
+     * @description Séquence d'initialisation optimisée pour garantir une expérience
+     *              fluide dès le premier contact avec l'application
+     * 
+     * @returns {Promise<void>} Promesse résolue une fois l'initialisation terminée
+     * 
+     * @example
+     * // L'initialisation est automatiquement appelée dans le constructeur
+     * const app = new BulleSensorielle(); // init() est exécutée automatiquement
      */
     async init() {
-        this.setupTheme();
-        this.setupEventListeners();
-        this.setupAudio();
-        this.setupVisuals();
-        this.setupInfoBubble();
-        this.loadProfiles();
-        this.showMascotMessage('Bienvenue dans ta bulle sensorielle !', 3000);
+        this.setupTheme();           // 🎨 Configuration du thème visuel
+        this.setupEventListeners();  // 👂 Mise en place des interactions
+        this.setupAudio();           // 🎵 Initialisation du système audio
+        this.setupVisuals();         // ✨ Configuration des animations visuelles
+        this.setupInfoBubble();      // ℹ️ Préparation de la bulle d'information
+        this.loadProfiles();         // 💾 Chargement des profils sauvegardés
+        this.showMascotMessage('Bienvenue dans ta bulle sensorielle !', 3000); // 🌙 Message d'accueil
     }
 
     /**
-     * Setup theme management
+     * 🎨 Configuration du système de thèmes
+     * 
+     * Gère avec tendresse l'alternance entre les modes jour et nuit pour
+     * s'adapter aux besoins sensoriels et aux préférences de chaque enfant.
+     * 
+     * @method setupTheme
+     * @description Applique le thème sauvegardé et configure les transitions douces
+     *              entre les modes clair et sombre pour le confort visuel
      */
     setupTheme() {
         document.documentElement.setAttribute('data-theme', this.theme);
