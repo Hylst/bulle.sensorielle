@@ -2,7 +2,7 @@
 
 Tous les changements notables de ce projet seront documentés dans ce fichier.
 
-## [Version 2.7.3] - 2024-12-22
+## [Version 2.7.3] - 2025-05-19
 
 ### 🐛 Corrections critiques de l'affichage visuel
 - **Canvas tronqué corrigé** : Suppression des conflits CSS width/height 100%
@@ -12,12 +12,14 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 - **Rendu DPR amélioré** : Gestion correcte du device pixel ratio
 - **Sécurité canvas** : Vérifications d'existence avant manipulation
 - **Logs de débogage** : Traçabilité des opérations canvas
+- **🆕 Respiration guidée corrigée** : Initialisation automatique du canvas lors de l'accès à la section visuels
 
 ### 🔧 Améliorations techniques
 - **Transform reset** : Réinitialisation du contexte canvas à chaque resize
 - **Dimensions minimales** : Garantie de taille minimum 200x150px
 - **Fallback dimensions** : Calculs de secours pour compatibilité
 - **Console logging** : Suivi détaillé des opérations visuelles
+- **🆕 initializeVisualsSection()** : Nouvelle méthode pour garantir l'affichage correct du premier visuel
 
 ## [Version 2.7.2] - 2024-12-22
 
@@ -585,4 +587,4 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 
 ---
 
-*Dernière mise à jour : 19 décembre 2024*
+*Dernière mise à jour : 19 mai 2025*

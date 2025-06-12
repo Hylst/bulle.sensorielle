@@ -1072,8 +1072,39 @@ class BulleSensorielle {
 
         this.currentSection = sectionId;
 
+        // Special handling for visuals section to ensure proper canvas initialization
+        if (sectionId === 'visuals') {
+            // Wait for the section to be visible, then initialize canvas properly
+            setTimeout(() => {
+                this.initializeVisualsSection();
+            }, 100);
+        }
+
         // Show relevant mascot messages
         this.showSectionMessage(sectionId);
+    }
+
+    /**
+     * Initialize visuals section when it becomes active
+     * This ensures the breathing visual displays correctly on first view
+     */
+    initializeVisualsSection() {
+        if (!this.canvas || !this.ctx) {
+            console.warn('Canvas not ready for visuals section initialization');
+            return;
+        }
+        
+        // Force canvas resize to ensure proper dimensions
+        this.resizeCanvas();
+        
+        // Ensure visuals are not paused
+        this.visualsPaused = false;
+        
+        // Force set the current visual to ensure it's properly initialized
+        const currentVisual = this.currentVisual || 'breathing';
+        this.setVisual(currentVisual);
+        
+        console.log('Visuals section initialized successfully');
     }
 
     /**

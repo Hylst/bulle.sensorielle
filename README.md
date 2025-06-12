@@ -78,7 +78,7 @@ Animations **Canvas** fluides conçues pour la régulation sensorielle :
 - Trajectoires douces et hypnotiques
 - Densité ajustable selon les préférences
 
-#### 🕸️ **Mandala Rotatif**
+#### 🕸️ **Géométrie vivante**
 - Géométrie sacrée en rotation lente
 - Symétrie apaisante et centrage visuel
 - Complexité progressive adaptable
@@ -284,7 +284,7 @@ npm run build
 
 ### 📜 **MIT License**
 ```
-Copyright (c) 2024 Geoffroy Streit
+Copyright (c) 2025 Geoffroy Streit
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
