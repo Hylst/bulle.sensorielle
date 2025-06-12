@@ -9,6 +9,7 @@ class BulleSensorielle {
         this.sounds = new Map();
         this.activeSounds = new Set();
         this.currentVisual = 'breathing';
+        this.audioInitialized = false;
         this.timer = {
             duration: 0,
             remaining: 0,
@@ -76,14 +77,14 @@ class BulleSensorielle {
             });
         }
 
-        // Solution 4: Enhanced sound controls with better event handling
+        // Enhanced sound controls with better event handling and audio context initialization
         document.querySelectorAll('.sound-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 const soundId = btn.getAttribute('data-sound');
                 console.log(`Sound button clicked: ${soundId}`);
-                this.toggleSound(soundId);
+                await this.toggleSound(soundId);
             });
         });
         
@@ -172,15 +173,32 @@ class BulleSensorielle {
 
     /**
      * Setup audio system using Tone.js
+     * Note: Audio context will be initialized on first user interaction
      */
     async setupAudio() {
-        // Initialize Tone.js
-        await Tone.start();
-
-        // Create sound generators
+        // Create sound generators (without starting audio context)
         this.createNoiseGenerators();
         this.createNatureSounds();
         this.createMelodies();
+    }
+
+    /**
+     * Initialize audio context on first user interaction
+     * This is required for Chrome's autoplay policy compliance
+     */
+    async initializeAudioContext() {
+        if (!this.audioInitialized) {
+            try {
+                await Tone.start();
+                this.audioInitialized = true;
+                console.log('Audio context initialized successfully');
+                return true;
+            } catch (error) {
+                console.error('Failed to initialize audio context:', error);
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -204,48 +222,62 @@ class BulleSensorielle {
     }
 
     /**
-     * Create nature sound synthesizers
+     * Create nature sounds using Tone.js synthesizers and audio files
      */
     createNatureSounds() {
-        // Rain sound (filtered noise)
-        const rainFilter = new Tone.Filter(800, 'lowpass').toDestination();
-        const rainNoise = new Tone.Noise('white').connect(rainFilter);
-        rainNoise.volume.value = -25;
-        this.sounds.set('rain', rainNoise);
-
-        // Ocean waves (LFO modulated noise)
-        const waveFilter = new Tone.Filter(400, 'lowpass').toDestination();
-        const waveLFO = new Tone.LFO(0.1, 0.3, 1);
-        const waveNoise = new Tone.Noise('white').connect(waveFilter);
-        waveLFO.connect(waveFilter.frequency);
-        waveNoise.volume.value = -22;
-        this.sounds.set('waves', { noise: waveNoise, lfo: waveLFO });
-
-        // Fire crackling (burst noise)
-        const fireFilter = new Tone.Filter(1200, 'lowpass').toDestination();
-        const fireNoise = new Tone.Noise('brown').connect(fireFilter);
-        fireNoise.volume.value = -28;
-        this.sounds.set('fire', fireNoise);
-
-        // Forest (filtered noise with bird-like tones)
-        const forestFilter = new Tone.Filter(2000, 'bandpass').toDestination();
-        const forestNoise = new Tone.Noise('pink').connect(forestFilter);
-        forestNoise.volume.value = -30;
-        this.sounds.set('forest', forestNoise);
-
-        // Cat purring (low frequency oscillator)
-        const purr = new Tone.Oscillator(25, 'sawtooth').toDestination();
-        purr.volume.value = -25;
-        this.sounds.set('cat', purr);
-
-        // Wind sound (audio file)
-        const windPlayer = new Tone.Player({
-            url: './sons/wind.mp3',
+        // Campagne sound (audio file)
+        const campagnePlayer = new Tone.Player({
+            url: './sons/campagne.mp3',
             loop: true,
             autostart: false
         }).toDestination();
-        windPlayer.volume.value = -20;
-        this.sounds.set('wind', windPlayer);
+        campagnePlayer.volume.value = -20;
+        this.sounds.set('campagne', campagnePlayer);
+
+        // Forest sound (audio file)
+        const forestPlayer = new Tone.Player({
+            url: './sons/forest.mp3',
+            loop: true,
+            autostart: false
+        }).toDestination();
+        forestPlayer.volume.value = -20;
+        this.sounds.set('forest', forestPlayer);
+
+        // Ocean sound (audio file)
+        const oceanPlayer = new Tone.Player({
+            url: './sons/ocean.mp3',
+            loop: true,
+            autostart: false
+        }).toDestination();
+        oceanPlayer.volume.value = -20;
+        this.sounds.set('ocean', oceanPlayer);
+
+        // Rain sound (audio file)
+        const rainPlayer = new Tone.Player({
+            url: './sons/rain.mp3',
+            loop: true,
+            autostart: false
+        }).toDestination();
+        rainPlayer.volume.value = -20;
+        this.sounds.set('rain', rainPlayer);
+
+        // Chat sound (audio file)
+        const chatPlayer = new Tone.Player({
+            url: './sons/chat.mp3',
+            loop: true,
+            autostart: false
+        }).toDestination();
+        chatPlayer.volume.value = -20;
+        this.sounds.set('chat', chatPlayer);
+
+        // Feu sound (audio file)
+        const feuPlayer = new Tone.Player({
+            url: './sons/feu.mp3',
+            loop: true,
+            autostart: false
+        }).toDestination();
+        feuPlayer.volume.value = -20;
+        this.sounds.set('feu', feuPlayer);
     }
 
     /**
@@ -542,11 +574,19 @@ class BulleSensorielle {
     }
 
     /**
-     * Toggle sound on/off with exclusive playback
-     * Solution 1: Complete rewrite with better state management
+     * Toggle sound on/off with enhanced state management
+     * Initializes audio context on first interaction for Chrome compatibility
      */
-    toggleSound(soundId) {
+    async toggleSound(soundId) {
         console.log(`Toggling sound: ${soundId}`);
+        
+        // Initialize audio context on first user interaction
+        const audioReady = await this.initializeAudioContext();
+        if (!audioReady) {
+            console.error('Failed to initialize audio context');
+            return;
+        }
+        
         const soundBtn = document.querySelector(`button[data-sound="${soundId}"]`);
         const soundControl = document.querySelector(`.sound-control[data-sound="${soundId}"]`);
         const sound = this.sounds.get(soundId);
@@ -705,7 +745,7 @@ class BulleSensorielle {
             if (sound.start) {
                 sound.start();
             } else if (sound.noise && sound.lfo) {
-                // For complex sounds like waves and wind
+                // For complex synthesized sounds (legacy)
                 sound.noise.start();
                 sound.lfo.start();
             }
@@ -739,7 +779,7 @@ class BulleSensorielle {
             if (sound.stop) {
                 sound.stop();
             } else if (sound.noise && sound.lfo) {
-                // For complex sounds like waves and wind
+                // For complex synthesized sounds (legacy)
                 sound.noise.stop();
                 sound.lfo.stop();
             }

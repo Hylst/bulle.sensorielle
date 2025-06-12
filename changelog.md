@@ -31,12 +31,13 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 #### 🎵 Système Audio (Mixeur Sonore)
 - ✅ Intégration de Tone.js pour synthèse audio avancée
 - ✅ Générateurs de bruits ambiants (blanc, rose, brun)
-- ✅ Sons de nature synthétisés :
-  - ✅ Pluie douce (bruit filtré)
-  - ✅ Vagues calmes (LFO + filtre)
-  - ✅ Feu de camp (bruit brun filtré)
-  - ✅ Forêt d'été (bruit rose filtré)
-  - ✅ Ronronnement de chat (oscillateur basse fréquence)
+- ✅ Sons de nature avec fichiers audio :
+  - ✅ Pluie douce (rain.mp3)
+  - ✅ Vagues calmes (ocean.mp3)
+  - ✅ Feu de camp (feu.mp3)
+  - ✅ Forêt d'été (forest.mp3)
+  - ✅ Ronronnement de chat (chat.mp3)
+  - ✅ Campagne paisible (campagne.mp3)
 - ✅ Mélodies douces automatiques :
   - ✅ Piano doux avec patterns harmoniques
   - ✅ Lo-fi calme avec synthèse triangle
