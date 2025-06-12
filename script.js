@@ -123,12 +123,24 @@ class BulleSensorielle {
                 e.stopPropagation();
                 const visual = e.currentTarget.dataset.visual;
                 
+                // Handle fullscreen button separately
+                if (btn.id === 'fullscreenBtn') {
+                    this.toggleFullscreen();
+                    return;
+                }
+                
                 // Track last clicked visual for profile saving
                 this.lastClickedVisual = visual;
                 
                 this.setVisual(visual);
             });
         });
+        
+        // Handle fullscreen change events
+        document.addEventListener('fullscreenchange', () => this.handleFullscreenChange());
+        document.addEventListener('webkitfullscreenchange', () => this.handleFullscreenChange());
+        document.addEventListener('mozfullscreenchange', () => this.handleFullscreenChange());
+        document.addEventListener('MSFullscreenChange', () => this.handleFullscreenChange());
 
         // Timer controls
         document.querySelectorAll('.preset-btn').forEach(btn => {
@@ -419,13 +431,83 @@ class BulleSensorielle {
     }
 
     /**
-     * Resize canvas to fit container
+     * Resize canvas to fit container responsively
      */
     resizeCanvas() {
+        if (!this.canvas || !this.ctx) return;
+        
         const container = this.canvas.parentElement;
+        if (!container) return;
+        
         const rect = container.getBoundingClientRect();
-        this.canvas.width = Math.min(800, rect.width - 40);
-        this.canvas.height = Math.min(600, rect.height - 40);
+        
+        // Get device pixel ratio for crisp rendering
+        const dpr = window.devicePixelRatio || 1;
+        
+        // Calculate optimal dimensions based on container with proper padding
+        const containerWidth = Math.max(rect.width - 40, 200); // Ensure minimum width
+        const containerHeight = Math.max(rect.height - 40, 150); // Ensure minimum height
+        
+        // Maintain aspect ratio while fitting container
+        let canvasWidth, canvasHeight;
+        
+        // Determine optimal aspect ratio based on screen size
+        const isMobile = window.innerWidth <= 480;
+        const isTablet = window.innerWidth <= 768 && window.innerWidth > 480;
+        
+        if (isMobile) {
+            // Mobile: Use 16:9 aspect ratio for better immersion
+            const aspectRatio = 16 / 9;
+            if (containerWidth / containerHeight > aspectRatio) {
+                canvasHeight = containerHeight;
+                canvasWidth = containerHeight * aspectRatio;
+            } else {
+                canvasWidth = containerWidth;
+                canvasHeight = containerWidth / aspectRatio;
+            }
+        } else if (isTablet) {
+            // Tablet: Use 16:10 aspect ratio
+            const aspectRatio = 16 / 10;
+            if (containerWidth / containerHeight > aspectRatio) {
+                canvasHeight = containerHeight;
+                canvasWidth = containerHeight * aspectRatio;
+            } else {
+                canvasWidth = containerWidth;
+                canvasHeight = containerWidth / aspectRatio;
+            }
+        } else {
+            // Desktop: Use 4:3 aspect ratio for classic feel
+            const aspectRatio = 4 / 3;
+            if (containerWidth / containerHeight > aspectRatio) {
+                canvasHeight = Math.min(containerHeight, 600);
+                canvasWidth = canvasHeight * aspectRatio;
+            } else {
+                canvasWidth = Math.min(containerWidth, 800);
+                canvasHeight = canvasWidth / aspectRatio;
+            }
+        }
+        
+        // Ensure minimum dimensions
+        canvasWidth = Math.max(canvasWidth, 200);
+        canvasHeight = Math.max(canvasHeight, 150);
+        
+        // Set canvas display size
+        this.canvas.style.width = canvasWidth + 'px';
+        this.canvas.style.height = canvasHeight + 'px';
+        
+        // Set canvas internal resolution for crisp rendering
+        this.canvas.width = canvasWidth * dpr;
+        this.canvas.height = canvasHeight * dpr;
+        
+        // Reset and scale context to match device pixel ratio
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
+        this.ctx.scale(dpr, dpr);
+        
+        // Store dimensions for animations
+        this.canvasDisplayWidth = canvasWidth;
+        this.canvasDisplayHeight = canvasHeight;
+        
+        console.log(`Canvas resized: ${canvasWidth}x${canvasHeight} (display), ${this.canvas.width}x${this.canvas.height} (internal)`);
     }
 
     /**
@@ -446,12 +528,16 @@ class BulleSensorielle {
      * Render the current visual
      */
     renderCurrentVisual() {
-        // Don't render if visuals are paused
-        if (this.visualsPaused) {
+        // Don't render if visuals are paused or canvas is not ready
+        if (this.visualsPaused || !this.canvas || !this.ctx) {
             return;
         }
         
-        const { width, height } = this.canvas;
+        // Use display dimensions for clearing, fallback to canvas dimensions
+        const width = this.canvasDisplayWidth || (this.canvas.width / (window.devicePixelRatio || 1));
+        const height = this.canvasDisplayHeight || (this.canvas.height / (window.devicePixelRatio || 1));
+        
+        // Clear the entire canvas
         this.ctx.clearRect(0, 0, width, height);
 
         switch (this.currentVisual) {
@@ -467,6 +553,10 @@ class BulleSensorielle {
             case 'mandala':
                 this.renderRotatingMandala();
                 break;
+            default:
+                // Render breathing circle as default
+                this.renderBreathingCircle();
+                break;
         }
     }
 
@@ -474,7 +564,8 @@ class BulleSensorielle {
      * Enhanced breathing guidance circle with better synchronization
      */
     renderBreathingCircle() {
-        const { width, height } = this.canvas;
+        const width = this.canvasDisplayWidth || this.canvas.width;
+        const height = this.canvasDisplayHeight || this.canvas.height;
         const centerX = width / 2;
         const centerY = height / 2;
         const time = Date.now() * 0.001;
@@ -557,7 +648,8 @@ class BulleSensorielle {
      * Render floating colors
      */
     renderFloatingColors() {
-        const { width, height } = this.canvas;
+        const width = this.canvasDisplayWidth || this.canvas.width;
+        const height = this.canvasDisplayHeight || this.canvas.height;
         const time = Date.now() * 0.0005;
 
         for (let i = 0; i < 5; i++) {
@@ -588,7 +680,8 @@ class BulleSensorielle {
      * Enhanced star rain with beautiful gentle falling stars
      */
     renderStarRain() {
-        const { width, height } = this.canvas;
+        const width = this.canvasDisplayWidth || this.canvas.width;
+        const height = this.canvasDisplayHeight || this.canvas.height;
         const time = Date.now() * 0.001;
 
         // Create beautiful gradient night sky background
@@ -728,7 +821,8 @@ class BulleSensorielle {
      * Enhanced rotating mandala with hypnotizing patterns
      */
     renderRotatingMandala() {
-        const { width, height } = this.canvas;
+        const width = this.canvasDisplayWidth || this.canvas.width;
+        const height = this.canvasDisplayHeight || this.canvas.height;
         const centerX = width / 2;
         const centerY = height / 2;
         const time = Date.now() * 0.001;
@@ -1100,14 +1194,80 @@ class BulleSensorielle {
         // Stop visual animation by setting a flag
         this.visualsPaused = true;
         
-        // Clear canvas
-        const { width, height } = this.canvas;
-        this.ctx.clearRect(0, 0, width, height);
+        // Clear canvas if it exists
+        if (this.canvas && this.ctx) {
+            const width = this.canvasDisplayWidth || (this.canvas.width / (window.devicePixelRatio || 1));
+            const height = this.canvasDisplayHeight || (this.canvas.height / (window.devicePixelRatio || 1));
+            this.ctx.clearRect(0, 0, width, height);
+        }
         
         // Reset visual controls
         document.querySelectorAll('.visual-btn').forEach(btn => {
             btn.classList.remove('active');
         });
+        
+        console.log('All visuals stopped');
+    }
+
+    /**
+     * Toggle fullscreen mode for visual display
+     */
+    toggleFullscreen() {
+        const visualDisplay = document.querySelector('.visual-display');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        
+        if (!document.fullscreenElement && !document.webkitFullscreenElement && 
+            !document.mozFullScreenElement && !document.msFullscreenElement) {
+            // Enter fullscreen
+            if (visualDisplay.requestFullscreen) {
+                visualDisplay.requestFullscreen();
+            } else if (visualDisplay.webkitRequestFullscreen) {
+                visualDisplay.webkitRequestFullscreen();
+            } else if (visualDisplay.mozRequestFullScreen) {
+                visualDisplay.mozRequestFullScreen();
+            } else if (visualDisplay.msRequestFullscreen) {
+                visualDisplay.msRequestFullscreen();
+            }
+            
+            visualDisplay.classList.add('fullscreen');
+            if (fullscreenBtn) {
+                fullscreenBtn.innerHTML = '<span class="visual-icon">⛶</span><span>Quitter</span>';
+            }
+        } else {
+            // Exit fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+        
+        // Resize canvas after fullscreen change
+        setTimeout(() => this.resizeCanvas(), 100);
+    }
+
+    /**
+     * Handle fullscreen change events
+     */
+    handleFullscreenChange() {
+        const visualDisplay = document.querySelector('.visual-display');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        
+        if (!document.fullscreenElement && !document.webkitFullscreenElement && 
+            !document.mozFullScreenElement && !document.msFullscreenElement) {
+            // Exited fullscreen
+            visualDisplay.classList.remove('fullscreen');
+            if (fullscreenBtn) {
+                fullscreenBtn.innerHTML = '<span class="visual-icon">⛶</span><span>Plein écran</span>';
+            }
+        }
+        
+        // Resize canvas after fullscreen change
+        setTimeout(() => this.resizeCanvas(), 100);
     }
 
     /**
@@ -1560,9 +1720,11 @@ class BulleSensorielle {
      * Set current visual
      */
     setVisual(visualId) {
+        // Remove active class from all visual buttons
         document.querySelectorAll('.visual-btn').forEach(btn => {
             btn.classList.remove('active');
         });
+        
         const activeBtn = document.querySelector(`[data-visual="${visualId}"]`);
         if (activeBtn) {
             activeBtn.classList.add('active');
@@ -1573,8 +1735,15 @@ class BulleSensorielle {
                 this.setLastClickedIcon(iconElement.textContent);
             }
             
+            // Set the current visual and ensure visuals are not paused
             this.currentVisual = visualId;
-            this.showMascotMessage(`Visual ${visualId} activé !`, 1500);
+            this.visualsPaused = false;
+            
+            // Force a canvas resize to ensure proper display
+            this.resizeCanvas();
+            
+            this.showMascotMessage(`Visuel ${visualId} activé !`, 1500);
+            console.log(`Visual changed to: ${visualId}`);
         } else {
             console.warn(`Visual button not found for: ${visualId}`);
             this.showMascotMessage(`Visuel ${visualId} introuvable`, 1500);

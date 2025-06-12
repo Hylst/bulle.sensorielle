@@ -858,17 +858,22 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 400px;
+  min-height: min(70vh, 500px);
+  max-height: 80vh;
   background: var(--bg-secondary);
   border-radius: 25px;
   box-shadow: 0 8px 30px var(--shadow-light);
   border: 2px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4/3;
+  width: 100%;
 }
 
 #visualCanvas {
-  max-width: 100%;
-  height: auto;
   border-radius: 20px;
+  display: block;
+  margin: 0 auto;
 }
 
 /* Timer Styles */
@@ -1528,9 +1533,11 @@ body {
   }
   
   .visual-display {
-    min-height: 300px;
+    min-height: min(60vh, 350px);
+    max-height: 70vh;
     margin: 0 -15px;
     border-radius: 20px;
+    aspect-ratio: 16/10;
   }
   
   /* Optimized timer for tablets */
@@ -1621,7 +1628,9 @@ body {
   }
   
   .visual-display {
-    min-height: 250px;
+    min-height: min(50vh, 280px);
+    max-height: 60vh;
+    aspect-ratio: 16/9;
   }
   
   .timer-circle {
@@ -1691,22 +1700,43 @@ body {
   .visual-options {
     gap: 0.5rem;
     margin-bottom: 1rem;
+    flex-wrap: wrap;
   }
   
   .visual-btn {
     padding: 0.7rem 0.9rem;
     min-width: 65px;
     border-radius: 12px;
+    flex: 1 1 auto;
   }
   
   .visual-icon {
     font-size: 1.2rem;
   }
   
+  /* Fullscreen visual mode */
+  .visual-display.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+    border-radius: 0;
+    margin: 0;
+    aspect-ratio: unset;
+  }
+  
+  .visual-display.fullscreen #visualCanvas {
+    border-radius: 0;
+  }
+  
   .visual-display {
-    min-height: 280px;
+    min-height: min(45vh, 250px);
+    max-height: 55vh;
     margin: 0 -12px;
     border-radius: 15px;
+    aspect-ratio: 16/9;
   }
   
   /* Mobile timer */

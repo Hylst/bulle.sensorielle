@@ -2,6 +2,45 @@
 
 Tous les changements notables de ce projet seront documentés dans ce fichier.
 
+## [Version 2.7.3] - 2024-12-22
+
+### 🐛 Corrections critiques de l'affichage visuel
+- **Canvas tronqué corrigé** : Suppression des conflits CSS width/height 100%
+- **Blocage visuel résolu** : Amélioration de la gestion des états visualsPaused
+- **Changement de visuel réparé** : Fonction setVisual() avec réactivation forcée
+- **Dimensions canvas stabilisées** : Calculs de redimensionnement robustes
+- **Rendu DPR amélioré** : Gestion correcte du device pixel ratio
+- **Sécurité canvas** : Vérifications d'existence avant manipulation
+- **Logs de débogage** : Traçabilité des opérations canvas
+
+### 🔧 Améliorations techniques
+- **Transform reset** : Réinitialisation du contexte canvas à chaque resize
+- **Dimensions minimales** : Garantie de taille minimum 200x150px
+- **Fallback dimensions** : Calculs de secours pour compatibilité
+- **Console logging** : Suivi détaillé des opérations visuelles
+
+## [Version 2.7.2] - 2024-12-22
+
+### 🖥️ Améliorations Responsives Majeures
+- **Canvas adaptatif** : Redimensionnement intelligent selon la taille d'écran
+- **Ratios d'aspect optimisés** : 16:9 mobile, 16:10 tablette, 4:3 desktop
+- **Rendu haute définition** : Support du device pixel ratio pour écrans Retina
+- **Dimensions fluides** : Utilisation de vh/vw pour une adaptation parfaite
+- **Gestion orientation** : Adaptation automatique portrait/paysage
+
+### 🎯 Mode Plein Écran Immersif
+- **Bouton plein écran** : Nouveau contrôle dans les options visuelles
+- **Immersion totale** : Affichage des visuels sur tout l'écran
+- **Compatibilité navigateurs** : Support Webkit, Moz, MS et standard
+- **Transitions fluides** : Entrée/sortie de plein écran sans interruption
+- **Redimensionnement automatique** : Canvas s'adapte instantanément
+
+### 📱 Optimisations Mobiles
+- **Contrôles tactiles** : Boutons visuels plus flexibles sur mobile
+- **Aspect ratios mobiles** : 16:9 pour une meilleure immersion
+- **Performance améliorée** : Rendu optimisé pour appareils mobiles
+- **Interface adaptative** : Éléments qui s'ajustent à l'espace disponible
+
 ## [Version 2.7.1] - 2024-12-22
 
 ### 🔧 Corrections Critiques de Suppression
