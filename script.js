@@ -316,10 +316,16 @@ class BulleSensorielle {
      * Note: Audio context will be initialized on first user interaction
      */
     async setupAudio() {
-        // Create sound generators (without starting audio context)
-        this.createNoiseGenerators();
-        this.createNatureSounds();
-        this.createMelodies();
+        try {
+            // Create sound generators (without starting audio context)
+            this.createNoiseGenerators();
+            await this.createNatureSounds();
+            await this.createMelodies();
+            console.log('Audio setup completed successfully');
+        } catch (error) {
+            console.error('Error during audio setup:', error);
+            // Continue with app initialization even if some audio fails
+        }
     }
 
     /**
@@ -331,6 +337,15 @@ class BulleSensorielle {
             try {
                 await Tone.start();
                 this.audioInitialized = true;
+                
+                // Start melody patterns now that audio context is active
+                if (this.melodyPatterns) {
+                    this.melodyPatterns.piano.start(0);
+                    this.melodyPatterns.lofi.start(0);
+                    Tone.Transport.start();
+                    console.log('Melody patterns started with audio context');
+                }
+                
                 console.log('Audio context initialized successfully');
                 return true;
             } catch (error) {
@@ -362,86 +377,107 @@ class BulleSensorielle {
     }
 
     /**
-     * Create nature sounds using Tone.js synthesizers and audio files
+     * Create HTML5 Audio element with proper error handling
+     * @param {string} src - Audio file path
+     * @param {boolean} loop - Whether to loop the audio
+     * @param {number} volume - Volume level (0-1)
+     * @param {string} name - Sound name for logging
+     * @returns {HTMLAudioElement|null} Audio element or null if failed
      */
-    createNatureSounds() {
+    createAudioElement(src, loop = true, volume = 0.1, name = 'unknown') {
+        try {
+            const audio = new Audio(src);
+            audio.loop = loop;
+            audio.volume = volume;
+            audio.preload = 'auto';
+            
+            // Add event listeners for better error handling
+            audio.addEventListener('canplaythrough', () => {
+                console.log(`${name} loaded successfully`);
+            });
+            
+            audio.addEventListener('error', (e) => {
+                console.warn(`${name} failed to load:`, e.target.error);
+            });
+            
+            // Add custom methods to match Tone.js interface
+            audio.start = () => {
+                if (audio.paused) {
+                    audio.play().catch(e => console.warn(`Failed to start ${name}:`, e));
+                }
+            };
+            
+            audio.stop = () => {
+                if (!audio.paused) {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+            };
+            
+            return audio;
+        } catch (error) {
+            console.warn(`Failed to create ${name} audio element:`, error);
+            return null;
+        }
+    }
+
+    /**
+     * Create nature sounds using HTML5 Audio API for better file:// protocol support
+     */
+    async createNatureSounds() {
         // Campagne sound (audio file)
-        const campagnePlayer = new Tone.Player({
-            url: './sons/campagne.mp3',
-            loop: true,
-            autostart: false
-        }).toDestination();
-        campagnePlayer.volume.value = -20;
-        this.sounds.set('campagne', campagnePlayer);
+        const campagnePlayer = this.createAudioElement('./sons/campagne.mp3', true, 0.1, 'Campagne');
+        if (campagnePlayer) {
+            this.sounds.set('campagne', campagnePlayer);
+        }
 
         // Forest sound (audio file)
-        const forestPlayer = new Tone.Player({
-            url: './sons/forest.mp3',
-            loop: true,
-            autostart: false
-        }).toDestination();
-        forestPlayer.volume.value = -20;
-        this.sounds.set('forest', forestPlayer);
+        const forestPlayer = this.createAudioElement('./sons/forest.mp3', true, 0.1, 'Forest');
+        if (forestPlayer) {
+            this.sounds.set('forest', forestPlayer);
+        }
 
         // Ocean sound (audio file)
-        const oceanPlayer = new Tone.Player({
-            url: './sons/ocean.mp3',
-            loop: true,
-            autostart: false
-        }).toDestination();
-        oceanPlayer.volume.value = -20;
-        this.sounds.set('ocean', oceanPlayer);
+        const oceanPlayer = this.createAudioElement('./sons/ocean.mp3', true, 0.1, 'Ocean');
+        if (oceanPlayer) {
+            this.sounds.set('ocean', oceanPlayer);
+        }
 
         // Rain sound (audio file)
-        const rainPlayer = new Tone.Player({
-            url: './sons/rain.mp3',
-            loop: true,
-            autostart: false
-        }).toDestination();
-        rainPlayer.volume.value = -20;
-        this.sounds.set('rain', rainPlayer);
+        const rainPlayer = this.createAudioElement('./sons/rain.mp3', true, 0.1, 'Rain');
+        if (rainPlayer) {
+            this.sounds.set('rain', rainPlayer);
+        }
 
         // Chat sound (audio file)
-        const chatPlayer = new Tone.Player({
-            url: './sons/chat.mp3',
-            loop: true,
-            autostart: false
-        }).toDestination();
-        chatPlayer.volume.value = -20;
-        this.sounds.set('chat', chatPlayer);
+        const chatPlayer = this.createAudioElement('./sons/chat.mp3', true, 0.1, 'Chat');
+        if (chatPlayer) {
+            this.sounds.set('chat', chatPlayer);
+        }
 
         // Feu sound (audio file)
-        const feuPlayer = new Tone.Player({
-            url: './sons/feu.mp3',
-            loop: true,
-            autostart: false
-        }).toDestination();
-        feuPlayer.volume.value = -20;
-        this.sounds.set('feu', feuPlayer);
+        const feuPlayer = this.createAudioElement('./sons/feu.mp3', true, 0.1, 'Feu');
+        if (feuPlayer) {
+            this.sounds.set('feu', feuPlayer);
+        }
 
         // Underwater sound (audio file)
-        const underwaterPlayer = new Tone.Player({
-            url: './sons/underwater.mp3',
-            loop: true,
-            autostart: false
-        }).toDestination();
-        underwaterPlayer.volume.value = -20;
-        this.sounds.set('underwater', underwaterPlayer);
+        const underwaterPlayer = this.createAudioElement('./sons/underwater.mp3', true, 0.1, 'Underwater');
+        if (underwaterPlayer) {
+            this.sounds.set('underwater', underwaterPlayer);
+        }
 
         // Bubble sound for UI feedback (non-looping)
-        const bubblePlayer = new Tone.Player({
-            url: './sons/bubble.mp3',
-            loop: false,
-            autostart: false
-        }).toDestination();
-        bubblePlayer.volume.value = -10;
-        this.sounds.set('bubble', bubblePlayer);
+        const bubblePlayer = this.createAudioElement('./sons/bubble.mp3', false, 0.3, 'Bubble');
+        if (bubblePlayer) {
+            this.sounds.set('bubble', bubblePlayer);
+        }
     }
 
     /**
      * Create melodic synthesizers
      */
-    createMelodies() {
+    async createMelodies() {
         // Soft piano
         const piano = new Tone.PolySynth(Tone.Synth, {
             oscillator: { type: 'sine' },
@@ -458,17 +494,24 @@ class BulleSensorielle {
         lofi.volume.value = -18;
         this.sounds.set('lofi', lofi);
 
-        // Berceuse melody
-        const berceuse = new Tone.Player("sons/berceuse.mp3").toDestination();
-        berceuse.loop = true;
-        berceuse.volume.value = -10;
-        this.sounds.set('berceuse', berceuse);
+        // Berceuse melody (HTML5 Audio)
+        console.log('Creating Berceuse player...');
+        const berceuse = this.createAudioElement('./sons/berceuse.mp3', true, 0.3, 'Berceuse');
+        if (berceuse) {
+            this.sounds.set('berceuse', berceuse);
+            console.log('Berceuse player created and added to sounds map');
+        }
 
-        // Ballade melody
-        const ballade = new Tone.Player("sons/ballade.mp3").toDestination();
-        ballade.loop = true;
-        ballade.volume.value = -10;
-        this.sounds.set('ballade', ballade);
+        // Ballade melody (HTML5 Audio)
+        console.log('Creating Ballade player...');
+        const ballade = this.createAudioElement('./sons/ballade.mp3', true, 0.3, 'Ballade');
+        if (ballade) {
+            this.sounds.set('ballade', ballade);
+            console.log('Ballade player created and added to sounds map');
+        }
+        
+        // Log the sounds map after adding MP3s
+        console.log('All sounds in map after MP3 creation:', Array.from(this.sounds.keys()));
 
         // Start gentle melodies
         this.startMelodyPatterns();
@@ -476,29 +519,36 @@ class BulleSensorielle {
 
     /**
      * Start gentle melody patterns
+     * Note: Transport will only start after user interaction
      */
     startMelodyPatterns() {
-        // Piano melody pattern
-        const pianoPattern = new Tone.Pattern((time, note) => {
-            if (this.activeSounds.has('piano')) {
-                this.sounds.get('piano').triggerAttackRelease(note, '2n', time);
-            }
-        }, ['C4', 'E4', 'G4', 'C5', 'G4', 'E4'], 'up');
-        pianoPattern.interval = '2n';
-        pianoPattern.start(0);
-
-        // Lo-fi melody pattern
-        const lofiPattern = new Tone.Pattern((time, note) => {
-            if (this.activeSounds.has('lofi')) {
-                this.sounds.get('lofi').triggerAttackRelease(note, '4n', time);
-            }
-        }, ['A3', 'C4', 'E4', 'A4', 'E4', 'C4'], 'upDown');
-        lofiPattern.interval = '4n';
-        lofiPattern.start(0);
-
-        // Start Tone.js transport
-        Tone.Transport.bpm.value = 60;
-        Tone.Transport.start();
+        try {
+            // Piano melody pattern
+            const pianoPattern = new Tone.Pattern((time, note) => {
+                if (this.activeSounds.has('piano')) {
+                    this.sounds.get('piano').triggerAttackRelease(note, '2n', time);
+                }
+            }, ['C4', 'E4', 'G4', 'C5', 'G4', 'E4'], 'up');
+            pianoPattern.interval = '2n';
+            
+            // Lo-fi melody pattern
+            const lofiPattern = new Tone.Pattern((time, note) => {
+                if (this.activeSounds.has('lofi')) {
+                    this.sounds.get('lofi').triggerAttackRelease(note, '4n', time);
+                }
+            }, ['A3', 'C4', 'E4', 'A4', 'E4', 'C4'], 'upDown');
+            lofiPattern.interval = '4n';
+            
+            // Store patterns for later use
+            this.melodyPatterns = { piano: pianoPattern, lofi: lofiPattern };
+            
+            // Configure transport but don't start yet
+            Tone.Transport.bpm.value = 60;
+            
+            console.log('Melody patterns configured successfully');
+        } catch (error) {
+            console.warn('Error configuring melody patterns:', error);
+        }
     }
 
     /**
@@ -1058,17 +1108,25 @@ class BulleSensorielle {
      * Navigate to a specific section
      */
     navigateToSection(sectionId) {
-        // Update navigation buttons
+        // Update navigation buttons (only if corresponding nav button exists)
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.classList.remove('active');
         });
-        document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+        
+        const navButton = document.querySelector(`[data-section="${sectionId}"]`);
+        if (navButton) {
+            navButton.classList.add('active');
+        }
 
         // Update sections
         document.querySelectorAll('.section').forEach(section => {
             section.classList.remove('active');
         });
-        document.getElementById(sectionId).classList.add('active');
+        
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.classList.add('active');
+        }
 
         this.currentSection = sectionId;
 
@@ -1173,8 +1231,25 @@ class BulleSensorielle {
         const soundControl = document.querySelector(`.sound-control[data-sound="${soundId}"]`);
         const sound = this.sounds.get(soundId);
 
+        console.log(`Sound button found:`, soundBtn);
+        console.log(`Sound control found:`, soundControl);
+        console.log(`Sound object found:`, sound);
+        console.log(`Sound loaded:`, sound?.loaded);
+        console.log(`Sound type:`, sound?.constructor?.name);
+        
+        // Special debugging for MP3 files
+        if (soundId === 'berceuse' || soundId === 'ballade') {
+            console.log(`MP3 Debug - ${soundId}:`);
+            console.log(`- Sound exists:`, !!sound);
+            console.log(`- Sound loaded:`, sound?.loaded);
+            console.log(`- Sound state:`, sound?.state);
+            console.log(`- Sound buffer:`, sound?.buffer);
+            console.log(`- Sound url:`, sound?.url);
+        }
+
         if (!sound || !soundBtn) {
             console.error(`Sound or button not found for: ${soundId}`);
+            console.log(`Available sounds:`, Array.from(this.sounds.keys()));
             return;
         }
 
@@ -1680,16 +1755,41 @@ class BulleSensorielle {
         }
 
         try {
-            if (sound.start) {
-                sound.start();
-                // Track state for Tone.js objects
-                this.soundStates.set(soundId, 'playing');
-                this.pausedSounds.delete(soundId);
-            } else if (sound.play) {
+            // Check if it's an HTML5 Audio element (has play method but not Tone.js start)
+            if (sound instanceof HTMLAudioElement || (sound.play && !sound.start)) {
                 // Handle HTML5 Audio objects
-                sound.play().catch(console.error);
+                sound.play().catch(e => console.warn(`Failed to play ${soundId}:`, e));
                 this.soundStates.set(soundId, 'playing');
                 this.pausedSounds.delete(soundId);
+            } else if (sound.start) {
+                // Check if it's a Tone.Player and if it's loaded
+                if (sound.loaded !== undefined) {
+                    if (sound.loaded) {
+                        sound.start();
+                        // Track state for Tone.js objects
+                        this.soundStates.set(soundId, 'playing');
+                        this.pausedSounds.delete(soundId);
+                    } else {
+                        console.warn(`Sound ${soundId} is not loaded yet. Waiting for load...`);
+                        // Wait for the sound to load, then start
+                        const checkLoaded = () => {
+                            if (sound.loaded) {
+                                sound.start();
+                                this.soundStates.set(soundId, 'playing');
+                                this.pausedSounds.delete(soundId);
+                                console.log(`Sound ${soundId} loaded and started`);
+                            } else {
+                                setTimeout(checkLoaded, 100);
+                            }
+                        };
+                        checkLoaded();
+                    }
+                } else {
+                    // Regular Tone.js synth objects
+                    sound.start();
+                    this.soundStates.set(soundId, 'playing');
+                    this.pausedSounds.delete(soundId);
+                }
             } else if (sound.noise && sound.lfo) {
                 // For complex synthesized sounds (legacy)
                 sound.noise.start();
@@ -1727,15 +1827,16 @@ class BulleSensorielle {
         }
 
         try {
-            if (sound.stop) {
-                sound.stop();
-                // Track state for Tone.js objects
-                this.soundStates.set(soundId, 'stopped');
-                this.pausedSounds.delete(soundId);
-            } else if (sound.pause) {
+            // Check if it's an HTML5 Audio element
+            if (sound instanceof HTMLAudioElement || (sound.pause && !sound.stop)) {
                 // Handle HTML5 Audio objects
                 sound.pause();
                 sound.currentTime = 0;
+                this.soundStates.set(soundId, 'stopped');
+                this.pausedSounds.delete(soundId);
+            } else if (sound.stop) {
+                sound.stop();
+                // Track state for Tone.js objects
                 this.soundStates.set(soundId, 'stopped');
                 this.pausedSounds.delete(soundId);
             } else if (sound.noise && sound.lfo) {
@@ -2418,7 +2519,312 @@ class BulleSensorielle {
      }
  }
 
+// Feelings functionality
+const emotionsData = {
+    joie: {
+        needs: [
+            { id: 'partage', icon: '🎵', title: 'Partager ma joie', description: 'Exprimer ce bonheur avec les autres' },
+            { id: 'creation', icon: '🎨', title: 'Créer quelque chose', description: 'Utiliser cette énergie positive' },
+            { id: 'celebration', icon: '🎉', title: 'Célébrer', description: 'Profiter de ce moment heureux' }
+        ],
+        activities: [
+            { icon: '🎵', title: 'Danser ou chanter une chanson', description: 'Laisse ton corps bouger sur ta musique préférée pour exprimer ta joie.' },
+            { icon: '🎨', title: 'Dessiner ou colorier', description: 'Crée quelque chose de beau avec tes couleurs préférées.' },
+            { icon: '📞', title: 'Appeler quelqu\'un que tu aimes', description: 'Partage ton bonheur avec une personne spéciale.' }
+        ]
+    },
+    calme: {
+        needs: [
+            { id: 'maintenir', icon: '🧘', title: 'Maintenir cette paix', description: 'Préserver ce moment de sérénité' },
+            { id: 'ressourcer', icon: '📚', title: 'Me ressourcer', description: 'Profiter de cette tranquillité' },
+            { id: 'savourer', icon: '🌸', title: 'Savourer l\'instant', description: 'Apprécier ce calme intérieur' }
+        ],
+        activities: [
+            { icon: '📚', title: 'Lire un livre tranquillement', description: 'Installe-toi confortablement avec un livre que tu aimes.' },
+            { icon: '🧘', title: 'Méditer ou respirer profondément', description: 'Ferme les yeux et concentre-toi sur ta respiration.' },
+            { icon: '🌿', title: 'Observer la nature', description: 'Regarde par la fenêtre ou va dehors pour admirer les plantes et les animaux.' }
+        ]
+    },
+    peur: {
+        needs: [
+            { id: 'securite', icon: '🤗', title: 'Être rassuré(e)', description: 'Avoir du réconfort et de la sécurité' },
+            { id: 'confiance', icon: '💪', title: 'Reprendre confiance', description: 'Retrouver du courage' },
+            { id: 'protection', icon: '🛡️', title: 'Me sentir protégé(e)', description: 'Avoir un environnement sûr' }
+        ],
+        activities: [
+            { icon: '🤗', title: 'Faire un câlin ou tenir la main', description: 'Demande un câlin à quelqu\'un en qui tu as confiance.' },
+            { icon: '🧸', title: 'Serrer une peluche ou une couverture', description: 'Enroule-toi dans une couverture douce avec ton doudou.' },
+            { icon: '🎧', title: 'Écouter de la musique douce', description: 'Mets tes écouteurs et écoute des sons apaisants.' }
+        ]
+    },
+    tristesse: {
+        needs: [
+            { id: 'reconfort', icon: '💙', title: 'Être consolé(e)', description: 'Recevoir de la compassion' },
+            { id: 'expression', icon: '🗣️', title: 'Exprimer mes sentiments', description: 'Partager ce que je ressens' },
+            { id: 'temps', icon: '⏰', title: 'Prendre mon temps', description: 'Laisser passer cette émotion' }
+        ],
+        activities: [
+            { icon: '😢', title: 'Pleurer si j\'en ai besoin', description: 'C\'est normal de pleurer, ça aide à évacuer la tristesse.' },
+            { icon: '🗣️', title: 'Parler de ce que je ressens', description: 'Trouve quelqu\'un de confiance pour partager tes émotions.' },
+            { icon: '🎨', title: 'Dessiner mes émotions', description: 'Utilise des couleurs pour exprimer ce que tu ressens sur papier.' }
+        ]
+    },
+    colere: {
+        needs: [
+            { id: 'evacuation', icon: '💨', title: 'Évacuer cette énergie', description: 'Libérer cette tension' },
+            { id: 'comprendre', icon: '🎯', title: 'Comprendre pourquoi', description: 'Identifier la cause de ma colère' },
+            { id: 'calme', icon: '😌', title: 'Retrouver mon calme', description: 'Apaiser cette émotion intense' }
+        ],
+        activities: [
+            { icon: '💨', title: 'Respirer profondément', description: 'Inspire lentement par le nez, retiens, puis expire par la bouche.' },
+            { icon: '🏃', title: 'Bouger ou faire du sport', description: 'Cours, saute, ou fais des mouvements pour évacuer l\'énergie.' },
+            { icon: '🥊', title: 'Taper dans un coussin', description: 'Utilise un coussin ou un oreiller pour libérer ta colère sans faire mal.' }
+        ]
+    },
+    fatigue: {
+        needs: [
+            { id: 'repos', icon: '😴', title: 'Me reposer', description: 'Récupérer de l\'énergie' },
+            { id: 'recharger', icon: '🔋', title: 'Recharger mes batteries', description: 'Prendre soin de moi' },
+            { id: 'ralentir', icon: '🛌', title: 'Ralentir le rythme', description: 'Faire une pause' }
+        ],
+        activities: [
+            { icon: '😴', title: 'Faire une sieste', description: 'Allonge-toi dans un endroit confortable pour te reposer.' },
+            { icon: '🛁', title: 'Prendre un bain chaud', description: 'L\'eau chaude va détendre tes muscles et t\'apaiser.' },
+            { icon: '🍵', title: 'Boire quelque chose de chaud', description: 'Une boisson chaude peut te réconforter et te donner de l\'énergie.' }
+        ]
+    }
+};
+
+let selectedEmotion = null;
+let selectedNeed = null;
+
+function showNeeds(emotion = selectedEmotion) {
+    // If no emotion is provided and no emotion is selected, return to emotions
+    if (!emotion) {
+        showEmotions();
+        return;
+    }
+    
+    selectedEmotion = emotion;
+    const emotionsSection = document.getElementById('emotionsSection');
+    const needsSection = document.getElementById('needsSection');
+    const activitiesSection = document.getElementById('activitiesSection');
+    const needsGrid = document.getElementById('needsGrid');
+    const activitiesGrid = document.getElementById('activitiesGrid');
+    
+    // Smooth transition: fade out current sections
+    emotionsSection.style.opacity = '0';
+    activitiesSection.style.opacity = '0';
+    
+    setTimeout(() => {
+        // Hide other sections
+        emotionsSection.style.display = 'none';
+        activitiesSection.style.display = 'none';
+        
+        // Show needs section with fade in
+        needsSection.style.display = 'block';
+        needsSection.style.opacity = '0';
+        
+        setTimeout(() => {
+            needsSection.style.opacity = '1';
+        }, 20);
+    }, 200);
+    
+    // Clear previous content
+    needsGrid.innerHTML = '';
+    activitiesGrid.innerHTML = '';
+    
+    // Reset styling of existing need cards
+    const existingNeedCards = document.querySelectorAll('.need-card');
+    existingNeedCards.forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Reset selected need when returning to needs
+    selectedNeed = null;
+    
+    // Populate needs
+    const needs = emotionsData[emotion].needs;
+    needs.forEach(need => {
+        const needCard = document.createElement('div');
+        needCard.className = 'need-card';
+        needCard.innerHTML = `
+            <div class="need-icon">${need.icon || '💭'}</div>
+            <h3>${need.title}</h3>
+            <p>${need.description}</p>
+        `;
+        needCard.addEventListener('click', () => selectNeed(need.id, needCard));
+        needsGrid.appendChild(needCard);
+    });
+}
+
+function selectNeed(needId, cardElement) {
+    selectedNeed = needId;
+    
+    // Remove selection from all need cards
+    document.querySelectorAll('.need-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Add selection to clicked card
+    cardElement.classList.add('selected');
+    
+    // Show activities after a short delay
+    setTimeout(() => {
+        showActivities();
+    }, 500);
+}
+
+function showActivities() {
+    const needsSection = document.getElementById('needsSection');
+    const activitiesSection = document.getElementById('activitiesSection');
+    const activitiesGrid = document.getElementById('activitiesGrid');
+    
+    // Smooth transition: fade out needs section
+    needsSection.style.opacity = '0';
+    
+    setTimeout(() => {
+        // Hide needs section
+        needsSection.style.display = 'none';
+        
+        // Show activities section with fade in
+        activitiesSection.style.display = 'block';
+        activitiesSection.style.opacity = '0';
+        
+        setTimeout(() => {
+            activitiesSection.style.opacity = '1';
+        }, 20);
+    }, 200);
+    
+    // Clear previous content
+    activitiesGrid.innerHTML = '';
+    
+    // Populate activities
+    const activities = emotionsData[selectedEmotion].activities;
+    activities.forEach(activity => {
+        const activityCard = document.createElement('div');
+        activityCard.className = 'activity-card';
+        activityCard.innerHTML = `
+            <div class="activity-icon">${activity.icon || '✨'}</div>
+            <h3>${activity.title}</h3>
+            <p>${activity.description}</p>
+        `;
+        activitiesGrid.appendChild(activityCard);
+    });
+}
+
+function showEmotions() {
+    const emotionsSection = document.getElementById('emotionsSection');
+    const needsSection = document.getElementById('needsSection');
+    const activitiesSection = document.getElementById('activitiesSection');
+    const needsGrid = document.getElementById('needsGrid');
+    const activitiesGrid = document.getElementById('activitiesGrid');
+    
+    // Smooth transition: fade out current sections
+    needsSection.style.opacity = '0';
+    activitiesSection.style.opacity = '0';
+    
+    setTimeout(() => {
+        // Hide other sections
+        needsSection.style.display = 'none';
+        activitiesSection.style.display = 'none';
+        
+        // Show emotions section with fade in
+        emotionsSection.style.display = 'block';
+        emotionsSection.style.opacity = '0';
+        
+        setTimeout(() => {
+            emotionsSection.style.opacity = '1';
+        }, 20);
+    }, 200);
+    
+    // Clear grids
+    needsGrid.innerHTML = '';
+    activitiesGrid.innerHTML = '';
+    
+    // Reset selections when returning to emotions
+    selectedEmotion = null;
+    selectedNeed = null;
+    
+    // Reset styling of emotion and need cards
+    const emotionCards = document.querySelectorAll('.emotion-card');
+    const needCards = document.querySelectorAll('.need-card');
+    
+    emotionCards.forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    needCards.forEach(card => {
+        card.classList.remove('selected');
+    });
+}
+
+function restart() {
+    const emotionsSection = document.getElementById('emotionsSection');
+    const needsSection = document.getElementById('needsSection');
+    const activitiesSection = document.getElementById('activitiesSection');
+    const needsGrid = document.getElementById('needsGrid');
+    const activitiesGrid = document.getElementById('activitiesGrid');
+    
+    // Hide all sections except emotions
+    needsSection.style.display = 'none';
+    activitiesSection.style.display = 'none';
+    emotionsSection.style.display = 'block';
+    
+    // Clear grids
+    needsGrid.innerHTML = '';
+    activitiesGrid.innerHTML = '';
+    
+    // Reset all selections
+    selectedEmotion = null;
+    selectedNeed = null;
+    
+    // Reset styling of all cards
+    const emotionCards = document.querySelectorAll('.emotion-card');
+    const needCards = document.querySelectorAll('.need-card');
+    
+    emotionCards.forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    needCards.forEach(card => {
+        card.classList.remove('selected');
+    });
+}
+
+// Add click event listeners to emotion cards
+document.addEventListener('DOMContentLoaded', () => {
+    const emotionCards = document.querySelectorAll('.emotion-card');
+    emotionCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const emotion = card.getAttribute('data-emotion');
+            const color = card.getAttribute('data-color');
+            
+            // Remove selection from all emotion cards
+            emotionCards.forEach(c => c.classList.remove('selected'));
+            
+            // Add selection to clicked card
+            card.classList.add('selected');
+            
+            // Show needs after a short delay
+            setTimeout(() => {
+                showNeeds(emotion);
+            }, 300);
+        });
+    });
+});
+
+// Global variable to store the app instance
+let appInstance = null;
+
+// Global function for section navigation (used by onclick events)
+function showSection(sectionId) {
+    if (appInstance) {
+        appInstance.navigateToSection(sectionId);
+    }
+}
+
 // Initialize the application when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new BulleSensorielle();
+    appInstance = new BulleSensorielle();
 });

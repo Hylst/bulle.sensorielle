@@ -116,10 +116,23 @@ function showNeeds(emotion = currentEmotion) {
     const activitiesSection = document.getElementById('activitiesSection');
     const needsGrid = document.getElementById('needsGrid');
     
-    // Hide emotions and activities, show needs
-    emotionsSection.style.display = 'none';
-    activitiesSection.style.display = 'none';
-    needsSection.style.display = 'block';
+    // Smooth transition: fade out current sections
+    emotionsSection.style.opacity = '0';
+    activitiesSection.style.opacity = '0';
+    
+    setTimeout(() => {
+        // Hide other sections
+        emotionsSection.style.display = 'none';
+        activitiesSection.style.display = 'none';
+        
+        // Show needs section with fade in
+        needsSection.style.display = 'block';
+        needsSection.style.opacity = '0';
+        
+        setTimeout(() => {
+            needsSection.style.opacity = '1';
+        }, 20);
+    }, 200);
 
     // Clear activities grid to prevent leftover cards
     const activitiesGrid = document.getElementById('activitiesGrid');
@@ -176,9 +189,21 @@ function showActivities() {
     const activitiesSection = document.getElementById('activitiesSection');
     const activitiesGrid = document.getElementById('activitiesGrid');
     
-    // Hide needs, show activities
-    needsSection.style.display = 'none';
-    activitiesSection.style.display = 'block';
+    // Smooth transition: fade out needs section
+    needsSection.style.opacity = '0';
+    
+    setTimeout(() => {
+        // Hide needs section
+        needsSection.style.display = 'none';
+        
+        // Show activities section with fade in
+        activitiesSection.style.display = 'block';
+        activitiesSection.style.opacity = '0';
+        
+        setTimeout(() => {
+            activitiesSection.style.opacity = '1';
+        }, 20);
+    }, 200);
     
     // Clear and populate activities
     activitiesGrid.innerHTML = '';
@@ -207,10 +232,23 @@ function showEmotions() {
     const needsSection = document.getElementById('needsSection');
     const activitiesSection = document.getElementById('activitiesSection');
     
-    // Hide needs and activities, show emotions
-    needsSection.style.display = 'none';
-    activitiesSection.style.display = 'none';
-    emotionsSection.style.display = 'block';
+    // Smooth transition: fade out current sections
+    needsSection.style.opacity = '0';
+    activitiesSection.style.opacity = '0';
+    
+    setTimeout(() => {
+        // Hide other sections
+        needsSection.style.display = 'none';
+        activitiesSection.style.display = 'none';
+        
+        // Show emotions section with fade in
+        emotionsSection.style.display = 'block';
+        emotionsSection.style.opacity = '0';
+        
+        setTimeout(() => {
+            emotionsSection.style.opacity = '1';
+        }, 20);
+    }, 200);
 
     // Clear needs and activities grids to prevent leftover cards
     const needsGrid = document.getElementById('needsGrid');
@@ -246,10 +284,23 @@ function restart() {
     const needsSection = document.getElementById('needsSection');
     const emotionsSection = document.getElementById('emotionsSection');
     
-    // Hide all sections except emotions
-    activitiesSection.style.display = 'none';
-    needsSection.style.display = 'none';
-    emotionsSection.style.display = 'block';
+    // Smooth transition: fade out current sections
+    activitiesSection.style.opacity = '0';
+    needsSection.style.opacity = '0';
+    
+    setTimeout(() => {
+        // Hide all sections except emotions
+        activitiesSection.style.display = 'none';
+        needsSection.style.display = 'none';
+        
+        // Show emotions section with fade in
+        emotionsSection.style.display = 'block';
+        emotionsSection.style.opacity = '0';
+        
+        setTimeout(() => {
+            emotionsSection.style.opacity = '1';
+        }, 20);
+    }, 200);
     
     // Clear all grids
     const needsGrid = document.getElementById('needsGrid');

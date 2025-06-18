@@ -76,6 +76,16 @@ body {
   animation: fadeInUp 1s ease-out 0.2s both;
 }
 
+/* Section Transitions */
+.emotions-section, .needs-section, .activities-section {
+  transition: opacity 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  will-change: opacity;
+}
+
+.emotions-section.show, .needs-section.show, .activities-section.show {
+  opacity: 1;
+}
+
 /* Emotions Grid */
 .emotions-grid {
   display: grid;

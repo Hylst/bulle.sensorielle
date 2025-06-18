@@ -2,6 +2,97 @@
 
 Tous les changements notables de ce projet seront documentés dans ce fichier.
 
+## [Latest] - HTML5 Audio API Implementation
+
+### Major Changes
+- **HTML5 Audio API**: Replaced Tone.js Player instances with native HTML5 Audio elements for all MP3 files
+- **File Protocol Support**: Application now works directly from file system without requiring HTTP server
+- **Hybrid Audio System**: MP3 files use HTML5 Audio, synthesized sounds use Tone.js
+- **No Server Required**: Eliminated need for local HTTP server setup
+
+### Fixed
+- **CORS Policy Errors**: Completely resolved by using HTML5 Audio API for MP3 files
+- **File Protocol Compatibility**: Application works when opened directly in browser
+- **Tone.js Deprecation Warnings**: Reduced by limiting Tone.js to synthesized sounds only
+- **AudioContext Suspension**: HTML5 Audio handles autoplay policies natively
+- **Audio Loading Failures**: Improved error handling with native HTML5 Audio events
+
+### Enhanced
+- **createAudioElement()**: New method for creating HTML5 Audio with unified interface
+- **Unified Audio Control**: Single interface for both HTML5 Audio and Tone.js objects
+- **Error Handling**: Native HTML5 Audio error events and loading states
+- **Performance**: More efficient MP3 playback with native browser audio
+- **Cross-Platform**: Better compatibility across devices and browsers
+
+### Technical Improvements
+- **createNatureSounds()**: Replaced all Tone.Player instances with HTML5 Audio elements
+- **createMelodies()**: Updated berceuse and ballade to use HTML5 Audio
+- **startSound()**: Added HTML5 Audio element detection and handling
+- **stopSound()**: Enhanced to properly handle both audio types
+- **Audio Interface**: Added start() and stop() methods to HTML5 Audio elements
+
+### Audio System Architecture
+```
+HTML5 Audio (MP3 Files):
+- Nature Sounds: campagne, forest, ocean, rain, chat, feu, underwater
+- UI Sounds: bubble
+- Melodies: berceuse, ballade
+
+Tone.js (Synthesized):
+- Noise Generators: white, pink, brown noise
+- Synthesizers: piano, lofi
+```
+
+### Documentation
+- **AUDIO_FIXES.md**: Updated with HTML5 Audio API implementation details
+- **Deployment**: Simplified - no server setup required
+- **Architecture**: Documented hybrid audio system approach
+
+### Benefits
+- **Simplified Deployment**: Double-click HTML file to run
+- **Better Performance**: Native audio handling for MP3 files
+- **Reduced Dependencies**: Less reliance on Tone.js
+- **Improved Reliability**: Native browser error handling
+- **Cross-Platform**: Works on all HTML5-capable devices
+
+### Requirements
+- **Modern Browser**: HTML5 Audio support (all modern browsers)
+- **Audio Files**: MP3 files in ./sons/ directory
+- **User Interaction**: Audio starts after user click (browser policy)
+
+---
+
+## [Previous] - 2024-12-19
+
+### Added
+- Comprehensive audio system error handling and recovery
+- Async/await pattern for audio initialization functions
+- Graceful degradation when audio files fail to load
+- Enhanced console logging for audio debugging
+- AUDIO_FIXES.md documentation for technical details
+- Proper HTTP server requirement for CORS compliance
+
+### Enhanced
+- Audio context initialization now properly deferred until user interaction
+- Melody patterns configured but not started until audio context is ready
+- All audio file loading wrapped in try-catch blocks for error recovery
+- Improved error messages changed from errors to warnings to reduce console noise
+- Better compliance with Chrome's autoplay policy
+
+### Fixed
+- CORS policy errors when accessing MP3 files via file:// protocol
+- Tone.js ScriptProcessorNode deprecation warnings
+- AudioContext suspension issues due to autoplay policy
+- Premature transport start causing audio context warnings
+- MP3 loading failures now handled gracefully without breaking the app
+
+### Technical Improvements
+- `setupAudio()` function now async with comprehensive error handling
+- `createNatureSounds()` and `createMelodies()` functions enhanced with individual file error handling
+- `startMelodyPatterns()` function improved to defer pattern activation
+- `initializeAudioContext()` function enhanced to start patterns when audio is ready
+- Application now requires HTTP server (localhost:8000) for proper audio functionality
+
 ## [Version 2.7.3] - 2025-05-19
 
 ### 🐛 Corrections critiques de l'affichage visuel
@@ -19,6 +110,30 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 - **Fonction `showEmotions()`** : Vidage des grilles des besoins (`needsGrid`) et des activités (`activitiesGrid`) pour un état propre.
 - **Fonction `restart()`** : Vidage de toutes les grilles (`needsGrid`, `activitiesGrid`) en plus de la réinitialisation des états et sections.
 - **Réinitialisation des états visuels** : Toutes les cartes se remettent à zéro correctement lors de la navigation
+
+## [Version 2.0.0] - Intégration complète
+
+### ✅ Terminé
+- ✅ Intégration complète de la section "Comment te sens-tu ?" dans l'application principale
+- ✅ Navigation fluide entre les sections émotions, besoins et activités
+- ✅ Design uniforme avec le reste de l'application
+- ✅ Boutons de retour et de recommencement fonctionnels
+- ✅ Cartes d'émotions avec animations et interactions
+- ✅ Système de sélection d'émotions, besoins et activités
+- ✅ Intégration dans la section Conseils de l'application principale
+- ✅ Correction du problème de navigation du bouton "Comment te sens-tu ?"
+- ✅ Correction du problème de chargement des fichiers MP3 avec Tone.js
+- ✅ Ajout de logs de débogage pour diagnostiquer les problèmes restants
+- ✅ Restauration du design original des cartes de besoins et d'activités
+- ✅ Ajout des icônes appropriées pour tous les besoins et activités
+- ✅ Harmonisation du style visuel avec le design original
+- ✅ Correction des problèmes de logique de navigation dans la section émotions/besoins
+- ✅ Correction du problème de lecture des fichiers MP3 (berceuse, ballade)
+- ✅ Amélioration de la gestion des états de sélection lors des retours en arrière
+- ✅ Ajout de transitions fluides entre les sections émotions ↔ besoins ↔ activités
+- ✅ Amélioration du debugging pour diagnostiquer les problèmes de lecture MP3
+- ✅ Optimisation des transitions (200ms) avec easing cubic-bezier pour plus de fluidité
+- ✅ Ajout de will-change: opacity pour optimiser les performances d'animation
 
 ### 🔧 Améliorations techniques
 - **Transform reset** : Réinitialisation du contexte canvas à chaque resize
