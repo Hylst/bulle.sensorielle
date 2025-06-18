@@ -13,6 +13,12 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 - **Sécurité canvas** : Vérifications d'existence avant manipulation
 - **Logs de débogage** : Traçabilité des opérations canvas
 - **🆕 Respiration guidée corrigée** : Initialisation automatique du canvas lors de l'accès à la section visuels
+- **Page interactive "Comment te sens-tu ?"** : Nouvelle fonctionnalité d'aide émotionnelle pour les enfants
+- **Navigation entre sections émotions/besoins/activités** : Correction complète des bugs d'affichage lors des retours (vidage des grilles)
+- **Fonction `showNeeds()`** : Vidage de la grille des activités (`activitiesGrid`) pour éviter les cartes résiduelles.
+- **Fonction `showEmotions()`** : Vidage des grilles des besoins (`needsGrid`) et des activités (`activitiesGrid`) pour un état propre.
+- **Fonction `restart()`** : Vidage de toutes les grilles (`needsGrid`, `activitiesGrid`) en plus de la réinitialisation des états et sections.
+- **Réinitialisation des états visuels** : Toutes les cartes se remettent à zéro correctement lors de la navigation
 
 ### 🔧 Améliorations techniques
 - **Transform reset** : Réinitialisation du contexte canvas à chaque resize
