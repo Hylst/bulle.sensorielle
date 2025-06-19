@@ -2,6 +2,65 @@
 
 Tous les changements notables de ce projet seront documentés dans ce fichier.
 
+## Version 2.2.1 - Corrections Audio et Interactions (2024-12-25)
+
+### 🐛 Corrections de Bugs
+- **Contrôles de volume individuels** : Correction du système de volume pour chaque son
+- **Affichage du volume** : Les sliders de volume mettent maintenant à jour correctement l'affichage en pourcentage
+- **Mapping des sons** : Correction des correspondances entre les boutons HTML et les fichiers audio
+  - `campagne` → `./sons/campagne.mp3`
+  - `feu` → `./sons/feu.mp3`
+  - `chat` → `./sons/chat.mp3`
+  - `berceuse` → `./sons/berceuse.mp3`
+  - `ballade` → `./sons/ballade.mp3`
+- **Cartes d'émotion cliquables** : Ajout des propriétés CSS manquantes (`cursor: pointer`, `user-select: none`)
+- **Debugging amélioré** : Ajout de logs pour diagnostiquer les problèmes d'interaction
+
+### 🔧 Améliorations Techniques
+- **Gestion du volume individuel** : Chaque son peut maintenant avoir son propre niveau de volume
+- **Stockage des volumes** : Les préférences de volume sont conservées pour chaque son
+- **Event listeners optimisés** : Meilleure gestion des événements de clic sur les cartes d'émotion
+
+### 📁 Fichiers Modifiés
+- `js/audio.js` : Système de volume individuel et mapping des sons
+- `js/feelings.js` : Debugging des événements de clic
+- `styles.css` : Propriétés CSS pour les cartes cliquables
+- `changelog.md` : Documentation des corrections
+
+---
+
+## [Version en cours] - 2024-12-XX
+
+### Ajouté
+- Nouveau système de profils avec sauvegarde/chargement
+- Interface de gestion des profils dans la section dédiée
+- Prévisualisation des profils sauvegardés sur la page d'accueil
+- Système de bulles d'information avec modal interactif
+- Animations de bulles flottantes dans le modal d'information
+- **ÉTAPE 1 TERMINÉE** : Refactorisation complète de la logique feelings
+  - Nouvelle classe `FeelingsState` pour la gestion centralisée d'état
+  - Suppression du code dupliqué entre `script.js` et `feelings.js`
+  - Migration des `onclick` vers des event listeners modernes
+  - Architecture modulaire et maintenable
+
+### Modifié
+- Amélioration de l'interface utilisateur avec de nouveaux styles
+- Optimisation du système de navigation entre les sections
+- **Refactorisation majeure du module feelings** :
+  - Centralisation de la logique dans `feelings.js` uniquement
+  - Remplacement des attributs `onclick` par `data-action`
+  - Implémentation d'un système d'observateurs pour l'état
+  - Unification de la gestion des émotions, besoins et activités
+
+### Corrigé
+- Correction des problèmes de duplication de cartes de profils
+- Amélioration de la gestion des états des profils
+- Correction des erreurs de navigation dans certains cas
+- **Élimination de la duplication de code** dans la section feelings
+- **Correction de l'architecture** : séparation claire des responsabilités
+
+---
+
 ## [Latest] - HTML5 Audio API Implementation
 
 ### Major Changes
@@ -110,6 +169,72 @@ Tone.js (Synthesized):
 - **Fonction `showEmotions()`** : Vidage des grilles des besoins (`needsGrid`) et des activités (`activitiesGrid`) pour un état propre.
 - **Fonction `restart()`** : Vidage de toutes les grilles (`needsGrid`, `activitiesGrid`) en plus de la réinitialisation des états et sections.
 - **Réinitialisation des états visuels** : Toutes les cartes se remettent à zéro correctement lors de la navigation
+
+## [Version 2.2.0] - 2024-12-18
+
+### ✅ Étape 2 : Harmonisation du design et des animations (TERMINÉE)
+
+#### 🎨 Système de cartes unifié
+- **Classe `card-base`** : Système de cartes commun pour toutes les sections
+- **Classes modulaires** : `card-icon`, `card-title`, `card-description` pour une structure cohérente
+- **Variantes de taille** : `card-small`, `card-large` pour différents contextes
+- **États harmonisés** : Hover, selected et active states unifiés
+
+#### ✨ Animations améliorées
+- **Micro-interactions** : Animation `cardPulse` au survol avec rotation subtile des icônes
+- **Transitions fluides** : Timing unifié avec `cubic-bezier(0.4, 0.0, 0.2, 1)`
+- **Effets visuels** : Gradients dynamiques et ombres progressives
+- **Performance optimisée** : Utilisation de `will-change` et `transform` pour les animations GPU
+
+#### 🎯 Design responsive harmonisé
+- **Grilles adaptatives** : Tailles minimales optimisées pour chaque type de carte
+- **Espacements cohérents** : Système d'espacement unifié (1rem, 1.2rem, 1.5rem)
+- **Typographie standardisée** : Tailles et poids de police harmonisés
+- **Points de rupture optimisés** : 768px (tablette) et 480px (mobile)
+
+#### 🌈 Système de couleurs enrichi
+- **Variables de gradient** : `--gradient-soft`, `--gradient-primary`, `--gradient-success`, `--gradient-warm`
+- **Couleurs contextuelles** : Chaque type de carte a sa couleur d'accent (bleu, vert, pêche)
+- **Contraste amélioré** : Meilleure lisibilité en mode sombre et clair
+
+#### 📁 Fichiers modifiés
+- `styles.css` : Système de cartes unifié, animations et responsive design
+- `index.html` : Migration vers les nouvelles classes de cartes
+- `js/feelings.js` : Utilisation des classes unifiées pour les cartes dynamiques
+
+#### ✅ Tests effectués
+- Cohérence visuelle sur desktop, tablette et mobile ✓
+- Animations fluides et performantes ✓
+- Interactions tactiles optimisées ✓
+- Thèmes clair et sombre harmonisés ✓
+- Serveur de test fonctionnel sur le port 8000 ✓
+
+## [Version 2.1.1] - 2024-12-18
+
+### ✅ Étape 1 : Refactorisation de la logique des sentiments (TERMINÉE)
+
+#### 🔧 Améliorations techniques
+- **Nouvelle classe `FeelingsState`** : Gestion centralisée de l'état des émotions, besoins et observateurs
+- **Suppression du code dupliqué** : Élimination des variables et fonctions redondantes dans `script.js`
+- **Migration des événements** : Remplacement des attributs `onclick` par des écouteurs d'événements avec `data-action`
+- **Centralisation de la logique** : Toute la logique des sentiments est maintenant dans `feelings.js`
+
+#### 🎯 Fonctionnalités maintenues
+- **Compatibilité totale** : Toutes les fonctions existantes continuent de fonctionner
+- **Fonctions globales** : Maintien de `showNeeds`, `showActivities`, `showEmotions`, `restart` pour la compatibilité
+- **Interface utilisateur** : Aucun changement visible pour l'utilisateur final
+
+#### 📁 Fichiers modifiés
+- `script.js` : Suppression du code dupliqué des émotions
+- `feelings.js` : Implémentation de `FeelingsState` et `FeelingsManager`
+- `index.html` : Migration des `onclick` vers `data-action`
+
+#### ✅ Tests effectués
+- Navigation entre les sections d'émotions ✓
+- Sélection d'émotions et affichage des besoins ✓
+- Sélection de besoins et affichage des activités ✓
+- Fonctions de retour et redémarrage ✓
+- Serveur de test fonctionnel sur le port 8000 ✓
 
 ## [Version 2.0.0] - Intégration complète
 

@@ -523,47 +523,47 @@
                             <p class="section-subtitle">Clique sur l'émotion qui correspond à ce que tu ressens</p>
                         </div>
                         <div class="emotions-grid">
-                            <div class="emotion-card" data-emotion="joie" data-color="#FFE066">
-                                <div class="emotion-face">😊</div>
-                                <h3>Joie</h3>
-                                <p>Je me sens heureux(se)</p>
+                            <div class="emotion-card card-base" data-emotion="joie" data-color="#FFE066">
+                                <div class="emotion-face card-icon">😊</div>
+                                <h3 class="card-title">Joie</h3>
+                                <p class="card-description">Je me sens heureux(se)</p>
                             </div>
                             
-                            <div class="emotion-card" data-emotion="calme" data-color="#A8E6CF">
-                                <div class="emotion-face">😌</div>
-                                <h3>Calme</h3>
-                                <p>Je me sens paisible</p>
+                            <div class="emotion-card card-base" data-emotion="calme" data-color="#A8E6CF">
+                                <div class="emotion-face card-icon">😌</div>
+                                <h3 class="card-title">Calme</h3>
+                                <p class="card-description">Je me sens paisible</p>
                             </div>
                             
-                            <div class="emotion-card" data-emotion="peur" data-color="#FFB3BA">
-                                <div class="emotion-face">😰</div>
-                                <h3>Peur</h3>
-                                <p>J'ai peur de quelque chose</p>
+                            <div class="emotion-card card-base" data-emotion="peur" data-color="#FFB3BA">
+                                <div class="emotion-face card-icon">😰</div>
+                                <h3 class="card-title">Peur</h3>
+                                <p class="card-description">J'ai peur de quelque chose</p>
                             </div>
                             
-                            <div class="emotion-card" data-emotion="tristesse" data-color="#B3D9FF">
-                                <div class="emotion-face">😢</div>
-                                <h3>Tristesse</h3>
-                                <p>Je me sens triste</p>
+                            <div class="emotion-card card-base" data-emotion="tristesse" data-color="#B3D9FF">
+                                <div class="emotion-face card-icon">😢</div>
+                                <h3 class="card-title">Tristesse</h3>
+                                <p class="card-description">Je me sens triste</p>
                             </div>
                             
-                            <div class="emotion-card" data-emotion="colere" data-color="#FFB366">
-                                <div class="emotion-face">😠</div>
-                                <h3>Colère</h3>
-                                <p>Je suis en colère</p>
+                            <div class="emotion-card card-base" data-emotion="colere" data-color="#FFB366">
+                                <div class="emotion-face card-icon">😠</div>
+                                <h3 class="card-title">Colère</h3>
+                                <p class="card-description">Je suis en colère</p>
                             </div>
                             
-                            <div class="emotion-card" data-emotion="fatigue" data-color="#D4B3FF">
-                                <div class="emotion-face">😴</div>
-                                <h3>Fatigue</h3>
-                                <p>Je me sens fatigué(e)</p>
+                            <div class="emotion-card card-base" data-emotion="fatigue" data-color="#D4B3FF">
+                                <div class="emotion-face card-icon">😴</div>
+                                <h3 class="card-title">Fatigue</h3>
+                                <p class="card-description">Je me sens fatigué(e)</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Needs Section -->
                     <div class="needs-section" id="needsSection" style="display: none;">
-                        <div class="back-button" onclick="showEmotions()">
+                        <div class="back-button" data-action="back-to-emotions">
                             ← Retour aux émotions
                         </div>
                         <h2 class="needs-title">De quoi as-tu besoin ?</h2>
@@ -574,14 +574,14 @@
 
                     <!-- Activities Section -->
                     <div class="activities-section" id="activitiesSection" style="display: none;">
-                        <div class="back-button" onclick="showNeeds()">
+                        <div class="back-button" data-action="back-to-needs">
                             ← Retour aux besoins
                         </div>
                         <h2 class="activities-title">Voici ce que tu peux faire :</h2>
                         <div class="activities-grid" id="activitiesGrid">
                             <!-- Activities will be populated by JavaScript -->
                         </div>
-                        <div class="restart-button" onclick="restart()">
+                        <div class="restart-button" data-action="restart">
                             🔄 Recommencer
                         </div>
                     </div>
@@ -602,6 +602,7 @@
         </div>
     </div>
 
+    <script src="js/feelings.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

@@ -15,7 +15,13 @@
   --border-color: #e2e8f0;
   --shadow-light: rgba(0, 0, 0, 0.05);
   --shadow-medium: rgba(0, 0, 0, 0.1);
+  --shadow-heavy: rgba(0, 0, 0, 0.25);
+  
+  /* Gradient Variables */
   --gradient-soft: linear-gradient(135deg, #bfdbfe 0%, #e9d5ff 50%, #bbf7d0 100%);
+  --gradient-primary: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-lavender) 100%);
+  --gradient-success: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+  --gradient-warm: linear-gradient(135deg, var(--accent-peach) 0%, var(--accent-lavender) 100%);
 }
 
 /* Dark Theme Colors */
@@ -91,11 +97,11 @@ body {
   opacity: 1;
 }
 
-/* Smooth transition for all interactive elements */
+/* Legacy card classes - now handled by .card-base */
 .emotion-card,
 .need-card,
 .activity-card {
-  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  /* Styles inherited from .card-base */
 }
 
 /* Back button smooth transitions */
@@ -1935,11 +1941,127 @@ body {
   }
 }
 
-/* Feelings Section Styles */
+/* ========================================
+   UNIFIED CARD SYSTEM - STEP 2.1
+   ======================================== */
+
+/* Base Card Foundation */
+.card-base {
+  background: var(--bg-secondary);
+  border-radius: 20px;
+  padding: 1.5rem;
+  cursor: pointer;
+  border: 2px solid var(--border-color);
+  box-shadow: 0 4px 12px var(--shadow-light);
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  
+  /* Unified transitions */
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  will-change: transform, box-shadow, background-color;
+}
+
+/* Card Hover States with Enhanced Animations */
+.card-base:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 32px var(--shadow-medium);
+  border-color: var(--accent-blue);
+  animation: cardPulse 0.6s ease-in-out;
+}
+
+/* Micro-interactions */
+@keyframes cardPulse {
+  0% { transform: translateY(-8px) scale(1.02); }
+  50% { transform: translateY(-10px) scale(1.03); }
+  100% { transform: translateY(-8px) scale(1.02); }
+}
+
+@keyframes cardGlow {
+  0% { box-shadow: 0 12px 32px var(--shadow-medium); }
+  50% { box-shadow: 0 16px 40px var(--shadow-heavy); }
+  100% { box-shadow: 0 12px 32px var(--shadow-medium); }
+}
+
+.card-base:active {
+  transform: translateY(-4px) scale(0.98);
+  transition: all 0.1s ease;
+}
+
+/* Card Active/Selected States */
+.card-base.selected {
+  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-lavender) 100%);
+  border-color: var(--accent-blue);
+  color: white;
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 16px 40px var(--shadow-medium);
+}
+
+/* Card Icon Styling */
+.card-icon {
+  font-size: 2.8rem;
+  margin-bottom: 1rem;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.card-base:hover .card-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.card-base.selected .card-icon {
+  transform: scale(1.15);
+  filter: drop-shadow(0 4px 8px rgba(255, 255, 255, 0.3));
+}
+
+/* Card Typography */
+.card-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+  transition: color 0.3s ease;
+}
+
+.card-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+.card-base.selected .card-title,
+.card-base.selected .card-description {
+  color: white;
+}
+
+/* Card Size Variants */
+.card-small {
+  padding: 1.2rem;
+  border-radius: 16px;
+}
+
+.card-large {
+  padding: 2rem;
+  border-radius: 24px;
+}
+
+.card-large .card-icon {
+  font-size: 3.2rem;
+}
+
+.card-large .card-title {
+  font-size: 1.5rem;
+}
+
+/* ========================================
+   FEELINGS SECTION - HARMONIZED
+   ======================================== */
+
 .feelings-container {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 2rem;
 }
 
 .emotions-section, .needs-section, .activities-section {
@@ -1947,101 +2069,98 @@ body {
 }
 
 .section-header {
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .section-title {
-  font-size: 2rem;
+  font-size: 2.2rem;
   color: var(--text-primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
   font-weight: 700;
+  background: var(--gradient-soft);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .section-subtitle {
   color: var(--text-secondary);
   font-size: 1.1rem;
+  font-weight: 500;
 }
 
+/* Grid Layouts - Unified */
 .emotions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
   margin-top: 2rem;
 }
 
+/* Emotion Cards - Using Base System */
 .emotion-card {
-  background: var(--bg-secondary);
-  border-radius: 15px;
-  padding: 1.5rem;
+  /* Additional emotion-specific styles */
   cursor: pointer;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-  box-shadow: 0 4px 6px var(--shadow-light);
-}
-
-.emotion-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px var(--shadow-medium);
-}
-
-.emotion-card.selected {
-  border-color: var(--accent-blue);
-  background: var(--accent-blue);
-  color: white;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 .emotion-face {
-  font-size: 3rem;
+  /* Legacy support - will be replaced by card-icon */
+  font-size: 2.8rem;
   margin-bottom: 1rem;
-}
-
-.emotion-card h3 {
-  font-size: 1.3rem;
-  margin-bottom: 0.5rem;
+  display: block;
+  transition: transform 0.3s ease;
   color: var(--text-primary);
 }
 
-.emotion-card.selected h3,
-.emotion-card.selected p {
+/* Emotion card specific styles - text colors handled by .card-title and .card-description */
+.emotion-card.selected .card-title,
+.emotion-card.selected .card-description {
   color: white;
 }
 
-.emotion-card p {
+.emotion-card .card-description {
   color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
+/* Needs Section - Harmonized */
 .needs-title, .activities-title {
-  font-size: 1.8rem;
+  font-size: 1.9rem;
   color: var(--text-primary);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.8rem;
   font-weight: 600;
+  background: var(--gradient-soft);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* Needs Grid */
 .needs-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 1.5rem;
   max-width: 900px;
   margin: 0 auto;
 }
 
 .need-card {
-  background: var(--bg-secondary);
-  border-radius: 20px;
-  padding: 2rem;
-  text-align: center;
-  box-shadow: 0 6px 20px var(--shadow-light);
-  border: 2px solid var(--border-color);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.need-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px var(--shadow-medium);
-}
+    /* Inherit from card-base but override text alignment */
+    text-align: left;
+  }
+  
+  .need-card:hover {
+    border-color: var(--accent-green);
+  }
+  
+  .need-card.selected {
+    background: var(--gradient-success);
+    border-color: var(--accent-green);
+  }
 
 .need-icon {
   font-size: 2.5rem;
@@ -2049,37 +2168,35 @@ body {
   display: block;
 }
 
-.need-card h3 {
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
-  font-size: 1.3rem;
-  font-weight: 600;
+/* Need card specific styles - typography handled by .card-title and .card-description */
+.need-card.selected .card-title,
+.need-card.selected .card-description {
+  color: white;
 }
 
-.need-card p {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
-
-/* Activities Grid */
+/* Activities Section - Harmonized */
 .activities-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  gap: 1.5rem;
   max-width: 1000px;
   margin: 0 auto 3rem;
 }
 
 .activity-card {
-  background: var(--bg-secondary);
-  border-radius: 20px;
-  padding: 2rem;
-  text-align: center;
-  box-shadow: 0 6px 20px var(--shadow-light);
-  border: 2px solid var(--border-color);
-  position: relative;
-  overflow: hidden;
-}
+    /* Enhanced card with gradient overlay */
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .activity-card:hover {
+    border-color: var(--accent-peach);
+  }
+  
+  .activity-card.selected {
+    background: var(--gradient-warm);
+    border-color: var(--accent-peach);
+  }
 
 .activity-card::before {
   content: '';
@@ -2088,13 +2205,14 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-lavender) 100%);
-  opacity: 0.1;
+  background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
+  opacity: 0;
   transition: opacity 0.3s ease;
+  z-index: 0;
 }
 
 .activity-card:hover::before {
-  opacity: 0.2;
+  opacity: 1;
 }
 
 .activity-icon {
@@ -2105,20 +2223,10 @@ body {
   z-index: 1;
 }
 
-.activity-card h3 {
-  color: var(--text-primary);
-  margin-bottom: 1rem;
-  font-size: 1.4rem;
-  font-weight: 600;
-  position: relative;
-  z-index: 1;
-}
-
-.activity-card p {
-  color: var(--text-secondary);
-  line-height: 1.6;
-  position: relative;
-  z-index: 1;
+/* Activity card specific styles - typography handled by .card-title and .card-description */
+.activity-card.selected .card-title,
+.activity-card.selected .card-description {
+  color: white;
 }
 
 .back-button, .restart-button {
@@ -2149,55 +2257,78 @@ body {
   background: var(--accent-peach);
 }
 
-/* Responsive design for feelings section */
+/* ========================================
+   RESPONSIVE DESIGN - HARMONIZED
+   ======================================== */
+
+/* Tablet Styles */
 @media (max-width: 768px) {
-  .emotions-grid {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
+  .feelings-container {
+    padding: 1.5rem;
   }
   
-  .emotion-card {
+  .emotions-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.2rem;
+  }
+  
+  .needs-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.2rem;
+  }
+  
+  .activities-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.2rem;
+  }
+  
+  .card-base {
+    padding: 1.2rem;
+  }
+  
+  .card-icon {
+    font-size: 2.4rem;
+  }
+  
+  .card-title {
+    font-size: 1.2rem;
+  }
+  
+  .section-title {
+    font-size: 1.8rem;
+  }
+}
+
+/* Mobile Styles */
+@media (max-width: 480px) {
+  .feelings-container {
     padding: 1rem;
   }
   
-  .emotion-face {
-    font-size: 2.5rem;
+  .emotions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
   }
   
   .needs-grid, .activities-grid {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 1rem;
   }
   
-  .section-title {
-    font-size: 1.6rem;
+  .card-base {
+    padding: 1rem;
   }
   
-  .feelings-container {
-    padding: 15px;
-  }
-}
-
-@media (max-width: 480px) {
-  .emotions-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+  .card-icon {
+    font-size: 2.2rem;
   }
   
-  .emotion-card {
-    padding: 0.8rem;
-  }
-  
-  .emotion-face {
-    font-size: 2rem;
-  }
-  
-  .emotion-card h3 {
+  .card-title {
     font-size: 1.1rem;
   }
   
-  .emotion-card p {
-    font-size: 0.8rem;
+  .card-description {
+    font-size: 0.85rem;
   }
 }
 

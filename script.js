@@ -426,7 +426,7 @@ class BulleSensorielle {
      */
     async createNatureSounds() {
         // Campagne sound (audio file)
-        const campagnePlayer = this.createAudioElement('./sons/campagne.mp3', true, 0.1, 'Campagne');
+        const campagnePlayer = this.createAudioElement('./sons/campagne.mp3', true, 0.5, 'Campagne');
         if (campagnePlayer) {
             this.sounds.set('campagne', campagnePlayer);
         }
@@ -1921,14 +1921,43 @@ class BulleSensorielle {
      */
     setVolume(soundId, volume) {
         const sound = this.sounds.get(soundId);
-        if (!sound) return;
+        if (!sound) {
+            console.warn(`Sound not found: ${soundId}`);
+            return;
+        }
 
-        const dbValue = -40 + (volume / 100) * 40; // Convert 0-100 to -40db to 0db
+        // Store volume preference for this sound
+        const volumeKey = `volume_${soundId}`;
+        localStorage.setItem(volumeKey, volume);
         
-        if (sound.volume) {
+        // Handle HTML5 Audio elements (campagne, feu, chat, berceuse, ballade, etc.)
+        if (sound instanceof HTMLAudioElement || (sound.volume !== undefined && typeof sound.volume === 'number')) {
+            sound.volume = volume / 100; // HTML5 Audio uses 0.0 to 1.0
+            console.log(`Set HTML5 audio volume for ${soundId}: ${volume}%`);
+        }
+        // Handle Tone.js objects with volume.value property
+        else if (sound.volume && sound.volume.value !== undefined) {
+            const dbValue = -40 + (volume / 100) * 40; // Convert 0-100 to -40db to 0db
             sound.volume.value = dbValue;
-        } else if (sound.noise) {
+            console.log(`Set Tone.js volume for ${soundId}: ${dbValue}db`);
+        }
+        // Handle complex synthesized sounds with noise property
+        else if (sound.noise && sound.noise.volume) {
+            const dbValue = -40 + (volume / 100) * 40;
             sound.noise.volume.value = dbValue;
+            console.log(`Set synthesized sound volume for ${soundId}: ${dbValue}db`);
+        }
+        else {
+            console.warn(`Unable to set volume for sound ${soundId} - unknown audio type`);
+        }
+        
+        // Update the volume display
+        const slider = document.querySelector(`.volume-slider[data-sound="${soundId}"]`);
+        if (slider) {
+            const volumeDisplay = slider.nextElementSibling;
+            if (volumeDisplay) {
+                volumeDisplay.textContent = `${volume}%`;
+            }
         }
     }
 
@@ -2519,300 +2548,9 @@ class BulleSensorielle {
      }
  }
 
-// Feelings functionality
-const emotionsData = {
-    joie: {
-        needs: [
-            { id: 'partage', icon: '🎵', title: 'Partager ma joie', description: 'Exprimer ce bonheur avec les autres' },
-            { id: 'creation', icon: '🎨', title: 'Créer quelque chose', description: 'Utiliser cette énergie positive' },
-            { id: 'celebration', icon: '🎉', title: 'Célébrer', description: 'Profiter de ce moment heureux' }
-        ],
-        activities: [
-            { icon: '🎵', title: 'Danser ou chanter une chanson', description: 'Laisse ton corps bouger sur ta musique préférée pour exprimer ta joie.' },
-            { icon: '🎨', title: 'Dessiner ou colorier', description: 'Crée quelque chose de beau avec tes couleurs préférées.' },
-            { icon: '📞', title: 'Appeler quelqu\'un que tu aimes', description: 'Partage ton bonheur avec une personne spéciale.' }
-        ]
-    },
-    calme: {
-        needs: [
-            { id: 'maintenir', icon: '🧘', title: 'Maintenir cette paix', description: 'Préserver ce moment de sérénité' },
-            { id: 'ressourcer', icon: '📚', title: 'Me ressourcer', description: 'Profiter de cette tranquillité' },
-            { id: 'savourer', icon: '🌸', title: 'Savourer l\'instant', description: 'Apprécier ce calme intérieur' }
-        ],
-        activities: [
-            { icon: '📚', title: 'Lire un livre tranquillement', description: 'Installe-toi confortablement avec un livre que tu aimes.' },
-            { icon: '🧘', title: 'Méditer ou respirer profondément', description: 'Ferme les yeux et concentre-toi sur ta respiration.' },
-            { icon: '🌿', title: 'Observer la nature', description: 'Regarde par la fenêtre ou va dehors pour admirer les plantes et les animaux.' }
-        ]
-    },
-    peur: {
-        needs: [
-            { id: 'securite', icon: '🤗', title: 'Être rassuré(e)', description: 'Avoir du réconfort et de la sécurité' },
-            { id: 'confiance', icon: '💪', title: 'Reprendre confiance', description: 'Retrouver du courage' },
-            { id: 'protection', icon: '🛡️', title: 'Me sentir protégé(e)', description: 'Avoir un environnement sûr' }
-        ],
-        activities: [
-            { icon: '🤗', title: 'Faire un câlin ou tenir la main', description: 'Demande un câlin à quelqu\'un en qui tu as confiance.' },
-            { icon: '🧸', title: 'Serrer une peluche ou une couverture', description: 'Enroule-toi dans une couverture douce avec ton doudou.' },
-            { icon: '🎧', title: 'Écouter de la musique douce', description: 'Mets tes écouteurs et écoute des sons apaisants.' }
-        ]
-    },
-    tristesse: {
-        needs: [
-            { id: 'reconfort', icon: '💙', title: 'Être consolé(e)', description: 'Recevoir de la compassion' },
-            { id: 'expression', icon: '🗣️', title: 'Exprimer mes sentiments', description: 'Partager ce que je ressens' },
-            { id: 'temps', icon: '⏰', title: 'Prendre mon temps', description: 'Laisser passer cette émotion' }
-        ],
-        activities: [
-            { icon: '😢', title: 'Pleurer si j\'en ai besoin', description: 'C\'est normal de pleurer, ça aide à évacuer la tristesse.' },
-            { icon: '🗣️', title: 'Parler de ce que je ressens', description: 'Trouve quelqu\'un de confiance pour partager tes émotions.' },
-            { icon: '🎨', title: 'Dessiner mes émotions', description: 'Utilise des couleurs pour exprimer ce que tu ressens sur papier.' }
-        ]
-    },
-    colere: {
-        needs: [
-            { id: 'evacuation', icon: '💨', title: 'Évacuer cette énergie', description: 'Libérer cette tension' },
-            { id: 'comprendre', icon: '🎯', title: 'Comprendre pourquoi', description: 'Identifier la cause de ma colère' },
-            { id: 'calme', icon: '😌', title: 'Retrouver mon calme', description: 'Apaiser cette émotion intense' }
-        ],
-        activities: [
-            { icon: '💨', title: 'Respirer profondément', description: 'Inspire lentement par le nez, retiens, puis expire par la bouche.' },
-            { icon: '🏃', title: 'Bouger ou faire du sport', description: 'Cours, saute, ou fais des mouvements pour évacuer l\'énergie.' },
-            { icon: '🥊', title: 'Taper dans un coussin', description: 'Utilise un coussin ou un oreiller pour libérer ta colère sans faire mal.' }
-        ]
-    },
-    fatigue: {
-        needs: [
-            { id: 'repos', icon: '😴', title: 'Me reposer', description: 'Récupérer de l\'énergie' },
-            { id: 'recharger', icon: '🔋', title: 'Recharger mes batteries', description: 'Prendre soin de moi' },
-            { id: 'ralentir', icon: '🛌', title: 'Ralentir le rythme', description: 'Faire une pause' }
-        ],
-        activities: [
-            { icon: '😴', title: 'Faire une sieste', description: 'Allonge-toi dans un endroit confortable pour te reposer.' },
-            { icon: '🛁', title: 'Prendre un bain chaud', description: 'L\'eau chaude va détendre tes muscles et t\'apaiser.' },
-            { icon: '🍵', title: 'Boire quelque chose de chaud', description: 'Une boisson chaude peut te réconforter et te donner de l\'énergie.' }
-        ]
-    }
-};
+// Code dupliqué supprimé - la logique des émotions est maintenant gérée par feelings.js
 
-let selectedEmotion = null;
-let selectedNeed = null;
-
-function showNeeds(emotion = selectedEmotion) {
-    // If no emotion is provided and no emotion is selected, return to emotions
-    if (!emotion) {
-        showEmotions();
-        return;
-    }
-    
-    selectedEmotion = emotion;
-    const emotionsSection = document.getElementById('emotionsSection');
-    const needsSection = document.getElementById('needsSection');
-    const activitiesSection = document.getElementById('activitiesSection');
-    const needsGrid = document.getElementById('needsGrid');
-    const activitiesGrid = document.getElementById('activitiesGrid');
-    
-    // Smooth transition: fade out current sections
-    emotionsSection.style.opacity = '0';
-    activitiesSection.style.opacity = '0';
-    
-    setTimeout(() => {
-        // Hide other sections
-        emotionsSection.style.display = 'none';
-        activitiesSection.style.display = 'none';
-        
-        // Show needs section with fade in
-        needsSection.style.display = 'block';
-        needsSection.style.opacity = '0';
-        
-        setTimeout(() => {
-            needsSection.style.opacity = '1';
-        }, 20);
-    }, 200);
-    
-    // Clear previous content
-    needsGrid.innerHTML = '';
-    activitiesGrid.innerHTML = '';
-    
-    // Reset styling of existing need cards
-    const existingNeedCards = document.querySelectorAll('.need-card');
-    existingNeedCards.forEach(card => {
-        card.classList.remove('selected');
-    });
-    
-    // Reset selected need when returning to needs
-    selectedNeed = null;
-    
-    // Populate needs
-    const needs = emotionsData[emotion].needs;
-    needs.forEach(need => {
-        const needCard = document.createElement('div');
-        needCard.className = 'need-card';
-        needCard.innerHTML = `
-            <div class="need-icon">${need.icon || '💭'}</div>
-            <h3>${need.title}</h3>
-            <p>${need.description}</p>
-        `;
-        needCard.addEventListener('click', () => selectNeed(need.id, needCard));
-        needsGrid.appendChild(needCard);
-    });
-}
-
-function selectNeed(needId, cardElement) {
-    selectedNeed = needId;
-    
-    // Remove selection from all need cards
-    document.querySelectorAll('.need-card').forEach(card => {
-        card.classList.remove('selected');
-    });
-    
-    // Add selection to clicked card
-    cardElement.classList.add('selected');
-    
-    // Show activities after a short delay
-    setTimeout(() => {
-        showActivities();
-    }, 500);
-}
-
-function showActivities() {
-    const needsSection = document.getElementById('needsSection');
-    const activitiesSection = document.getElementById('activitiesSection');
-    const activitiesGrid = document.getElementById('activitiesGrid');
-    
-    // Smooth transition: fade out needs section
-    needsSection.style.opacity = '0';
-    
-    setTimeout(() => {
-        // Hide needs section
-        needsSection.style.display = 'none';
-        
-        // Show activities section with fade in
-        activitiesSection.style.display = 'block';
-        activitiesSection.style.opacity = '0';
-        
-        setTimeout(() => {
-            activitiesSection.style.opacity = '1';
-        }, 20);
-    }, 200);
-    
-    // Clear previous content
-    activitiesGrid.innerHTML = '';
-    
-    // Populate activities
-    const activities = emotionsData[selectedEmotion].activities;
-    activities.forEach(activity => {
-        const activityCard = document.createElement('div');
-        activityCard.className = 'activity-card';
-        activityCard.innerHTML = `
-            <div class="activity-icon">${activity.icon || '✨'}</div>
-            <h3>${activity.title}</h3>
-            <p>${activity.description}</p>
-        `;
-        activitiesGrid.appendChild(activityCard);
-    });
-}
-
-function showEmotions() {
-    const emotionsSection = document.getElementById('emotionsSection');
-    const needsSection = document.getElementById('needsSection');
-    const activitiesSection = document.getElementById('activitiesSection');
-    const needsGrid = document.getElementById('needsGrid');
-    const activitiesGrid = document.getElementById('activitiesGrid');
-    
-    // Smooth transition: fade out current sections
-    needsSection.style.opacity = '0';
-    activitiesSection.style.opacity = '0';
-    
-    setTimeout(() => {
-        // Hide other sections
-        needsSection.style.display = 'none';
-        activitiesSection.style.display = 'none';
-        
-        // Show emotions section with fade in
-        emotionsSection.style.display = 'block';
-        emotionsSection.style.opacity = '0';
-        
-        setTimeout(() => {
-            emotionsSection.style.opacity = '1';
-        }, 20);
-    }, 200);
-    
-    // Clear grids
-    needsGrid.innerHTML = '';
-    activitiesGrid.innerHTML = '';
-    
-    // Reset selections when returning to emotions
-    selectedEmotion = null;
-    selectedNeed = null;
-    
-    // Reset styling of emotion and need cards
-    const emotionCards = document.querySelectorAll('.emotion-card');
-    const needCards = document.querySelectorAll('.need-card');
-    
-    emotionCards.forEach(card => {
-        card.classList.remove('selected');
-    });
-    
-    needCards.forEach(card => {
-        card.classList.remove('selected');
-    });
-}
-
-function restart() {
-    const emotionsSection = document.getElementById('emotionsSection');
-    const needsSection = document.getElementById('needsSection');
-    const activitiesSection = document.getElementById('activitiesSection');
-    const needsGrid = document.getElementById('needsGrid');
-    const activitiesGrid = document.getElementById('activitiesGrid');
-    
-    // Hide all sections except emotions
-    needsSection.style.display = 'none';
-    activitiesSection.style.display = 'none';
-    emotionsSection.style.display = 'block';
-    
-    // Clear grids
-    needsGrid.innerHTML = '';
-    activitiesGrid.innerHTML = '';
-    
-    // Reset all selections
-    selectedEmotion = null;
-    selectedNeed = null;
-    
-    // Reset styling of all cards
-    const emotionCards = document.querySelectorAll('.emotion-card');
-    const needCards = document.querySelectorAll('.need-card');
-    
-    emotionCards.forEach(card => {
-        card.classList.remove('selected');
-    });
-    
-    needCards.forEach(card => {
-        card.classList.remove('selected');
-    });
-}
-
-// Add click event listeners to emotion cards
-document.addEventListener('DOMContentLoaded', () => {
-    const emotionCards = document.querySelectorAll('.emotion-card');
-    emotionCards.forEach(card => {
-        card.addEventListener('click', () => {
-            const emotion = card.getAttribute('data-emotion');
-            const color = card.getAttribute('data-color');
-            
-            // Remove selection from all emotion cards
-            emotionCards.forEach(c => c.classList.remove('selected'));
-            
-            // Add selection to clicked card
-            card.classList.add('selected');
-            
-            // Show needs after a short delay
-            setTimeout(() => {
-                showNeeds(emotion);
-            }, 300);
-        });
-    });
-});
+// Fonctions supprimées - maintenant gérées par feelings.js
 
 // Global variable to store the app instance
 let appInstance = null;
