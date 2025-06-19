@@ -5,6 +5,25 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/spec/v2.0.0.html).
 
+## [2.7.5] - 2024-12-19
+
+### 🚨 Correction Critique - Positionnement des Bulles
+- **Position CSS corrigée** : Changement de `position: relative` vers `position: fixed` dans `.encouragement-bubble`
+- **Logique JavaScript adaptée** : Suppression des calculs de scroll, utilisation des coordonnées viewport directes
+- **Positionnement précis** : La bulle se positionne maintenant correctement par rapport à la fenêtre visible
+
+### 🔧 Améliorations Techniques
+- **Coordonnées viewport** : Utilisation de `getBoundingClientRect()` sans ajustements de scroll
+- **Centrage parfait** : Calcul précis du centre horizontal de la carte
+- **Contraintes renforcées** : Marges de sécurité pour éviter tout débordement
+
+### 📁 Fichiers Modifiés
+- `styles.css` : Correction de `position: relative` vers `position: fixed`
+- `js/tips.js` : Refactorisation complète de la méthode `positionBubble()`
+- `changelog.md` : Documentation de la correction définitive
+
+---
+
 ## [2.7.4] - 2024-12-19
 
 ### Ajouté
@@ -288,7 +307,117 @@ Tone.js (Synthesized):
 - Fonctions de retour et redémarrage ✓
 - Serveur de test fonctionnel sur le port 8000 ✓
 
-## [Version 2.0.0] - Intégration complète
+## [Version 2.0.0] - 2024-12-19
+
+### ✨ Nouvelles fonctionnalités
+- **Cartes de conseils et d'activités interactives** : Ajout d'animations et de messages d'encouragement lors du clic
+  - Animation de pulsation douce lors du clic sur une carte
+  - Bulle d'encouragement personnalisée pour chaque conseil et activité avec messages tendres et apaisants
+  - Design adapté aux enfants avec icônes flottantes et transitions fluides
+  - Messages contextuels encourageant l'enfant à suivre le conseil ou l'activité choisie
+  - Fermeture automatique après 8 secondes ou manuelle via bouton de fermeture
+  - **Effet sonore** : Son de bulle 'pop' au clic qui ne stoppe pas la musique en cours
+  - **Amélioration du design** : Bulle plus arrondie (30px) et meilleur contraste en mode sombre
+  - **Extension aux cartes d'activités** : Fonctionnalité étendue aux cartes "Voici ce que tu peux faire"
+  - Nouveau fichier `js/tips.js` pour gérer toutes les interactions
+  - Styles CSS dédiés avec animations douces et design apaisant optimisé pour le mode sombre
+
+## Version 1.3.1 - Corrections de Positionnement et Transparence
+
+### 🔧 Corrections Critiques
+- **Positionnement intelligent** : Correction du problème de positionnement vertical des bulles
+  - Détection automatique de l'espace disponible au-dessus et en-dessous de la carte
+  - Positionnement adaptatif : au-dessus si possible, sinon en-dessous, ou au centre du viewport
+  - Calculs précis tenant compte de la hauteur du viewport et du scroll
+- **Contraintes de viewport** : Les bulles restent toujours visibles dans les limites de l'écran
+- **Transparence subtile** : Ajout d'une légère transparence (95%) pour un effet plus élégant
+
+### 🎯 Améliorations UX
+- **Positionnement centré** : Bulles parfaitement centrées horizontalement sur les cartes
+- **Gestion des bords** : Protection contre le débordement hors écran
+- **Animation cohérente** : Transparence maintenue dans toutes les phases d'animation
+
+### 📁 Fichiers Modifiés
+- `js/tips.js` : Refactoring complet de la logique de positionnement
+- `styles.css` : Ajustement de l'opacité et des animations
+- `changelog.md` : Documentation des corrections
+
+---
+
+## Version 1.3.0 - Amélioration Majeure des Bulles Interactives
+
+### ✨ Nouvelles Fonctionnalités
+- **Messages personnalisés intelligents** : Système de mapping dynamique basé sur le contenu réel des activités
+- **Reconnaissance contextuelle** : Messages adaptés automatiquement selon les mots-clés des activités
+- **Fallback intelligent** : Message par défaut personnalisé avec le titre de l'activité si aucun template ne correspond
+
+### 🎨 Design de Bulle Révolutionné
+- **Dégradés sophistiqués** : Arrière-plan avec dégradé subtil multi-couleurs (violet, bleu, lavande)
+- **Effets visuels avancés** :
+  - Animation de shimmer continue
+  - Effet d'entrée avec rotation et rebond
+  - Glow animé autour de l'icône
+  - Ombres colorées et inset highlights
+- **Dimensions optimisées** : Bulle plus large (320px) avec padding généreux
+- **Backdrop-filter amélioré** : Flou de 15px avec saturation pour un effet premium
+
+### 🔧 Corrections Techniques Majeures
+- **Mapping corrigé** : Fin de la confusion entre index et contenu réel des activités
+- **Timing optimisé** : Délai d'affichage ajusté (400ms) avec transition fluide
+- **Gestion des états** : Nettoyage automatique des bulles existantes avant affichage
+- **Templates étendus** : 20+ templates couvrant tous les types d'activités
+
+### 📋 Templates d'Activités Supportés
+- **Repos** : sieste, dormir, bain, boissons chaudes
+- **Musique** : écouter, chanter, danser
+- **Créativité** : dessiner, colorier, créer
+- **Lecture** : lire, livres
+- **Physique** : respirer, bouger, sport, évacuation
+- **Social** : parler, appeler, câlins
+- **Nature** : observer, connexion naturelle
+- **Réconfort** : peluches, couvertures, pleurer
+
+### 🎯 Améliorations UX
+- **Animations fluides** : Entrée avec rotation et effet de rebond
+- **Feedback visuel riche** : Icônes avec glow et animations flottantes
+- **Positionnement intelligent** : Bulle positionnée de manière optimale
+- **Auto-masquage** : Disparition automatique après 8 secondes
+
+### 📁 Fichiers Modifiés
+- `js/tips.js` : Refactoring complet du système de messages avec mapping intelligent
+- `styles.css` : Design de bulle entièrement repensé avec effets avancés
+- `changelog.md` : Documentation des améliorations majeures
+
+---
+
+## Version 1.2.0 - Améliorations des Cartes Interactives
+
+### ✨ Nouvelles Fonctionnalités
+- **Extension aux cartes d'activités** : Les fonctionnalités interactives s'appliquent maintenant aussi aux cartes d'activités
+- **Effet sonore de bulle** : Ajout d'un son "pop" agréable lors du clic sur les cartes
+- **Messages d'encouragement personnalisés** : Messages adaptés pour chaque type de carte (conseils et activités)
+
+### 🎨 Améliorations du Design
+- **Bulle plus arrondie** : Rayon de bordure augmenté pour un aspect plus doux
+- **Meilleur contraste en mode sombre** : Texte plus lisible avec `font-weight: 500`
+- **Queue de bulle améliorée** : Utilisation des variables CSS et ombre portée ajustée
+- **Effet de flou d'arrière-plan** : `backdrop-filter: blur(10px)` pour un effet moderne
+
+### 🔧 Améliorations Techniques
+- **Code modulaire** : Méthode commune `displayEncouragementBubble()` pour les deux types de cartes
+- **Gestion robuste** : Gestion d'erreur pour le chargement du son
+- **Performance optimisée** : Délégation d'événements pour les cartes d'activités
+- **Timing amélioré** : Synchronisation parfaite entre son, animation et affichage du message
+
+### 📁 Fichiers Modifiés
+- `js/tips.js` : Ajout des fonctionnalités sonores et extension aux activités
+- `styles.css` : Améliorations du design de la bulle et du contraste
+- `changelog.md` : Documentation des nouvelles fonctionnalités
+
+### 🎯 Fonctionnalités Testables
+- Cliquer sur les cartes dans les sections "Conseils" et "Activités" pour entendre le son et voir les messages
+- Tester en mode sombre pour vérifier la lisibilité améliorée
+- L'effet sonore ne bloque pas les autres sons de l'application
 
 ### ✅ Terminé
 - ✅ Intégration complète de la section "Comment te sens-tu ?" dans l'application principale

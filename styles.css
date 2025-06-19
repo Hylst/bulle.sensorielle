@@ -1312,6 +1312,213 @@ body {
   line-height: 1.6;
 }
 
+/* Tip card click animation */
+.tip-card-clicked {
+  animation: tipCardPulse 0.6s ease-in-out;
+}
+
+@keyframes tipCardPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); box-shadow: 0 15px 40px var(--shadow-medium); }
+  100% { transform: scale(1); }
+}
+
+/* Encouragement bubble styles */
+.encouragement-bubble {
+  position: fixed;
+  width: 320px;
+  background: linear-gradient(135deg, 
+    var(--bg-primary) 0%, 
+    rgba(139, 69, 255, 0.05) 25%,
+    rgba(59, 130, 246, 0.05) 50%,
+    rgba(168, 85, 247, 0.05) 75%,
+    var(--bg-primary) 100%);
+  border-radius: 35px;
+  box-shadow: 
+    0 20px 60px rgba(139, 69, 255, 0.15),
+    0 8px 25px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(30px) scale(0.8) rotate(-2deg);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+  backdrop-filter: blur(15px) saturate(1.2);
+  overflow: hidden;
+}
+
+.encouragement-bubble::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    rgba(139, 69, 255, 0.1) 0%,
+    rgba(59, 130, 246, 0.08) 25%,
+    rgba(168, 85, 247, 0.06) 50%,
+    rgba(139, 69, 255, 0.04) 75%,
+    transparent 100%);
+  border-radius: 35px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.encouragement-bubble::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.03), 
+    transparent);
+  transform: rotate(45deg);
+  animation: bubbleShimmer 3s ease-in-out infinite;
+}
+
+.encouragement-bubble.show {
+  opacity: 0.95;
+  transform: translateY(0) scale(1) rotate(0deg);
+  pointer-events: auto;
+  animation: bubbleEntrance 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.encouragement-bubble.show::before {
+  opacity: 1;
+}
+
+.encouragement-bubble.hidden {
+  opacity: 0;
+  transform: translateY(30px) scale(0.8) rotate(-2deg);
+  pointer-events: none;
+}
+
+.bubble-content {
+  padding: 2rem 1.8rem;
+  position: relative;
+  z-index: 2;
+}
+
+.bubble-icon {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 1.2rem;
+  animation: bubbleIconFloat 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  position: relative;
+}
+
+.bubble-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, rgba(139, 69, 255, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+  animation: iconGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes bubbleIconFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.05); }
+}
+
+@keyframes iconGlow {
+  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+@keyframes bubbleShimmer {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
+}
+
+@keyframes bubbleEntrance {
+  0% { 
+    opacity: 0; 
+    transform: translateY(30px) scale(0.8) rotate(-5deg); 
+  }
+  60% { 
+    opacity: 0.75; 
+    transform: translateY(-5px) scale(1.05) rotate(1deg); 
+  }
+  100% { 
+    opacity: 0.95; 
+    transform: translateY(0) scale(1) rotate(0deg); 
+  }
+}
+
+.bubble-text {
+  color: var(--text-primary);
+  font-size: 1rem;
+  line-height: 1.6;
+  text-align: center;
+  margin-bottom: 1.2rem;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.01em;
+}
+
+.bubble-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.bubble-close:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.bubble-tail {
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 18px solid transparent;
+  border-right: 18px solid transparent;
+  border-top: 18px solid var(--bg-primary);
+  filter: drop-shadow(0 4px 8px rgba(139, 69, 255, 0.15));
+}
+
+.bubble-tail::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: -16px;
+  width: 0;
+  height: 0;
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-top: 16px solid rgba(139, 69, 255, 0.1);
+}
+
 .interactive-card {
   cursor: pointer;
   background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-lavender) 100%);
