@@ -1,0 +1,133 @@
+/**
+ * CSS Variables Module - Bulle Sensorielle V2
+ * Contains all CSS custom properties for theming and design tokens
+ * This file must be imported first to ensure variables are available
+ */
+
+/* ===== ROOT VARIABLES (Light Theme) ===== */
+:root {
+  /* Background Colors */
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-accent: #e2e8f0;
+  
+  /* Text Colors */
+  --text-primary: #334155;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  
+  /* Accent Colors */
+  --accent-blue: #bfdbfe;
+  --accent-lavender: #e9d5ff;
+  --accent-green: #bbf7d0;
+  --accent-peach: #fed7aa;
+  --accent-pink: #fce7f3;
+  
+  /* Border and Shadow */
+  --border-color: #e2e8f0;
+  --shadow-light: rgba(0, 0, 0, 0.05);
+  --shadow-medium: rgba(0, 0, 0, 0.1);
+  --shadow-heavy: rgba(0, 0, 0, 0.25);
+  
+  /* Gradient Variables */
+  --gradient-soft: linear-gradient(135deg, #bfdbfe 0%, #e9d5ff 50%, #bbf7d0 100%);
+  --gradient-primary: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-lavender) 100%);
+  --gradient-success: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+  --gradient-warm: linear-gradient(135deg, var(--accent-peach) 0%, var(--accent-lavender) 100%);
+  
+  /* Spacing Scale */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  
+  /* Font Sizes */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+  
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 50%;
+  
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  
+  /* Z-Index Scale */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+}
+
+/* ===== DARK THEME VARIABLES ===== */
+[data-theme="dark"] {
+  /* Background Colors */
+  --bg-primary: #1e293b;
+  --bg-secondary: #334155;
+  --bg-accent: #475569;
+  
+  /* Text Colors */
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  
+  /* Accent Colors */
+  --accent-blue: #3b82f6;
+  --accent-lavender: #8b5cf6;
+  --accent-green: #10b981;
+  --accent-peach: #f59e0b;
+  --accent-pink: #ec4899;
+  
+  /* Border and Shadow */
+  --border-color: #475569;
+  --shadow-light: rgba(0, 0, 0, 0.2);
+  --shadow-medium: rgba(0, 0, 0, 0.3);
+  --shadow-heavy: rgba(0, 0, 0, 0.5);
+  
+  /* Gradient Variables (Dark Theme) */
+  --gradient-soft: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #10b981 100%);
+}
+
+/* ===== HIGH CONTRAST MODE ===== */
+@media (prefers-contrast: high) {
+  :root {
+    --border-color: #000;
+    --text-secondary: #000;
+    --shadow-light: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0s;
+    --transition-base: 0s;
+    --transition-slow: 0s;
+  }
+}
+
+/**
+ * Variable Usage Guidelines:
+ * 
+ * 1. Always use CSS variables instead of hardcoded values
+ * 2. Use semantic naming (--text-primary vs --color-gray-900)
+ * 3. Group related variables together
+ * 4. Document any complex calculations or relationships
+ * 5. Test variables in both light and dark themes
+ */

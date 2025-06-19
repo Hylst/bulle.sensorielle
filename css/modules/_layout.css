@@ -1,0 +1,372 @@
+/**
+ * Layout Module - Bulle Sensorielle V2
+ * Contains layout systems: containers, grids, flexbox, and positioning
+ * Provides the structural foundation for the application
+ */
+
+/* ===== CONTAINER SYSTEM ===== */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: clamp(12px, 3vw, 20px);
+  min-height: 100vh;
+  width: 100%;
+}
+
+.container-fluid {
+  width: 100%;
+  padding: clamp(12px, 3vw, 20px);
+}
+
+.container-narrow {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: clamp(12px, 3vw, 20px);
+}
+
+/* ===== HEADER LAYOUT ===== */
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-xl) 0;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: var(--gradient-soft);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--spacing-sm);
+  animation: fadeInDown 1s ease-out;
+}
+
+.subtitle {
+  font-size: var(--font-size-xl);
+  color: var(--text-secondary);
+  font-weight: 400;
+  animation: fadeInUp 1s ease-out 0.2s both;
+}
+
+/* ===== SECTION LAYOUT ===== */
+.section {
+  margin-bottom: var(--spacing-2xl);
+  padding: var(--spacing-xl) 0;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+}
+
+.section-title {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+  color: var(--text-primary);
+}
+
+.section-description {
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ===== GRID SYSTEMS ===== */
+.grid {
+  display: grid;
+  gap: var(--spacing-lg);
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.grid-auto {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.grid-auto-small {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+/* Intensity Grid */
+.intensity-grid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin: var(--spacing-xl) 0;
+  flex-wrap: wrap;
+}
+
+/* ===== FLEXBOX UTILITIES ===== */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-nowrap {
+  flex-wrap: nowrap;
+}
+
+/* Justify Content */
+.justify-start {
+  justify-content: flex-start;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-end {
+  justify-content: flex-end;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.justify-around {
+  justify-content: space-around;
+}
+
+.justify-evenly {
+  justify-content: space-evenly;
+}
+
+/* Align Items */
+.items-start {
+  align-items: flex-start;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.items-end {
+  align-items: flex-end;
+}
+
+.items-stretch {
+  align-items: stretch;
+}
+
+.items-baseline {
+  align-items: baseline;
+}
+
+/* Flex Grow/Shrink */
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+.flex-auto {
+  flex: 1 1 auto;
+}
+
+.flex-none {
+  flex: none;
+}
+
+/* ===== POSITIONING ===== */
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.fixed {
+  position: fixed;
+}
+
+.sticky {
+  position: sticky;
+}
+
+/* Position Values */
+.top-0 {
+  top: 0;
+}
+
+.right-0 {
+  right: 0;
+}
+
+.bottom-0 {
+  bottom: 0;
+}
+
+.left-0 {
+  left: 0;
+}
+
+.inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+/* ===== Z-INDEX ===== */
+.z-dropdown {
+  z-index: var(--z-dropdown);
+}
+
+.z-sticky {
+  z-index: var(--z-sticky);
+}
+
+.z-fixed {
+  z-index: var(--z-fixed);
+}
+
+.z-modal {
+  z-index: var(--z-modal);
+}
+
+/* ===== OVERFLOW ===== */
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.overflow-auto {
+  overflow: auto;
+}
+
+.overflow-scroll {
+  overflow: scroll;
+}
+
+.overflow-x-hidden {
+  overflow-x: hidden;
+}
+
+.overflow-y-hidden {
+  overflow-y: hidden;
+}
+
+/* ===== DISPLAY ===== */
+.block {
+  display: block;
+}
+
+.inline {
+  display: inline;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.hidden {
+  display: none;
+}
+
+.show {
+  display: block;
+}
+
+/* ===== RESPONSIVE LAYOUT ===== */
+@media (max-width: 1024px) {
+  .container {
+    padding: clamp(16px, 4vw, 24px);
+  }
+  
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-md);
+  }
+  
+  .header {
+    padding: var(--spacing-lg) 0;
+  }
+  
+  .title {
+    font-size: 2rem;
+  }
+  
+  .subtitle {
+    font-size: var(--font-size-lg);
+  }
+  
+  .grid-4,
+  .grid-3,
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .grid-auto {
+    grid-template-columns: 1fr;
+  }
+  
+  .intensity-grid {
+    gap: var(--spacing-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: var(--spacing-sm);
+  }
+  
+  .title {
+    font-size: 1.75rem;
+  }
+  
+  .subtitle {
+    font-size: var(--font-size-base);
+  }
+  
+  .intensity-grid {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .section {
+    margin-bottom: var(--spacing-xl);
+    padding: var(--spacing-lg) 0;
+  }
+}
+
+/**
+ * Layout Guidelines:
+ * 
+ * 1. Use semantic class names that describe purpose
+ * 2. Prefer CSS Grid for 2D layouts, Flexbox for 1D
+ * 3. Use responsive design principles
+ * 4. Maintain consistent spacing using CSS variables
+ * 5. Consider accessibility in layout decisions
+ */

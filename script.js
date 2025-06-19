@@ -578,46 +578,63 @@ class BulleSensorielle {
         // Get device pixel ratio for crisp rendering
         const dpr = window.devicePixelRatio || 1;
         
-        // Calculate optimal dimensions based on container with proper padding
-        const containerWidth = Math.max(rect.width - 40, 200); // Ensure minimum width
-        const containerHeight = Math.max(rect.height - 40, 150); // Ensure minimum height
+        // Check if we're in fullscreen mode
+        const isFullscreen = container.classList.contains('fullscreen');
+        
+        let containerWidth, containerHeight;
+        
+        if (isFullscreen) {
+            // In fullscreen mode, use full viewport dimensions
+            containerWidth = window.innerWidth;
+            containerHeight = window.innerHeight;
+        } else {
+            // In normal mode, use reduced padding for better space utilization
+            containerWidth = Math.max(rect.width - 20, 200); // Reduced from 40 to 20
+            containerHeight = Math.max(rect.height - 20, 150); // Reduced from 40 to 20
+        }
         
         // Maintain aspect ratio while fitting container
         let canvasWidth, canvasHeight;
         
-        // Determine optimal aspect ratio based on screen size
-        const isMobile = window.innerWidth <= 480;
-        const isTablet = window.innerWidth <= 768 && window.innerWidth > 480;
-        
-        if (isMobile) {
-            // Mobile: Use 16:9 aspect ratio for better immersion
-            const aspectRatio = 16 / 9;
-            if (containerWidth / containerHeight > aspectRatio) {
-                canvasHeight = containerHeight;
-                canvasWidth = containerHeight * aspectRatio;
-            } else {
-                canvasWidth = containerWidth;
-                canvasHeight = containerWidth / aspectRatio;
-            }
-        } else if (isTablet) {
-            // Tablet: Use 16:10 aspect ratio
-            const aspectRatio = 16 / 10;
-            if (containerWidth / containerHeight > aspectRatio) {
-                canvasHeight = containerHeight;
-                canvasWidth = containerHeight * aspectRatio;
-            } else {
-                canvasWidth = containerWidth;
-                canvasHeight = containerWidth / aspectRatio;
-            }
+        if (isFullscreen) {
+            // In fullscreen mode, use full screen dimensions
+            canvasWidth = containerWidth;
+            canvasHeight = containerHeight;
         } else {
-            // Desktop: Use 4:3 aspect ratio for classic feel
-            const aspectRatio = 4 / 3;
-            if (containerWidth / containerHeight > aspectRatio) {
-                canvasHeight = Math.min(containerHeight, 600);
-                canvasWidth = canvasHeight * aspectRatio;
+            // Determine optimal aspect ratio based on screen size
+            const isMobile = window.innerWidth <= 480;
+            const isTablet = window.innerWidth <= 768 && window.innerWidth > 480;
+            
+            if (isMobile) {
+                // Mobile: Use 16:9 aspect ratio for better immersion
+                const aspectRatio = 16 / 9;
+                if (containerWidth / containerHeight > aspectRatio) {
+                    canvasHeight = containerHeight;
+                    canvasWidth = containerHeight * aspectRatio;
+                } else {
+                    canvasWidth = containerWidth;
+                    canvasHeight = containerWidth / aspectRatio;
+                }
+            } else if (isTablet) {
+                // Tablet: Use 16:10 aspect ratio
+                const aspectRatio = 16 / 10;
+                if (containerWidth / containerHeight > aspectRatio) {
+                    canvasHeight = containerHeight;
+                    canvasWidth = containerHeight * aspectRatio;
+                } else {
+                    canvasWidth = containerWidth;
+                    canvasHeight = containerWidth / aspectRatio;
+                }
             } else {
-                canvasWidth = Math.min(containerWidth, 800);
-                canvasHeight = canvasWidth / aspectRatio;
+                // Desktop: Use 4:3 aspect ratio for classic feel
+                const aspectRatio = 4 / 3;
+                if (containerWidth / containerHeight > aspectRatio) {
+                    canvasHeight = Math.min(containerHeight, 600);
+                    canvasWidth = canvasHeight * aspectRatio;
+                } else {
+                    canvasWidth = Math.min(containerWidth, 800);
+                    canvasHeight = canvasWidth / aspectRatio;
+                }
             }
         }
         
@@ -641,7 +658,12 @@ class BulleSensorielle {
         this.canvasDisplayWidth = canvasWidth;
         this.canvasDisplayHeight = canvasHeight;
         
-        console.log(`Canvas resized: ${canvasWidth}x${canvasHeight} (display), ${this.canvas.width}x${this.canvas.height} (internal)`);
+        console.log(`Canvas resized: ${canvasWidth}x${canvasHeight} (display), ${this.canvas.width}x${this.canvas.height} (internal), fullscreen: ${isFullscreen}`);
+        
+        // If we have an active visual animation, reinitialize it with new dimensions
+        if (this.currentVisual && this.isAnimating) {
+            this.startVisual(this.currentVisual);
+        }
     }
 
     /**
@@ -1530,8 +1552,16 @@ class BulleSensorielle {
         if (!sound) return false;
 
         try {
+            // Handle piano and lofi melody patterns specifically
+            if ((soundId === 'piano' || soundId === 'lofi') && this.melodyPatterns && this.melodyPatterns[soundId]) {
+                this.melodyPatterns[soundId].stop();
+                this.soundStates.set(soundId, 'paused');
+                this.pausedSounds.add(soundId);
+                console.log(`Melody pattern ${soundId} paused`);
+                return true;
+            }
             // Handle Tone.js Player objects
-            if (sound.state && sound.state === 'started') {
+            else if (sound.state && sound.state === 'started') {
                 sound.stop();
                 this.soundStates.set(soundId, 'paused');
                 this.pausedSounds.add(soundId);
@@ -1568,8 +1598,16 @@ class BulleSensorielle {
         if (!sound || !this.pausedSounds.has(soundId)) return false;
 
         try {
+            // Handle piano and lofi melody patterns specifically
+            if ((soundId === 'piano' || soundId === 'lofi') && this.melodyPatterns && this.melodyPatterns[soundId]) {
+                this.melodyPatterns[soundId].start();
+                this.soundStates.set(soundId, 'playing');
+                this.pausedSounds.delete(soundId);
+                console.log(`Melody pattern ${soundId} resumed`);
+                return true;
+            }
             // Handle Tone.js Player objects
-            if (sound.start && this.soundStates.get(soundId) === 'paused') {
+            else if (sound.start && this.soundStates.get(soundId) === 'paused') {
                 sound.start();
                 this.soundStates.set(soundId, 'playing');
                 this.pausedSounds.delete(soundId);
@@ -1755,8 +1793,15 @@ class BulleSensorielle {
         }
 
         try {
+            // Handle piano and lofi melody patterns specifically
+            if ((soundId === 'piano' || soundId === 'lofi') && this.melodyPatterns && this.melodyPatterns[soundId]) {
+                this.melodyPatterns[soundId].start();
+                this.soundStates.set(soundId, 'playing');
+                this.pausedSounds.delete(soundId);
+                console.log(`Melody pattern ${soundId} started`);
+            }
             // Check if it's an HTML5 Audio element (has play method but not Tone.js start)
-            if (sound instanceof HTMLAudioElement || (sound.play && !sound.start)) {
+            else if (sound instanceof HTMLAudioElement || (sound.play && !sound.start)) {
                 // Handle HTML5 Audio objects
                 sound.play().catch(e => console.warn(`Failed to play ${soundId}:`, e));
                 this.soundStates.set(soundId, 'playing');
@@ -1827,8 +1872,15 @@ class BulleSensorielle {
         }
 
         try {
+            // Handle piano and lofi melody patterns specifically
+            if ((soundId === 'piano' || soundId === 'lofi') && this.melodyPatterns && this.melodyPatterns[soundId]) {
+                this.melodyPatterns[soundId].stop();
+                this.soundStates.set(soundId, 'stopped');
+                this.pausedSounds.delete(soundId);
+                console.log(`Melody pattern ${soundId} stopped`);
+            }
             // Check if it's an HTML5 Audio element
-            if (sound instanceof HTMLAudioElement || (sound.pause && !sound.stop)) {
+            else if (sound instanceof HTMLAudioElement || (sound.pause && !sound.stop)) {
                 // Handle HTML5 Audio objects
                 sound.pause();
                 sound.currentTime = 0;

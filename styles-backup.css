@@ -196,7 +196,11 @@ body {
     margin: 0 auto;
   }
 }
-
+.emotion-card,
+.need-card,
+.activity-card {
+  /* Styles inherited from .card-base */
+}
 
 /* Back button smooth transitions */
 .back-button {
@@ -2112,7 +2116,6 @@ body {
     border-radius: 0;
     margin: 0;
     aspect-ratio: unset;
-    padding: 0; /* Remove padding in fullscreen mode */
   }
   
   .visual-display.fullscreen #visualCanvas {
@@ -2125,7 +2128,6 @@ body {
     margin: 0 -12px;
     border-radius: 15px;
     aspect-ratio: 16/9;
-    padding: 8px; /* Reduced padding for mobile */
   }
   
   /* Mobile timer */
@@ -2487,29 +2489,18 @@ body {
 }
 
 .activity-card {
-    background: var(--bg-secondary);
-    border: 2px solid var(--border-color);
-    border-radius: 20px;
-    padding: var(--spacing-xl);
-    text-align: center;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    cursor: pointer;
+    /* Enhanced card with gradient overlay */
     position: relative;
     overflow: hidden;
-    box-shadow: 0 8px 25px var(--shadow-light);
   }
   
   .activity-card:hover {
-    transform: translateY(-10px) scale(1.02);
-    box-shadow: 0 20px 50px var(--shadow-medium);
     border-color: var(--accent-peach);
   }
   
   .activity-card.selected {
     background: var(--gradient-warm);
     border-color: var(--accent-peach);
-    transform: translateY(-5px);
-    box-shadow: 0 15px 40px var(--shadow-medium);
   }
 
 .activity-card::before {
@@ -2519,53 +2510,15 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, var(--accent-peach) 0%, var(--accent-lavender) 100%);
+  background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.3s ease;
   z-index: 0;
 }
 
 .activity-card:hover::before {
-  opacity: 0.15;
+  opacity: 1;
 }
-
-.activity-card.selected::before {
-  opacity: 0.2;
-}
-
-.activity-icon {
-  font-size: 3rem;
-  margin-bottom: var(--spacing-lg);
-  color: var(--accent-peach);
-  display: block;
-  position: relative;
-  z-index: 1;
-  transition: transform 0.3s ease;
-}
-
-.activity-card:hover .activity-icon {
-  transform: scale(1.1) rotate(5deg);
-}
-
-.activity-card h3 {
-  color: var(--text-primary);
-  margin-bottom: var(--spacing-md);
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  position: relative;
-  z-index: 1;
-  transition: color 0.3s ease;
-}
-
-.activity-card p {
-  color: var(--text-secondary);
-  line-height: 1.6;
-  position: relative;
-  z-index: 1;
-  font-size: var(--font-size-base);
-}
-
-
 
 .activity-icon {
   font-size: 3rem;

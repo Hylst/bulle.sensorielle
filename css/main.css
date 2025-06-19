@@ -1,0 +1,42 @@
+/**
+ * Main CSS Entry Point - Bulle Sensorielle V2
+ * This file imports all CSS modules in the correct order
+ * to maintain proper cascade and specificity
+ */
+
+/* Import order is critical for proper CSS cascade */
+
+/* 1. Variables - Must be first for CSS custom properties */
+@import './modules/_variables.css';
+
+/* 2. Base styles - Reset and fundamental styles */
+@import './modules/_base.css';
+
+/* 3. Layout - Grid, flexbox, positioning */
+@import './modules/_layout.css';
+
+/* 4. Navigation - Navigation specific styles */
+@import './modules/_navigation.css';
+
+/* 5. Components - Reusable UI components */
+@import './modules/_components.css';
+
+/* 6. Sections - Page section specific styles */
+@import './modules/_sections.css';
+
+/* 7. Animations - Keyframes and transitions */
+@import './modules/_animations.css';
+
+/* 8. Responsive - Media queries */
+@import './modules/_responsive.css';
+
+/* 9. Utilities - Helper classes (highest specificity) */
+@import './modules/_utilities.css';
+
+/**
+ * Note: This modular structure ensures:
+ * - Proper CSS cascade order
+ * - Maintainable code organization
+ * - Easy debugging and updates
+ * - Consistent variable usage across modules
+ */

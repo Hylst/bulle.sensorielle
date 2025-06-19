@@ -1,0 +1,634 @@
+/**
+ * Animations Module - Bulle Sensorielle V2
+ * Contains all keyframe animations, transitions, and motion effects
+ * Used throughout the application for enhanced user experience
+ */
+
+/* ===== KEYFRAME ANIMATIONS ===== */
+
+/* Gentle Pulse Animation */
+@keyframes gentle-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* ===== CORE ANIMATIONS ===== */
+
+/* Fade Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Float Animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Pulse Animations */
+@keyframes pulse {
+  0%, 100% { 
+    opacity: 0.8; 
+  }
+  50% { 
+    opacity: 1; 
+  }
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+/* Breathing Animation */
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* Shake Animation */
+@keyframes shake {
+  0%, 100% { 
+    transform: translateX(0); 
+  }
+  25% { 
+    transform: translateX(-2px); 
+  }
+  75% { 
+    transform: translateX(2px); 
+  }
+}
+
+/* ===== BUBBLE ANIMATIONS ===== */
+
+/* Animated Bubbles */
+@keyframes bubbleFloat {
+  0%, 100% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translateY(-30px) translateX(10px) scale(1.1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-60px) translateX(-5px) scale(0.9);
+    opacity: 1;
+  }
+  75% {
+    transform: translateY(-30px) translateX(-10px) scale(1.05);
+    opacity: 0.7;
+  }
+}
+
+/* Bubble Icon Float */
+@keyframes bubbleIconFloat {
+  0%, 100% { 
+    transform: translateY(0) scale(1); 
+  }
+  50% { 
+    transform: translateY(-8px) scale(1.05); 
+  }
+}
+
+/* Icon Glow Effect */
+@keyframes iconGlow {
+  0%, 100% { 
+    opacity: 0.3; 
+    transform: translate(-50%, -50%) scale(1); 
+  }
+  50% { 
+    opacity: 0.6; 
+    transform: translate(-50%, -50%) scale(1.2); 
+  }
+}
+
+/* Bubble Shimmer Effect */
+@keyframes bubbleShimmer {
+  0% { 
+    transform: translateX(-100%) translateY(-100%) rotate(45deg); 
+    opacity: 0; 
+  }
+  50% { 
+    opacity: 1; 
+  }
+  100% { 
+    transform: translateX(100%) translateY(100%) rotate(45deg); 
+    opacity: 0; 
+  }
+}
+
+/* Bubble Entrance Animation */
+@keyframes bubbleEntrance {
+  0% { 
+    opacity: 0; 
+    transform: translateY(30px) scale(0.8) rotate(-5deg); 
+  }
+  60% { 
+    opacity: 0.75; 
+    transform: translateY(-5px) scale(1.05) rotate(1deg); 
+  }
+  100% { 
+    opacity: 0.95; 
+    transform: translateY(0) scale(1) rotate(0deg); 
+  }
+}
+
+/* ===== CARD ANIMATIONS ===== */
+
+/* Card Pulse Effect */
+@keyframes cardPulse {
+  0% { 
+    transform: translateY(-8px) scale(1.02); 
+  }
+  50% { 
+    transform: translateY(-10px) scale(1.03); 
+  }
+  100% { 
+    transform: translateY(-8px) scale(1.02); 
+  }
+}
+
+/* Card Glow Effect */
+@keyframes cardGlow {
+  0% { 
+    box-shadow: 0 12px 32px var(--shadow-medium); 
+  }
+  50% { 
+    box-shadow: 0 16px 40px var(--shadow-heavy); 
+  }
+  100% { 
+    box-shadow: 0 12px 32px var(--shadow-medium); 
+  }
+}
+
+/* Tip Card Pulse */
+@keyframes tipCardPulse {
+  0% { 
+    transform: scale(1); 
+  }
+  50% { 
+    transform: scale(1.05); 
+    box-shadow: 0 15px 40px var(--shadow-medium); 
+  }
+  100% { 
+    transform: scale(1); 
+  }
+}
+
+/* Shimmer Effect for Interactive Cards */
+@keyframes shimmer {
+  0% { 
+    transform: translateX(-100%) translateY(-100%) rotate(45deg); 
+    opacity: 0; 
+  }
+  50% { 
+    opacity: 1; 
+  }
+  100% { 
+    transform: translateX(100%) translateY(100%) rotate(45deg); 
+    opacity: 0; 
+  }
+}
+
+/* ===== MODAL ANIMATIONS ===== */
+
+/* Modal Slide In */
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ===== SOUND ICON ANIMATIONS ===== */
+
+/* Rain Animation */
+@keyframes rainDrop {
+  0% {
+    transform: translateY(-5px) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(2px) scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-5px) scale(1);
+    opacity: 0.8;
+  }
+}
+
+/* Fire Animation */
+@keyframes fireFlicker {
+  0%, 100% {
+    transform: scale(1) rotate(-1deg);
+    opacity: 0.9;
+  }
+  25% {
+    transform: scale(1.05) rotate(1deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.98) rotate(-0.5deg);
+    opacity: 0.95;
+  }
+  75% {
+    transform: scale(1.02) rotate(0.5deg);
+    opacity: 1;
+  }
+}
+
+/* Ocean Wave Animation */
+@keyframes oceanWave {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  25% {
+    transform: translateY(-3px) scale(1.02);
+  }
+  50% {
+    transform: translateY(0) scale(0.98);
+  }
+  75% {
+    transform: translateY(3px) scale(1.01);
+  }
+}
+
+/* Forest Breeze Animation */
+@keyframes forestBreeze {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  25% {
+    transform: rotate(2deg) scale(1.02);
+  }
+  50% {
+    transform: rotate(0deg) scale(0.98);
+  }
+  75% {
+    transform: rotate(-1deg) scale(1.01);
+  }
+}
+
+/* Thunder Animation */
+@keyframes thunderFlash {
+  0%, 90%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  5%, 15% {
+    opacity: 0.3;
+    transform: scale(1.1);
+  }
+  10% {
+    opacity: 1;
+    transform: scale(0.95);
+  }
+}
+
+/* Wind Animation */
+@keyframes windSway {
+  0%, 100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(2px) rotate(1deg);
+  }
+  50% {
+    transform: translateX(0) rotate(0deg);
+  }
+  75% {
+    transform: translateX(-2px) rotate(-1deg);
+  }
+}
+
+/* ===== ANIMATION CLASSES ===== */
+
+/* Breathing Circle */
+.breathing-circle {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+/* Animated Bubble */
+.animated-bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, 
+    rgba(102, 126, 234, 0.3), 
+    rgba(118, 75, 162, 0.3), 
+    rgba(255, 255, 255, 0.2)
+  );
+  animation: bubbleFloat 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Tip Card Click Animation */
+.tip-card-clicked {
+  animation: tipCardPulse 0.6s ease-in-out;
+}
+
+/* Profile Button States */
+.profile-btn.loading {
+  animation: pulse 1s infinite;
+}
+
+.profile-btn.deleting {
+  animation: shake 0.5s ease;
+}
+
+/* Sound Icon Animations */
+.sound-icon.rain {
+  animation: rainDrop 2s ease-in-out infinite;
+}
+
+.sound-icon.fire {
+  animation: fireFlicker 1.5s ease-in-out infinite;
+}
+
+.sound-icon.ocean {
+  animation: oceanWave 3s ease-in-out infinite;
+}
+
+.sound-icon.forest {
+  animation: forestBreeze 4s ease-in-out infinite;
+}
+
+.sound-icon.thunder {
+  animation: thunderFlash 3s ease-in-out infinite;
+}
+
+.sound-icon.wind {
+  animation: windSway 2.5s ease-in-out infinite;
+}
+
+/* ===== HOVER ANIMATIONS ===== */
+
+/* Interactive Card Shimmer */
+.interactive-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+  transform: rotate(45deg);
+  transition: all 0.6s ease;
+  opacity: 0;
+}
+
+.interactive-card:hover::before {
+  animation: shimmer 0.6s ease-in-out;
+}
+
+/* ===== LOADING ANIMATIONS ===== */
+
+/* Spinner Animation */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* Dots Loading Animation */
+@keyframes dotsLoading {
+  0%, 20% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+.dots-loading {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.dots-loading span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-blue);
+  animation: dotsLoading 1.4s ease-in-out infinite;
+}
+
+.dots-loading span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dots-loading span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* ===== TRANSITION UTILITIES ===== */
+
+/* Smooth Transitions */
+.transition-base {
+  transition: all var(--transition-base);
+}
+
+.transition-slow {
+  transition: all var(--transition-slow);
+}
+
+.transition-fast {
+  transition: all var(--transition-fast);
+}
+
+/* Transform Utilities */
+.hover-lift:hover {
+  transform: translateY(-3px);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.hover-rotate:hover {
+  transform: rotate(5deg);
+}
+
+/* ===== ACCESSIBILITY ANIMATIONS ===== */
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  /* Disable specific animations that might cause issues */
+  .breathing-circle,
+  .animated-bubble,
+  .sound-icon.rain,
+  .sound-icon.fire,
+  .sound-icon.ocean,
+  .sound-icon.forest,
+  .sound-icon.thunder,
+  .sound-icon.wind {
+    animation: none;
+  }
+  
+  /* Keep essential feedback animations but make them instant */
+  .tip-card-clicked {
+    animation: none;
+    transform: scale(0.95);
+  }
+  
+  .profile-btn.loading {
+    animation: none;
+    opacity: 0.8;
+  }
+  
+  .profile-btn.deleting {
+    animation: none;
+    background: #dc2626;
+  }
+}
+
+/* ===== PERFORMANCE OPTIMIZATIONS ===== */
+
+/* Will-change for animated elements */
+.animated-bubble,
+.breathing-circle,
+.sound-icon,
+.interactive-card,
+.card-base {
+  will-change: transform, opacity;
+}
+
+/* GPU acceleration for smooth animations */
+.card-base,
+.modal-content,
+.encouragement-bubble {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* ===== ENCOURAGEMENT BUBBLE ANIMATIONS ===== */
+
+.encouragement-bubble {
+  position: fixed;
+  background: var(--gradient-primary);
+  color: var(--text-primary);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 8px 25px var(--shadow-medium);
+  z-index: var(--z-tooltip);
+  max-width: 280px;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: 1.4;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  opacity: 0;
+  transform: translateY(10px) scale(0.9);
+  transition: all var(--transition-base);
+  pointer-events: none;
+}
+
+.encouragement-bubble.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  animation: bubbleEntrance 0.4s ease-out;
+}
+
+.encouragement-bubble.show::before {
+  animation: bubbleShimmer 2s ease-in-out infinite;
+}
+
+.encouragement-bubble.hidden {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.9);
+  pointer-events: none;
+}
+
+/**
+ * Animation Guidelines:
+ * 
+ * 1. Use CSS custom properties for consistent timing
+ * 2. Implement will-change for performance optimization
+ * 3. Provide reduced motion alternatives
+ * 4. Keep animations purposeful and not distracting
+ * 5. Use GPU acceleration for smooth performance
+ * 6. Test animations on various devices and browsers
+ * 7. Consider battery life impact on mobile devices
+ */

@@ -1,0 +1,256 @@
+/**
+ * Base Styles Module - Bulle Sensorielle V2
+ * Contains global resets, typography, and fundamental styles
+ * Applied to all elements across the application
+ */
+
+/* ===== CSS RESET ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+/* ===== ROOT ELEMENT ===== */
+html {
+  /* Responsive font sizing */
+  font-size: clamp(14px, 2.5vw, 16px);
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+/* ===== BODY ELEMENT ===== */
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  font-size: 16px;
+  transition: all var(--transition-slow);
+  overflow-x: hidden;
+  /* Improve touch scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+  /* Prevent horizontal scroll */
+  width: 100%;
+  min-height: 100vh;
+  /* Improve font rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ===== TYPOGRAPHY ===== */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: var(--spacing-md);
+  color: var(--text-primary);
+}
+
+h1 {
+  font-size: var(--font-size-3xl);
+}
+
+h2 {
+  font-size: var(--font-size-2xl);
+}
+
+h3 {
+  font-size: var(--font-size-xl);
+}
+
+h4 {
+  font-size: var(--font-size-lg);
+}
+
+h5 {
+  font-size: var(--font-size-base);
+}
+
+h6 {
+  font-size: var(--font-size-sm);
+}
+
+p {
+  margin-bottom: var(--spacing-md);
+  color: var(--text-secondary);
+}
+
+a {
+  color: var(--accent-blue);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover,
+a:focus {
+  color: var(--accent-lavender);
+  text-decoration: underline;
+}
+
+/* ===== FORM ELEMENTS ===== */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+}
+
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+/* ===== MEDIA ELEMENTS ===== */
+img,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* ===== LIST ELEMENTS ===== */
+ul,
+ol {
+  list-style: none;
+}
+
+/* ===== TABLE ELEMENTS ===== */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* ===== ACCESSIBILITY ===== */
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus visible for keyboard navigation */
+.focus-visible {
+  outline: 2px solid var(--accent-blue);
+  outline-offset: 2px;
+}
+
+/* ===== SMOOTH TRANSITIONS ===== */
+* {
+  transition: all var(--transition-base);
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ===== SELECTION STYLES ===== */
+::selection {
+  background: var(--accent-blue);
+  color: white;
+}
+
+::-moz-selection {
+  background: var(--accent-blue);
+  color: white;
+}
+
+/* ===== SCROLLBAR STYLES ===== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-accent);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-blue);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-lavender);
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+  
+  img {
+    page-break-inside: avoid;
+  }
+  
+  p,
+  h2,
+  h3 {
+    orphans: 3;
+    widows: 3;
+  }
+  
+  h2,
+  h3 {
+    page-break-after: avoid;
+  }
+}
+
+/**
+ * Base Styles Guidelines:
+ * 
+ * 1. Keep global styles minimal and semantic
+ * 2. Use CSS variables for all values
+ * 3. Ensure accessibility compliance
+ * 4. Test across different devices and browsers
+ * 5. Consider performance implications
+ */

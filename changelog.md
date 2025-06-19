@@ -5,6 +5,142 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/spec/v2.0.0.html).
 
+## [2.8.4] - 2024-12-25
+
+### 🎨 Corrections Visuelles - Section Effets Visuels
+- **Problème résolu** : Deux problèmes d'affichage dans la section visuels
+  1. **Mode plein écran** : L'effet ne s'étendait pas à tout l'écran
+  2. **Mode normal** : Padding excessif autour du canvas des effets visuels
+
+- **Solutions implémentées** :
+  - **Redimensionnement intelligent du canvas** : Modification de `resizeCanvas()` dans `script.js`
+    - Détection automatique du mode plein écran
+    - Utilisation des dimensions complètes de la fenêtre en mode plein écran
+    - Réduction du padding de 40px à 20px en mode normal
+  - **Optimisation CSS** : Mise à jour des styles dans tous les fichiers CSS
+    - Padding réduit à 10px en mode normal (8px sur mobile)
+    - Padding supprimé complètement en mode plein écran
+    - Cohérence entre tous les breakpoints responsifs
+
+### 📁 Fichiers Modifiés
+- `script.js` : Amélioration de la fonction `resizeCanvas()` avec gestion du plein écran
+- `css/modules/_sections.css` : Optimisation du padding du conteneur visuel
+- `css/modules/_responsive.css` : Mise à jour des styles responsifs
+- `styles.css` : Cohérence des styles de plein écran
+- `changelog.md` : Documentation des corrections
+
+### 🎯 Résultat
+- **Plein écran optimal** : Les effets visuels utilisent maintenant toute la surface de l'écran
+- **Espace mieux utilisé** : Réduction significative du padding en mode normal
+- **Expérience immersive** : Affichage plus engageant des effets visuels
+- **Responsive amélioré** : Comportement cohérent sur tous les appareils
+
+---
+
+## [2.8.3] - 2024-12-25
+
+### 🎵 Correction Critique de la Pause Globale pour Piano et Lo-Fi
+- **Problème résolu** : La pause globale ne fonctionnait pas correctement avec les sons "Piano Doux" et "Lo-Fi Calme"
+- **Cause identifiée** : Ces sons utilisent des objets `Tone.Pattern` qui nécessitent une gestion spécifique
+- **Solution implémentée** : Ajout de la gestion des patterns de mélodie dans les fonctions de contrôle audio
+  - `pauseSound()` : Détection et pause des patterns piano/lofi via `melodyPatterns[soundId].stop()`
+  - `resumeSound()` : Reprise des patterns piano/lofi via `melodyPatterns[soundId].start()`
+  - `startSound()` : Démarrage correct des patterns lors de l'activation
+  - `stopSound()` : Arrêt complet des patterns lors de la désactivation
+
+### 📁 Fichiers Modifiés
+- `script.js` : Mise à jour des fonctions `pauseSound`, `resumeSound`, `startSound`, `stopSound`
+- `changelog.md` : Documentation de la correction
+
+### 🎯 Résultat
+- **Pause globale fonctionnelle** : Tous les types de sons (HTML5, Tone.js, Patterns) sont correctement gérés
+- **Contrôle unifié** : Piano et Lo-Fi répondent maintenant aux commandes de pause/reprise globales
+- **Expérience utilisateur améliorée** : Comportement cohérent pour tous les sons de l'application
+
+---
+
+## [2.8.2] - 2024-12-25
+
+### 🔧 Correction Critique du Modal d'Information
+- **Problème résolu** : Modal d'information qui s'affichait en permanence sur la page d'accueil
+- **Styles ajoutés** : Restauration complète des styles de modal manquants
+  - `.info-modal` : Style de base avec `display: none` par défaut
+  - `.info-modal-content`, `.info-modal-header`, `.info-modal-close`, `.info-modal-body`
+  - Positionnement fixe, arrière-plan semi-transparent, z-index approprié
+- **Animation ajoutée** : `@keyframes slideUp` pour l'animation d'ouverture du modal
+- **Comportement restauré** : Modal caché par défaut, visible uniquement au clic sur la bulle d'info
+
+### 📁 Fichiers Modifiés
+- `css/modules/_components.css` : Ajout des styles de modal complets
+- `css/modules/_animations.css` : Ajout de l'animation slideUp
+- `changelog.md` : Documentation de la correction
+
+### 🎯 Résultat
+- **Mise en page corrigée** : Contenu de la page d'accueil non plus décalé
+- **Modal fonctionnel** : Affichage correct uniquement lors de l'interaction
+- **UX restaurée** : Comportement conforme à la version originale
+
+---
+
+## [2.8.1] - 2024-12-25
+
+### 🐛 Correction des Styles Manquants
+- **Composants UI restaurés** : Ajout des styles critiques manquants dans la structure modulaire
+  - `.theme-toggle` : Bouton de changement de thème avec positionnement fixe et animations
+  - `.info-bubble` : Bouton d'information avec animation gentle-pulse
+  - `.mascot` et `.mascot-message` : Système de mascotte avec messages interactifs
+  - `.global-pause-btn` : Bouton de pause globale avec animations float
+- **Animation ajoutée** : `@keyframes gentle-pulse` dans `_animations.css`
+- **Cohérence visuelle** : Restauration complète de l'apparence originale
+
+### 📁 Fichiers Modifiés
+- `css/modules/_components.css` : Ajout des 4 composants manquants
+- `css/modules/_animations.css` : Ajout de l'animation gentle-pulse
+- `changelog.md` : Documentation des corrections
+
+### 🎯 Résultat
+- **Interface complète** : Tous les éléments UI sont maintenant correctement stylés
+- **Fonctionnalités préservées** : Boutons de contrôle, mascotte et thème fonctionnels
+- **Architecture maintenue** : Corrections intégrées dans la structure modulaire ITCSS
+
+---
+
+## [2.8.0] - 2024-12-19
+
+### ✨ Modularisation CSS Complète
+- **Architecture CSS refactorisée** : Division du fichier `styles.css` (2681 lignes) en 9 modules spécialisés
+- **Structure modulaire** : Création du dossier `css/modules/` avec organisation ITCSS (Inverted Triangle CSS)
+- **Modules créés** :
+  - `_variables.css` : Variables CSS et design tokens
+  - `_base.css` : Reset, typographie et styles fondamentaux
+  - `_layout.css` : Grilles, conteneurs et layouts structurels
+  - `_navigation.css` : Composants de navigation
+  - `_components.css` : Composants UI réutilisables
+  - `_sections.css` : Sections spécifiques aux pages
+  - `_animations.css` : Keyframes, transitions et animations
+  - `_responsive.css` : Media queries et ajustements responsifs
+  - `_utilities.css` : Classes utilitaires et helpers
+
+### 🔧 Améliorations Techniques
+- **Fichier principal** : `css/main.css` importe tous les modules dans l'ordre correct
+- **Cascade CSS optimisée** : Ordre d'import respectant la spécificité croissante
+- **Maintenabilité** : Code CSS organisé par responsabilité et réutilisabilité
+- **Performance** : Structure modulaire permettant le lazy loading futur
+
+### 📁 Fichiers Modifiés
+- `index.html` : Mise à jour du lien CSS vers `css/main.css`
+- `css/main.css` : Point d'entrée principal avec imports modulaires
+- Création de 9 nouveaux modules CSS dans `css/modules/`
+- `changelog.md` : Documentation de la refactorisation
+
+### 🎯 Bénéfices
+- **Développement** : Édition ciblée par fonctionnalité
+- **Débogage** : Isolation des styles par module
+- **Collaboration** : Travail parallèle sur différents modules
+- **Évolutivité** : Ajout facile de nouveaux composants
+
+---
+
 ## [2.7.5] - 2024-12-19
 
 ### 🚨 Correction Critique - Positionnement des Bulles
@@ -905,6 +1041,9 @@ Tone.js (Synthesized):
   - [ ] Upload d'images de fond
   - [ ] Création de dégradés custom
 - [ ] **Animations WebGL** : Visuels plus complexes et fluides
+
+### 🐛 Correction de l'erreur CSS
+- **Problème résolu** : Suppression de la règle CSS vide pour `.emotion-card`, `.need-card`, et `.activity-card` dans `styles.css`.
 - [ ] **Mode Plein Écran** : Immersion totale
 
 ### 🧠 Intelligence Adaptative
