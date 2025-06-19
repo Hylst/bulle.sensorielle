@@ -2,6 +2,34 @@
 
 Tous les changements notables de ce projet seront documentés dans ce fichier.
 
+Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
+et ce projet adhère au [Versioning Sémantique](https://semver.org/spec/v2.0.0.html).
+
+## [2.7.4] - 2024-12-19
+
+### Ajouté
+- Section d'intensité intermédiaire dans le module "Comment te sens-tu ?"
+- Sélection de 5 niveaux d'intensité avec icônes et descriptions adaptées à chaque émotion
+- Navigation fluide : Émotions → Intensité → Besoins → Activités
+- Cartes d'intensité avec design responsive et animations de transition
+- Gestion d'état pour le suivi de l'intensité sélectionnée
+
+### Modifié
+- Flux de navigation dans la section des conseils émotionnels
+- Bouton de retour de la section "Besoins" pointe maintenant vers "Intensité"
+- Synchronisation des versions dans tous les fichiers du projet
+
+### Corrigé
+- **Bug critique** : Ajout de la méthode manquante `notifyObservers()` dans la classe `FeelingsState`
+- Erreur "this.notifyObservers is not a function" qui empêchait la navigation vers l'intensité
+
+### Technique
+- Ajout de la classe CSS `.intensity-section` et `.intensity-card`
+- Extension de la classe `FeelingsState` avec `selectedIntensity`
+- Nouvelles méthodes `showIntensity()` et `selectIntensity()` dans `FeelingsManager`
+- Structure de données `intensityData` pour chaque émotion
+- Implémentation complète du pattern Observer dans `FeelingsState`
+
 ## Version 2.2.1 - Corrections Audio et Interactions (2024-12-25)
 
 ### 🐛 Corrections de Bugs
@@ -26,6 +54,30 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 - `js/feelings.js` : Debugging des événements de clic
 - `styles.css` : Propriétés CSS pour les cartes cliquables
 - `changelog.md` : Documentation des corrections
+
+---
+
+## [Version Actuelle] - 2024-12-19
+
+### ✅ Corrigé
+- **Bug critique**: Correction de l'erreur `this.notifyObservers is not a function` dans `js/feelings.js`
+  - Ajout de la méthode `notifyObservers()` manquante à la classe `FeelingsState`
+  - Implémentation complète du pattern Observer pour la gestion d'état
+  - La navigation Émotions → Intensité → Besoins → Activités fonctionne maintenant correctement
+- **Bug d'affichage**: Correction du problème de superposition des sections dans le parcours émotionnel
+  - Les cartes de besoins apparaissaient en dessous des cartes d'intensité au lieu de les remplacer
+  - Ajout de la gestion manquante de `intensitySection` dans les méthodes `showNeeds()`, `showEmotions()` et `restart()`
+  - Navigation par étapes maintenant correcte avec remplacement complet des sections
+
+### 🔧 Améliorations techniques
+- Implémentation complète du pattern Observer dans `FeelingsState`
+- Meilleure gestion des erreurs et de l'état de l'application
+- Navigation plus cohérente entre toutes les sections du parcours émotionnel
+- Code plus robuste et maintenable
+
+### ⚠️ Avertissements non critiques
+- Avertissements de dépréciation `ScriptProcessorNode` de Tone.js v14.7.77 (non critique, fonctionnalité intacte)
+- Recommandation: Mise à niveau vers Tone.js v15+ ou utilisation d'`AudioWorkletNode` à long terme
 
 ---
 

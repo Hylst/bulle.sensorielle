@@ -2,7 +2,7 @@
   "name": "Bulle Sensorielle - Sanctuaire Numérique Apaisant",
   "short_name": "Bulle Sensorielle",
   "description": "Application web thérapeutique pour enfants avec sensibilités sensorielles (TSA, TDAH). Créez votre bulle de calme personnalisée avec sons et visuels apaisants.",
-  "version": "2.7.3",
+  "version": "2.7.4",
   "author": "Geoffroy Streit <geoffroy.streit@gmail.com>",
   "start_url": "./index.html",
   "display": "standalone",

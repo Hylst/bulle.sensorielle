@@ -12,7 +12,7 @@
  * - Interface adaptative jour/nuit
  * 
  * @fileoverview Application web progressive pour enfants avec TSA, TDAH et sensibilités sensorielles
- * @version 2.7.3
+ * @version 2.7.4
  * @author Geoffroy Streit <geoffroy.streit@gmail.com>
  * @created 2024
  * @license MIT

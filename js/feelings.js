@@ -3,6 +3,52 @@
  * Module autonome pour la section feelings de l'application Bulle Sensorielle
  */
 
+// Données d'intensité pour chaque émotion
+const intensityData = {
+    joie: [
+        { level: 1, icon: '🙂', title: 'Un peu content(e)', description: 'Je me sens bien' },
+        { level: 2, icon: '😊', title: 'Content(e)', description: 'Je suis de bonne humeur' },
+        { level: 3, icon: '😄', title: 'Joyeux(se)', description: 'Je me sens vraiment bien' },
+        { level: 4, icon: '😁', title: 'Très joyeux(se)', description: 'Je suis super content(e)' },
+        { level: 5, icon: '🤩', title: 'Euphorique', description: 'Je déborde de joie' }
+    ],
+    calme: [
+        { level: 1, icon: '😐', title: 'Un peu calme', description: 'Je me sens neutre' },
+        { level: 2, icon: '😌', title: 'Calme', description: 'Je me sens paisible' },
+        { level: 3, icon: '🧘', title: 'Très calme', description: 'Je suis serein(e)' },
+        { level: 4, icon: '😇', title: 'Profondément calme', description: 'Je me sens zen' },
+        { level: 5, icon: '🕊️', title: 'Paix totale', description: 'Je suis en harmonie' }
+    ],
+    peur: [
+        { level: 1, icon: '😟', title: 'Un peu inquiet(ète)', description: 'Je me sens légèrement mal à l\'aise' },
+        { level: 2, icon: '😰', title: 'Inquiet(ète)', description: 'J\'ai des soucis' },
+        { level: 3, icon: '😨', title: 'Peur', description: 'J\'ai vraiment peur' },
+        { level: 4, icon: '😱', title: 'Très peur', description: 'Je suis effrayé(e)' },
+        { level: 5, icon: '😵', title: 'Terreur', description: 'J\'ai une peur intense' }
+    ],
+    tristesse: [
+        { level: 1, icon: '😕', title: 'Un peu triste', description: 'Je ne me sens pas au top' },
+        { level: 2, icon: '😢', title: 'Triste', description: 'J\'ai de la peine' },
+        { level: 3, icon: '😭', title: 'Très triste', description: 'J\'ai envie de pleurer' },
+        { level: 4, icon: '💔', title: 'Profondément triste', description: 'J\'ai le cœur gros' },
+        { level: 5, icon: '😞', title: 'Désespoir', description: 'Je me sens abattu(e)' }
+    ],
+    colere: [
+        { level: 1, icon: '😤', title: 'Un peu agacé(e)', description: 'Quelque chose m\'embête' },
+        { level: 2, icon: '😠', title: 'En colère', description: 'Je suis fâché(e)' },
+        { level: 3, icon: '😡', title: 'Très en colère', description: 'Je suis vraiment énervé(e)' },
+        { level: 4, icon: '🤬', title: 'Furieux(se)', description: 'Je bouillonne de colère' },
+        { level: 5, icon: '💢', title: 'Rage', description: 'Je suis hors de moi' }
+    ],
+    fatigue: [
+        { level: 1, icon: '😪', title: 'Un peu fatigué(e)', description: 'Je manque un peu d\'énergie' },
+        { level: 2, icon: '😴', title: 'Fatigué(e)', description: 'J\'ai besoin de repos' },
+        { level: 3, icon: '🥱', title: 'Très fatigué(e)', description: 'Je suis vraiment épuisé(e)' },
+        { level: 4, icon: '😵‍💫', title: 'Épuisé(e)', description: 'Je n\'ai plus d\'énergie' },
+        { level: 5, icon: '🛌', title: 'Complètement vidé(e)', description: 'Je suis au bout du rouleau' }
+    ]
+};
+
 // Données des émotions et leurs besoins/activités associés
 const emotionsData = {
     joie: {
@@ -85,6 +131,7 @@ const emotionsData = {
 class FeelingsState {
     constructor() {
         this.selectedEmotion = null;
+        this.selectedIntensity = null;
         this.selectedNeed = null;
         this.observers = [];
     }
@@ -98,22 +145,24 @@ class FeelingsState {
     }
 
     /**
-     * Notifie tous les observateurs d'un changement d'état
-     * @param {string} type - Type de changement
-     * @param {*} data - Données associées au changement
-     */
-    notifyObservers(type, data) {
-        this.observers.forEach(callback => callback(type, data));
-    }
-
-    /**
      * Définit l'émotion sélectionnée
      * @param {string} emotion - L'émotion sélectionnée
      */
     setSelectedEmotion(emotion) {
         this.selectedEmotion = emotion;
+        this.selectedIntensity = null; // Reset intensity when emotion changes
         this.selectedNeed = null; // Reset need when emotion changes
-        this.notifyObservers('emotionChanged', emotion);
+        this.notifyObservers();
+    }
+
+    /**
+     * Définit l'intensité sélectionnée
+     * @param {number} intensity - Le niveau d'intensité (1-5)
+     */
+    setSelectedIntensity(intensity) {
+        this.selectedIntensity = intensity;
+        this.selectedNeed = null; // Reset need when intensity changes
+        this.notifyObservers();
     }
 
     /**
@@ -122,16 +171,28 @@ class FeelingsState {
      */
     setSelectedNeed(need) {
         this.selectedNeed = need;
-        this.notifyObservers('needChanged', need);
+        this.notifyObservers();
     }
 
     /**
-     * Réinitialise l'état
+     * Remet à zéro tous les états
      */
     reset() {
         this.selectedEmotion = null;
+        this.selectedIntensity = null;
         this.selectedNeed = null;
-        this.notifyObservers('stateReset', null);
+        this.notifyObservers();
+    }
+
+    /**
+     * Notifie tous les observateurs des changements d'état
+     */
+    notifyObservers() {
+        this.observers.forEach(callback => {
+            if (typeof callback === 'function') {
+                callback(this.getState());
+            }
+        });
     }
 
     /**
@@ -141,6 +202,7 @@ class FeelingsState {
     getState() {
         return {
             selectedEmotion: this.selectedEmotion,
+            selectedIntensity: this.selectedIntensity,
             selectedNeed: this.selectedNeed
         };
     }
@@ -194,6 +256,9 @@ class FeelingsManager {
                 case 'back-to-emotions':
                     this.showEmotions();
                     break;
+                case 'back-to-intensity':
+                    this.showIntensity(this.state.selectedEmotion);
+                    break;
                 case 'back-to-needs':
                     this.showNeeds();
                     break;
@@ -223,10 +288,88 @@ class FeelingsManager {
         // Ajouter la sélection à la carte cliquée
         card.classList.add('selected');
         
+        // Afficher l'intensité après un court délai
+        setTimeout(() => {
+            this.showIntensity(emotion);
+        }, 200);
+    }
+
+    /**
+     * Affiche la section d'intensité pour une émotion donnée
+     * @param {string} emotion - L'émotion sélectionnée
+     */
+    showIntensity(emotion) {
+        if (!emotion) {
+            this.showEmotions();
+            return;
+        }
+        
+        this.state.setSelectedEmotion(emotion);
+        
+        const emotionsSection = document.getElementById('emotionsSection');
+        const intensitySection = document.getElementById('intensitySection');
+        const needsSection = document.getElementById('needsSection');
+        const activitiesSection = document.getElementById('activitiesSection');
+        const intensityGrid = document.getElementById('intensityGrid');
+        
+        // Transition cohérente
+        emotionsSection.style.opacity = '0';
+        needsSection.style.opacity = '0';
+        activitiesSection.style.opacity = '0';
+        
+        setTimeout(() => {
+            // Masquer les autres sections
+            emotionsSection.style.display = 'none';
+            needsSection.style.display = 'none';
+            activitiesSection.style.display = 'none';
+            
+            // Afficher la section d'intensité
+            intensitySection.style.display = 'block';
+            intensitySection.style.opacity = '0';
+            
+            requestAnimationFrame(() => {
+                intensitySection.style.opacity = '1';
+            });
+        }, 200);
+        
+        // Vider le contenu précédent
+        intensityGrid.innerHTML = '';
+        
+        // Peupler les niveaux d'intensité
+        const intensityLevels = intensityData[emotion];
+        intensityLevels.forEach(level => {
+            const intensityCard = document.createElement('div');
+            intensityCard.className = 'intensity-card';
+            intensityCard.setAttribute('data-level', level.level);
+            intensityCard.innerHTML = `
+                <div class="intensity-icon">${level.icon}</div>
+                <div class="intensity-level">${level.title}</div>
+                <div class="intensity-description">${level.description}</div>
+            `;
+            intensityCard.addEventListener('click', () => this.selectIntensity(level.level, intensityCard));
+            intensityGrid.appendChild(intensityCard);
+        });
+    }
+
+    /**
+     * Sélectionne un niveau d'intensité et affiche les besoins
+     * @param {number} level - Le niveau d'intensité sélectionné
+     * @param {HTMLElement} cardElement - L'élément de la carte cliquée
+     */
+    selectIntensity(level, cardElement) {
+        // Retirer la sélection de toutes les cartes d'intensité
+        document.querySelectorAll('.intensity-card').forEach(c => c.classList.remove('selected'));
+        
+        // Ajouter la sélection à la carte cliquée
+        cardElement.classList.add('selected');
+        
+        // Mettre à jour l'état
+        this.state.setSelectedIntensity(level);
+        
         // Afficher les besoins après un court délai
         setTimeout(() => {
-            this.showNeeds(emotion);
-        }, 200);
+            this.showNeeds();
+        }, 300);
     }
 
     /**
@@ -242,6 +385,7 @@ class FeelingsManager {
         this.state.setSelectedEmotion(emotion);
         
         const emotionsSection = document.getElementById('emotionsSection');
+        const intensitySection = document.getElementById('intensitySection');
         const needsSection = document.getElementById('needsSection');
         const activitiesSection = document.getElementById('activitiesSection');
         const needsGrid = document.getElementById('needsGrid');
@@ -249,11 +393,13 @@ class FeelingsManager {
         
         // Transition cohérente avec le système principal
         emotionsSection.style.opacity = '0';
+        intensitySection.style.opacity = '0';
         activitiesSection.style.opacity = '0';
         
         setTimeout(() => {
             // Masquer les autres sections
             emotionsSection.style.display = 'none';
+            intensitySection.style.display = 'none';
             activitiesSection.style.display = 'none';
             
             // Afficher la section des besoins avec transition fluide
@@ -362,23 +508,26 @@ class FeelingsManager {
      */
     showEmotions() {
         const emotionsSection = document.getElementById('emotionsSection');
+        const intensitySection = document.getElementById('intensitySection');
         const needsSection = document.getElementById('needsSection');
         const activitiesSection = document.getElementById('activitiesSection');
         const needsGrid = document.getElementById('needsGrid');
         const activitiesGrid = document.getElementById('activitiesGrid');
         
         // Vérifier que toutes les sections existent
-        if (!emotionsSection || !needsSection || !activitiesSection) {
+        if (!emotionsSection || !intensitySection || !needsSection || !activitiesSection) {
             console.warn('Sections feelings non trouvées - peut-être sur la mauvaise page');
             return;
         }
         
         // Transition cohérente avec le système principal
+        intensitySection.style.opacity = '0';
         needsSection.style.opacity = '0';
         activitiesSection.style.opacity = '0';
         
         setTimeout(() => {
             // Masquer les autres sections
+            intensitySection.style.display = 'none';
             needsSection.style.display = 'none';
             activitiesSection.style.display = 'none';
             
@@ -417,18 +566,20 @@ class FeelingsManager {
      */
     restart() {
         const emotionsSection = document.getElementById('emotionsSection');
+        const intensitySection = document.getElementById('intensitySection');
         const needsSection = document.getElementById('needsSection');
         const activitiesSection = document.getElementById('activitiesSection');
         const needsGrid = document.getElementById('needsGrid');
         const activitiesGrid = document.getElementById('activitiesGrid');
         
         // Vérifier que les sections existent
-        if (!emotionsSection || !needsSection || !activitiesSection) {
+        if (!emotionsSection || !intensitySection || !needsSection || !activitiesSection) {
             console.warn('Sections feelings non trouvées - peut-être sur la mauvaise page');
             return;
         }
         
         // Masquer toutes les sections sauf les émotions
+        intensitySection.style.display = 'none';
         needsSection.style.display = 'none';
         activitiesSection.style.display = 'none';
         emotionsSection.style.display = 'block';
