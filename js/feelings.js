@@ -586,29 +586,92 @@ class FeelingsManager {
             const randomEncouragement = encouragements[Math.floor(Math.random() * encouragements.length)];
             
             // Calculer la position de la bulle par rapport à la carte
-            const cardRect = activityCard.getBoundingClientRect();
-            const mascotMessage = document.getElementById('mascotMessage');
+            this.positionSpeechBubble(activityCard);
             
-            if (mascotMessage) {
-                // Réinitialiser les classes de position
-                mascotMessage.classList.remove('position-left', 'position-bottom');
-                
-                // Déterminer la position optimale de la bulle
-                const windowWidth = window.innerWidth;
-                const windowHeight = window.innerHeight;
-                
-                // Si la carte est dans la partie droite de l'écran, positionner la bulle à gauche
-                if (cardRect.right > windowWidth * 0.6) {
-                    mascotMessage.classList.add('position-left');
-                }
-                
-                // Si la carte est dans la partie haute de l'écran, positionner la bulle en bas
-                if (cardRect.top < windowHeight * 0.3) {
-                    mascotMessage.classList.add('position-bottom');
-                }
+            // Afficher le message dans la bulle de speech ET dans la mascotte en haut à droite
+            window.appInstance.showMascotMessage(randomEncouragement, 2000);
+            this.showInTopRightMascot(randomEncouragement, 4000);
+        }
+    }
+    
+    /**
+     * Positionne la bulle de speech par rapport à la carte d'activité
+     * @param {HTMLElement} activityCard - La carte d'activité de référence
+     */
+    positionSpeechBubble(activityCard) {
+        const cardRect = activityCard.getBoundingClientRect();
+        const mascotMessage = document.getElementById('mascotMessage');
+        
+        if (mascotMessage) {
+            // Réinitialiser les classes de position
+            mascotMessage.classList.remove('position-left', 'position-bottom', 'position-right', 'position-top');
+            
+            // Déterminer la position optimale de la bulle
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const cardCenterX = cardRect.left + cardRect.width / 2;
+            const cardCenterY = cardRect.top + cardRect.height / 2;
+            
+            // Position horizontale : gauche ou droite selon la position de la carte
+            if (cardCenterX > windowWidth / 2) {
+                mascotMessage.classList.add('position-left');
+            } else {
+                mascotMessage.classList.add('position-right');
             }
             
-            window.appInstance.showMascotMessage(randomEncouragement, 2000);
+            // Position verticale : haut ou bas selon la position de la carte
+            if (cardCenterY > windowHeight / 2) {
+                mascotMessage.classList.add('position-top');
+            } else {
+                mascotMessage.classList.add('position-bottom');
+            }
+            
+            // Stocker la référence de la carte pour le triangle
+            mascotMessage.setAttribute('data-target-card', activityCard.getAttribute('data-activity-index') || '0');
+        }
+    }
+    
+    /**
+     * Affiche le message dans la bulle mascotte en haut à droite
+     * @param {string} message - Message à afficher
+     * @param {number} duration - Durée d'affichage en millisecondes
+     */
+    showInTopRightMascot(message, duration = 4000) {
+        const appSymbolBtn = document.getElementById('appSymbolBtn');
+        if (appSymbolBtn) {
+            // Créer ou récupérer la bulle de message temporaire
+            let tempBubble = document.getElementById('tempMascotBubble');
+            if (!tempBubble) {
+                tempBubble = document.createElement('div');
+                tempBubble.id = 'tempMascotBubble';
+                tempBubble.className = 'temp-mascot-bubble';
+                document.body.appendChild(tempBubble);
+            }
+            
+            // Positionner la bulle près du symbole de l'app
+            const symbolRect = appSymbolBtn.getBoundingClientRect();
+            tempBubble.style.position = 'fixed';
+            tempBubble.style.top = `${symbolRect.bottom + 10}px`;
+            tempBubble.style.right = '20px';
+            tempBubble.style.zIndex = '10000';
+            tempBubble.textContent = message;
+            
+            // Afficher avec animation
+            tempBubble.style.opacity = '1';
+            tempBubble.style.transform = 'translateY(0)';
+            
+            // Cacher après la durée spécifiée
+            setTimeout(() => {
+                if (tempBubble) {
+                    tempBubble.style.opacity = '0';
+                    tempBubble.style.transform = 'translateY(-10px)';
+                    setTimeout(() => {
+                        if (tempBubble && tempBubble.parentNode) {
+                            tempBubble.parentNode.removeChild(tempBubble);
+                        }
+                    }, 300);
+                }
+            }, duration);
         }
     }
     
@@ -620,7 +683,8 @@ class FeelingsManager {
         if (mascotMessage) {
             // Réinitialiser les classes de position après un délai
             setTimeout(() => {
-                mascotMessage.classList.remove('position-left', 'position-bottom');
+                mascotMessage.classList.remove('position-left', 'position-bottom', 'position-right', 'position-top');
+                mascotMessage.removeAttribute('data-target-card');
             }, 500);
         }
     }
@@ -640,8 +704,10 @@ class FeelingsManager {
         activityCard.classList.add('selected');
         
         // Afficher un message de confirmation
+        const confirmationMessage = `Parfait ! ${activity.title} va t'aider à te sentir mieux !`;
         if (typeof window.appInstance !== 'undefined' && window.appInstance.showMascotMessage) {
-            window.appInstance.showMascotMessage(`Parfait ! ${activity.title} va t'aider à te sentir mieux !`, 3000);
+            window.appInstance.showMascotMessage(confirmationMessage, 3000);
+            this.showInTopRightMascot(confirmationMessage, 4000);
         }
     }
 
@@ -649,6 +715,9 @@ class FeelingsManager {
      * Redémarre la section feelings (retour aux émotions)
      */
     restart() {
+        // Fermer toutes les bulles de speech avant de redémarrer
+        this.closeAllSpeechBubbles();
+        
         const emotionsSection = document.getElementById('emotionsSection');
         const intensitySection = document.getElementById('intensitySection');
         const needsSection = document.getElementById('needsSection');
@@ -694,9 +763,34 @@ class FeelingsManager {
         });
         
         // Afficher un message de redémarrage
+        const restartMessage = 'On recommence ! Dis-moi comment tu te sens.';
         if (typeof window.appInstance !== 'undefined' && window.appInstance.showMascotMessage) {
-            window.appInstance.showMascotMessage('On recommence ! Dis-moi comment tu te sens.', 2000);
+            window.appInstance.showMascotMessage(restartMessage, 2000);
+            this.showInTopRightMascot(restartMessage, 4000);
         }
+    }
+    
+    /**
+     * Ferme toutes les bulles de speech actives
+     */
+    closeAllSpeechBubbles() {
+        // Réinitialiser les classes de position du message mascotte
+        const mascotMessage = document.getElementById('mascotMessage');
+        if (mascotMessage) {
+            mascotMessage.classList.remove('position-left', 'position-bottom', 'position-right', 'position-top');
+            mascotMessage.removeAttribute('data-target-card');
+            // Cacher le message avec une transition douce
+            mascotMessage.style.opacity = '0';
+            mascotMessage.style.transform = 'translateX(20px)';
+        }
+        
+        // Supprimer les bulles temporaires de la mascotte en haut à droite
+        const tempBubbles = document.querySelectorAll('#tempMascotBubble');
+        tempBubbles.forEach(bubble => {
+            if (bubble.parentNode) {
+                bubble.parentNode.removeChild(bubble);
+            }
+        });
     }
 }
 

@@ -258,6 +258,9 @@ class NavigationManager {
             return;
         }
 
+        // Fermer toutes les bulles de speech avant de changer de section
+        this.closeAllSpeechBubbles();
+
         // Mettre à jour l'état
         this.currentSection = sectionId;
         
@@ -394,6 +397,52 @@ class NavigationManager {
     }
 
     /**
+     * Ferme toutes les bulles de speech actives
+     */
+    closeAllSpeechBubbles() {
+        // Réinitialiser les classes de position du message mascotte
+        const mascotMessage = document.getElementById('mascotMessage');
+        if (mascotMessage) {
+            mascotMessage.classList.remove('position-left', 'position-bottom');
+            // Cacher le message avec une transition douce
+            mascotMessage.style.opacity = '0';
+            mascotMessage.style.transform = 'translateX(20px)';
+        }
+        
+        // Fermer les bulles d'encouragement des tips si elles existent
+        const encouragementBubbles = document.querySelectorAll('.encouragement-bubble');
+        encouragementBubbles.forEach(bubble => {
+            bubble.classList.remove('show');
+            bubble.classList.add('hidden');
+        });
+    }
+    
+    /**
+     * Délègue l'affichage des messages à l'instance principale de l'app
+     * @param {string} message - Message à afficher
+     * @param {number} duration - Durée d'affichage en millisecondes
+     */
+    showMascotMessage(message, duration = 3000) {
+        // Déléguer à l'instance principale si elle existe
+        if (typeof window.appInstance !== 'undefined' && window.appInstance.showMascotMessage) {
+            window.appInstance.showMascotMessage(message, duration);
+        } else {
+            // Fallback vers l'affichage direct
+            const mascotMessage = document.getElementById('mascotMessage');
+            if (mascotMessage) {
+                mascotMessage.textContent = message;
+                mascotMessage.style.opacity = '1';
+                mascotMessage.style.transform = 'translateX(0)';
+                
+                setTimeout(() => {
+                    mascotMessage.style.opacity = '0';
+                    mascotMessage.style.transform = 'translateX(20px)';
+                }, duration);
+            }
+        }
+    }
+
+    /**
      * Charge les profils sauvegardés
      */
     loadSavedProfiles() {
@@ -442,6 +491,9 @@ class NavigationManager {
      * Retourne à la section précédente
      */
     goBack() {
+        // Fermer toutes les bulles de speech avant de retourner
+        this.closeAllSpeechBubbles();
+        
         // Pour l'instant, retourner à l'accueil
         this.navigateToSection('home');
     }
