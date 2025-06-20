@@ -491,14 +491,21 @@ class FeelingsManager {
         
         // Peupler les activités
         const activities = emotionsData[this.state.selectedEmotion].activities;
-        activities.forEach(activity => {
+        activities.forEach((activity, index) => {
             const activityCard = document.createElement('div');
             activityCard.className = 'activity-card card-base';
+            activityCard.setAttribute('data-activity-index', index);
             activityCard.innerHTML = `
                 <div class="activity-icon card-icon">${activity.icon || '✨'}</div>
                 <h3 class="card-title">${activity.title}</h3>
                 <p class="card-description">${activity.description}</p>
             `;
+            
+            // Ajouter les événements d'interaction pour les encouragements
+            activityCard.addEventListener('mouseenter', () => this.showActivityEncouragement(activityCard, activity));
+            activityCard.addEventListener('mouseleave', () => this.hideActivityEncouragement());
+            activityCard.addEventListener('click', () => this.selectActivity(activityCard, activity));
+            
             activitiesGrid.appendChild(activityCard);
         });
     }
@@ -562,6 +569,83 @@ class FeelingsManager {
     }
 
     /**
+     * Affiche un encouragement interactif pour une activité
+     * @param {HTMLElement} activityCard - La carte d'activité survolée
+     * @param {Object} activity - Les données de l'activité
+     */
+    showActivityEncouragement(activityCard, activity) {
+        if (typeof window.appInstance !== 'undefined' && window.appInstance.showMascotMessage) {
+            const encouragements = [
+                `${activity.title} est une excellente idée !`,
+                `Essaie ${activity.title}, ça peut t'aider !`,
+                `${activity.title} pourrait te faire du bien !`,
+                `C'est parti pour ${activity.title} !`,
+                `${activity.title} est parfait pour toi !`
+            ];
+            
+            const randomEncouragement = encouragements[Math.floor(Math.random() * encouragements.length)];
+            
+            // Calculer la position de la bulle par rapport à la carte
+            const cardRect = activityCard.getBoundingClientRect();
+            const mascotMessage = document.getElementById('mascotMessage');
+            
+            if (mascotMessage) {
+                // Réinitialiser les classes de position
+                mascotMessage.classList.remove('position-left', 'position-bottom');
+                
+                // Déterminer la position optimale de la bulle
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+                
+                // Si la carte est dans la partie droite de l'écran, positionner la bulle à gauche
+                if (cardRect.right > windowWidth * 0.6) {
+                    mascotMessage.classList.add('position-left');
+                }
+                
+                // Si la carte est dans la partie haute de l'écran, positionner la bulle en bas
+                if (cardRect.top < windowHeight * 0.3) {
+                    mascotMessage.classList.add('position-bottom');
+                }
+            }
+            
+            window.appInstance.showMascotMessage(randomEncouragement, 2000);
+        }
+    }
+    
+    /**
+     * Cache l'encouragement interactif
+     */
+    hideActivityEncouragement() {
+        const mascotMessage = document.getElementById('mascotMessage');
+        if (mascotMessage) {
+            // Réinitialiser les classes de position après un délai
+            setTimeout(() => {
+                mascotMessage.classList.remove('position-left', 'position-bottom');
+            }, 500);
+        }
+    }
+    
+    /**
+     * Sélectionne une activité et affiche un message de confirmation
+     * @param {HTMLElement} activityCard - La carte d'activité sélectionnée
+     * @param {Object} activity - Les données de l'activité
+     */
+    selectActivity(activityCard, activity) {
+        // Retirer la sélection de toutes les cartes d'activité
+        document.querySelectorAll('.activity-card').forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        // Ajouter la sélection à la carte cliquée
+        activityCard.classList.add('selected');
+        
+        // Afficher un message de confirmation
+        if (typeof window.appInstance !== 'undefined' && window.appInstance.showMascotMessage) {
+            window.appInstance.showMascotMessage(`Parfait ! ${activity.title} va t'aider à te sentir mieux !`, 3000);
+        }
+    }
+
+    /**
      * Redémarre la section feelings (retour aux émotions)
      */
     restart() {
@@ -595,6 +679,7 @@ class FeelingsManager {
         // Réinitialiser le style de toutes les cartes
         const emotionCards = document.querySelectorAll('.emotion-card');
         const needCards = document.querySelectorAll('.need-card');
+        const activityCards = document.querySelectorAll('.activity-card');
         
         emotionCards.forEach(card => {
             card.classList.remove('selected');
@@ -603,6 +688,15 @@ class FeelingsManager {
         needCards.forEach(card => {
             card.classList.remove('selected');
         });
+        
+        activityCards.forEach(card => {
+            card.classList.remove('selected');
+        });
+        
+        // Afficher un message de redémarrage
+        if (typeof window.appInstance !== 'undefined' && window.appInstance.showMascotMessage) {
+            window.appInstance.showMascotMessage('On recommence ! Dis-moi comment tu te sens.', 2000);
+        }
     }
 }
 

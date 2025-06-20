@@ -647,20 +647,102 @@
 
 .mascot-message {
   background: var(--bg-secondary);
-  padding: 10px 15px;
+  padding: 12px 18px;
   border-radius: 20px;
   font-size: 0.9rem;
   color: var(--text-primary);
-  box-shadow: 0 4px 20px var(--shadow-light);
-  max-width: 200px;
+  box-shadow: 0 6px 25px var(--shadow-medium);
+  max-width: 250px;
   opacity: 0;
   transform: translateX(20px);
   transition: all var(--transition-slow);
+  position: relative;
+  border: 2px solid var(--border-color);
+}
+
+/* Speech Bubble Triangle */
+.mascot-message::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -8px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-left: 8px solid var(--bg-secondary);
+  z-index: 2;
+}
+
+.mascot-message::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -10px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 10px solid var(--border-color);
+  z-index: 1;
+}
+
+/* Dynamic positioning for activity cards */
+.mascot-message.position-left {
+  transform: translateX(-20px);
+}
+
+.mascot-message.position-left::after {
+  right: auto;
+  left: -8px;
+  border-left: none;
+  border-right: 8px solid var(--bg-secondary);
+}
+
+.mascot-message.position-left::before {
+  right: auto;
+  left: -10px;
+  border-left: none;
+  border-right: 10px solid var(--border-color);
+}
+
+.mascot-message.position-bottom {
+  transform: translateY(20px);
+}
+
+.mascot-message.position-bottom::after {
+  top: -8px;
+  right: 50%;
+  transform: translateX(50%);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid var(--bg-secondary);
+  border-top: none;
+}
+
+.mascot-message.position-bottom::before {
+  top: -10px;
+  right: 50%;
+  transform: translateX(50%);
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid var(--border-color);
+  border-top: none;
 }
 
 .mascot:hover .mascot-message {
   opacity: 1;
   transform: translateX(0);
+}
+
+.mascot:hover .mascot-message.position-left {
+  transform: translateX(0);
+}
+
+.mascot:hover .mascot-message.position-bottom {
+  transform: translateY(0);
 }
 
 /* Global Pause/Play Button */
@@ -725,6 +807,85 @@
 
 .save-icon {
   font-size: 1.3rem;
+}
+
+/* Restart Button */
+.restart-button {
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-lavender));
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: 0 4px 15px var(--shadow-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  margin: var(--spacing-xl) auto 0;
+  min-width: 160px;
+  position: relative;
+  overflow: hidden;
+}
+
+.restart-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.restart-button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 25px var(--shadow-medium);
+  background: linear-gradient(135deg, var(--accent-lavender), var(--accent-blue));
+}
+
+.restart-button:hover::before {
+  left: 100%;
+}
+
+.restart-button:active {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 4px 15px var(--shadow-light);
+  transition: all 0.1s ease;
+}
+
+/* Back Button */
+.back-button {
+  background: var(--bg-accent);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-lg);
+}
+
+.back-button:hover {
+  background: var(--bg-secondary);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+  transform: translateX(-3px);
+  box-shadow: 0 4px 15px var(--shadow-light);
+}
+
+.back-button:active {
+  transform: translateX(-1px);
+  transition: all 0.1s ease;
 }
 
 /* ===== MODAL COMPONENTS ===== */
@@ -1050,6 +1211,18 @@
     width: 50px;
     height: 50px;
     font-size: 1.2rem;
+  }
+  
+  .restart-button {
+    min-width: 140px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+  }
+  
+  .mascot-message {
+    max-width: 200px;
+    font-size: 0.8rem;
+    padding: 10px 14px;
   }
 }
 

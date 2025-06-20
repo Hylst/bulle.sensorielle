@@ -5,6 +5,32 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.3] - 2024-12-25
+
+### ✨ Enhanced Interactive Feelings Section
+- **Interactive activity cards with dynamic encouragements**:
+  - Hover over activity cards to see personalized encouragement messages
+  - Random encouraging messages for each activity ("C'est une excellente idée!", "Ça peut t'aider!", etc.)
+  - Click activity cards to select them with visual feedback
+  - Smart speech bubble positioning based on card location on screen
+- **Improved mascot message system**:
+  - Dynamic positioning classes `.position-left` and `.position-bottom`
+  - Speech bubble triangles that adapt to bubble position
+  - Automatic positioning based on activity card location
+  - Enhanced visual feedback for user interactions
+- **Enhanced restart functionality**:
+  - Clear all selections including activity cards
+  - Encouraging restart message from mascot
+  - Complete state reset for better user experience
+- **New CSS components**:
+  - `.restart-button` with hover effects and animated icon
+  - `.back-button` with consistent styling
+  - Enhanced `.mascot-message` with speech bubble triangles
+  - Responsive design for smaller screens
+- **Files modified**:
+  - `css/modules/_components.css` - New button styles and enhanced mascot message
+  - `js/feelings.js` - Interactive encouragements and dynamic positioning
+
 ## [2.9.2] - 2024-12-25
 
 ### 🔧 Interactive Bubbles Fix
