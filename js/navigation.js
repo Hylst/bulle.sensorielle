@@ -122,14 +122,7 @@ class NavigationManager {
      * Configure les bulles d'interface dans les coins
      */
     setupCornerBubbles() {
-        // Bulle d'information (coin inférieur gauche)
-        const infoBubble = document.getElementById('infoBubble');
-        if (infoBubble) {
-            infoBubble.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.toggleInfoModal();
-            });
-        }
+        // Info button is handled by script.js setupInfoBubble() method
         
         // Bouton symbole de l'app (coin supérieur droit)
         const appSymbolBtn = document.getElementById('appSymbolBtn');

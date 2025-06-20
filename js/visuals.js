@@ -87,6 +87,12 @@ class VisualsManager {
         } else {
             this.setupVisualButtons();
         }
+        
+        // Événements pour navigation par clavier
+        document.addEventListener('keydown', (e) => this.handleKeyNavigation(e));
+        
+        // Événements pour navigation tactile
+        this.setupTouchNavigation();
     }
 
     /**
@@ -177,6 +183,7 @@ class VisualsManager {
         if (!document.fullscreenElement) {
             visualDisplay.requestFullscreen().then(() => {
                 visualDisplay.classList.add('fullscreen');
+                this.createFullscreenExitButton();
                 this.resizeCanvas();
             }).catch(err => {
                 console.log('Erreur plein écran:', err);
@@ -184,8 +191,73 @@ class VisualsManager {
         } else {
             document.exitFullscreen().then(() => {
                 visualDisplay.classList.remove('fullscreen');
+                this.removeFullscreenExitButton();
                 this.resizeCanvas();
             });
+        }
+    }
+    
+    /**
+     * Crée le bouton de sortie du mode plein écran
+     */
+    createFullscreenExitButton() {
+        // Supprimer le bouton existant s'il y en a un
+        this.removeFullscreenExitButton();
+        
+        const exitButton = document.createElement('button');
+        exitButton.id = 'fullscreenExitBtn';
+        exitButton.innerHTML = '🫧';
+        exitButton.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        `;
+        
+        exitButton.addEventListener('click', () => this.exitFullscreen());
+        exitButton.addEventListener('mouseenter', () => {
+            exitButton.style.background = 'rgba(255, 255, 255, 0.2)';
+            exitButton.style.color = 'rgba(255, 255, 255, 0.8)';
+            exitButton.style.transform = 'scale(1.1)';
+        });
+        exitButton.addEventListener('mouseleave', () => {
+            exitButton.style.background = 'rgba(255, 255, 255, 0.1)';
+            exitButton.style.color = 'rgba(255, 255, 255, 0.5)';
+            exitButton.style.transform = 'scale(1)';
+        });
+        
+        document.body.appendChild(exitButton);
+    }
+    
+    /**
+     * Supprime le bouton de sortie du mode plein écran
+     */
+    removeFullscreenExitButton() {
+        const existingButton = document.getElementById('fullscreenExitBtn');
+        if (existingButton) {
+            existingButton.remove();
+        }
+    }
+    
+    /**
+     * Sort du mode plein écran
+     */
+    exitFullscreen() {
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
         }
     }
     
@@ -571,6 +643,96 @@ class VisualsManager {
         }
     }
 
+    /**
+     * Gère la navigation par clavier
+     * @param {KeyboardEvent} e - Événement clavier
+     */
+    handleKeyNavigation(e) {
+        // ESC pour sortir du plein écran
+        if (e.key === 'Escape' && document.fullscreenElement) {
+            this.exitFullscreen();
+            return;
+        }
+        
+        // Navigation par flèches uniquement si un visuel est actif
+        if (!this.isAnimating) return;
+        
+        if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            this.switchToPreviousVisual();
+        } else if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            this.switchToNextVisual();
+        }
+    }
+    
+    /**
+     * Configure la navigation tactile
+     */
+    setupTouchNavigation() {
+        let startX = 0;
+        let startY = 0;
+        
+        const visualDisplay = document.querySelector('.visual-display');
+        if (!visualDisplay) return;
+        
+        visualDisplay.addEventListener('touchstart', (e) => {
+            if (!this.isAnimating) return;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        }, { passive: true });
+        
+        visualDisplay.addEventListener('touchend', (e) => {
+            if (!this.isAnimating) return;
+            
+            const endX = e.changedTouches[0].clientX;
+            const endY = e.changedTouches[0].clientY;
+            const deltaX = endX - startX;
+            const deltaY = endY - startY;
+            
+            // Vérifier que c'est un swipe horizontal (plus horizontal que vertical)
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                if (deltaX > 0) {
+                    // Swipe vers la droite - visuel suivant
+                    this.switchToNextVisual();
+                } else {
+                    // Swipe vers la gauche - visuel précédent
+                    this.switchToPreviousVisual();
+                }
+            }
+        }, { passive: true });
+    }
+    
+    /**
+     * Passe au visuel précédent
+     */
+    switchToPreviousVisual() {
+        const visualTypes = ['breathing', 'colors', 'stars', 'mandala'];
+        const currentIndex = visualTypes.indexOf(this.currentAnimation);
+        const previousIndex = currentIndex > 0 ? currentIndex - 1 : visualTypes.length - 1;
+        const previousVisual = visualTypes[previousIndex];
+        
+        const button = document.querySelector(`[data-visual="${previousVisual}"]`);
+        if (button) {
+            this.toggleVisual(previousVisual, button);
+        }
+    }
+    
+    /**
+     * Passe au visuel suivant
+     */
+    switchToNextVisual() {
+        const visualTypes = ['breathing', 'colors', 'stars', 'mandala'];
+        const currentIndex = visualTypes.indexOf(this.currentAnimation);
+        const nextIndex = currentIndex < visualTypes.length - 1 ? currentIndex + 1 : 0;
+        const nextVisual = visualTypes[nextIndex];
+        
+        const button = document.querySelector(`[data-visual="${nextVisual}"]`);
+        if (button) {
+            this.toggleVisual(nextVisual, button);
+        }
+    }
+    
     /**
      * Met à jour l'état visuel des boutons
      * @param {HTMLElement} activeButton - Bouton actuellement actif

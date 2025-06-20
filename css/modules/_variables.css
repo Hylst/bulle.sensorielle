@@ -60,9 +60,11 @@
   --radius-full: 50%;
   
   /* Transitions */
-  --transition-fast: 0.15s ease;
-  --transition-base: 0.3s ease;
-  --transition-slow: 0.5s ease;
+  --transition-fast: var(--duration-fast) ease;
+  --transition-base: var(--duration-normal) ease;
+  --transition-slow: var(--duration-slow) ease;
+  --transition-slower: var(--duration-slower) ease;
+  --transition-slowest: var(--duration-slowest) ease;
   
   /* Z-Index Scale */
   --z-dropdown: 1000;
@@ -72,6 +74,49 @@
   --z-modal: 1050;
   --z-popover: 1060;
   --z-tooltip: 1070;
+  
+  /* Breakpoint Variables */
+  --breakpoint-xs: 360px;
+  --breakpoint-sm: 480px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1200px;
+  
+  /* Animation Durations */
+  --duration-instant: 0s;
+  --duration-fast: 0.15s;
+  --duration-normal: 0.3s;
+  --duration-slow: 0.5s;
+  --duration-slower: 0.75s;
+  --duration-slowest: 1s;
+  
+  /* Animation Easing Functions */
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-back: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* Grid System Variables */
+  --grid-gap-xs: 0.5rem;
+  --grid-gap-sm: 1rem;
+  --grid-gap-md: 1.5rem;
+  --grid-gap-lg: 2rem;
+  --grid-gap-xl: 3rem;
+  
+  /* Component Sizes */
+  --component-height-sm: 2rem;
+  --component-height-md: 2.5rem;
+  --component-height-lg: 3rem;
+  --component-height-xl: 3.5rem;
+  
+  /* Container Widths */
+  --container-sm: 640px;
+  --container-md: 768px;
+  --container-lg: 1024px;
+  --container-xl: 1200px;
+  --container-2xl: 1400px;
 }
 
 /* ===== DARK THEME VARIABLES ===== */
@@ -116,9 +161,11 @@
 /* ===== REDUCED MOTION ===== */
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --transition-fast: 0s;
-    --transition-base: 0s;
-    --transition-slow: 0s;
+    --duration-fast: 0s;
+    --duration-normal: 0s;
+    --duration-slow: 0s;
+    --duration-slower: 0s;
+    --duration-slowest: 0s;
   }
 }
 

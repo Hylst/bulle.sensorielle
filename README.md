@@ -2,7 +2,7 @@
 
 > *"Pour tous ceux qui cherchent un moment de paix dans leur journée"*
 
-[![Version](https://img.shields.io/badge/version-2.7.3-blue.svg)](./changelog.md)
+[![Version](https://img.shields.io/badge/version-2.9.1-blue.svg)](./changelog.md)
 [![Licence](https://img.shields.io/badge/licence-MIT-green.svg)](#licence)
 [![PWA](https://img.shields.io/badge/PWA-Ready-purple.svg)](./manifest.json)
 [![Accessibilité](https://img.shields.io/badge/accessibilité-AAA-brightgreen.svg)](#accessibilité)
@@ -83,14 +83,22 @@ Animations **Canvas** fluides conçues pour la régulation sensorielle :
 - Symétrie apaisante et centrage visuel
 - Complexité progressive adaptable
 
+**🎮 Navigation Interactive Avancée :**
+- 🖱️ **Mode Plein Écran** : Icône bulle discrète (🫧) pour retour au mode normal
+- ⌨️ **Navigation Clavier** : Touches fléchées (← →) pour changer d'effet
+- 👆 **Navigation Tactile** : Swipe gauche/droite sur écrans tactiles
+- 🔄 **Cycle Automatique** : Transition fluide entre tous les effets visuels
+- ⚡ **Contrôles Intuitifs** : ESC pour sortir du plein écran, navigation active uniquement pendant les effets
+
 ### ⏰ Minuteur de Pause Sensorielle
 Outil de gestion du temps thérapeutique avec visualisation progressive :
 
-- ⚡ **Durées Prédéfinies** : 2, 5, 10 minutes (optimisées pour l'attention)
-- 🎯 **Durée Personnalisée** : Adaptation aux besoins individuels
+- ⚡ **Durées Prédéfinies** : 1, 2, 5, 10, 30 minutes (optimisées pour différents besoins)
+- 🎯 **Durée Personnalisée** : Adaptation aux besoins individuels (1-60 minutes)
 - 📊 **Visualisation Progressive** : Cercle de progression non-stressant
 - 🔔 **Alerte Douce** : Fin de session non-surprenante
 - 📱 **Notifications Respectueuses** : Signaux visuels et sonores adaptés
+- 🕐 **Sessions Longues** : Support pour pauses étendues de 30 minutes
 
 ### 💾 Mes Bulles (Profils Sensoriels)
 Système de personnalisation avancé pour l'autonomie :

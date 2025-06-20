@@ -5,6 +5,7 @@
  */
 
 /* ===== DISPLAY UTILITIES ===== */
+/* Display Types */
 .d-none {
   display: none !important;
 }
@@ -33,20 +34,25 @@
   display: grid !important;
 }
 
-.hidden {
-  display: none;
-}
-
-.show {
-  display: block;
-}
-
+/* Visibility */
 .visible {
-  visibility: visible;
+  visibility: visible !important;
 }
 
 .invisible {
-  visibility: hidden;
+  visibility: hidden !important;
+}
+
+.opacity-0 {
+  opacity: 0 !important;
+}
+
+.opacity-50 {
+  opacity: 0.5 !important;
+}
+
+.opacity-100 {
+  opacity: 1 !important;
 }
 
 /* ===== FLEXBOX UTILITIES ===== */
@@ -80,6 +86,35 @@
 
 .justify-between {
   justify-content: space-between !important;
+}
+
+.justify-around {
+  justify-content: space-around !important;
+}
+
+.justify-evenly {
+  justify-content: space-evenly !important;
+}
+
+/* Align Items */
+.items-start {
+  align-items: flex-start !important;
+}
+
+.items-center {
+  align-items: center !important;
+}
+
+.items-end {
+  align-items: flex-end !important;
+}
+
+.items-stretch {
+  align-items: stretch !important;
+}
+
+.items-baseline {
+  align-items: baseline !important;
 }
 
 .justify-around {
@@ -124,6 +159,18 @@
 
 .flex-shrink-1 {
   flex-shrink: 1 !important;
+}
+
+.flex-1 {
+  flex: 1 1 0% !important;
+}
+
+.flex-auto {
+  flex: 1 1 auto !important;
+}
+
+.flex-none {
+  flex: none !important;
 }
 
 /* ===== TEXT ALIGNMENT ===== */

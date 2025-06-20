@@ -12,9 +12,45 @@
   50% { transform: scale(1.05); }
 }
 
-/* ===== CORE ANIMATIONS ===== */
+/* ===== CORE PARAMETERIZABLE ANIMATIONS ===== */
 
-/* Fade Animations */
+/* Base Fade Animation - Parameterizable with CSS Variables */
+@keyframes fadeInDirection {
+  from {
+    opacity: 0;
+    transform: var(--fade-direction, translateY(20px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Base Scale Animation - Parameterizable */
+@keyframes scaleDirection {
+  from {
+    opacity: 0;
+    transform: var(--scale-direction, scale(0.8));
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Base Slide Animation - Parameterizable */
+@keyframes slideDirection {
+  from {
+    opacity: 0;
+    transform: var(--slide-direction, translateX(-100%));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Legacy animations for backward compatibility */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -382,6 +418,133 @@
   pointer-events: none;
 }
 
+/* ===== ANIMATION MODIFIER CLASSES ===== */
+
+/* Fade Animation Modifiers */
+.fade-in {
+  animation: fadeInDirection var(--duration-normal) var(--ease-out) forwards;
+}
+
+.fade-in--up {
+  --fade-direction: translateY(30px);
+  animation: fadeInDirection var(--duration-normal) var(--ease-out) forwards;
+}
+
+.fade-in--down {
+  --fade-direction: translateY(-30px);
+  animation: fadeInDirection var(--duration-normal) var(--ease-out) forwards;
+}
+
+.fade-in--left {
+  --fade-direction: translateX(-30px);
+  animation: fadeInDirection var(--duration-normal) var(--ease-out) forwards;
+}
+
+.fade-in--right {
+  --fade-direction: translateX(30px);
+  animation: fadeInDirection var(--duration-normal) var(--ease-out) forwards;
+}
+
+/* Scale Animation Modifiers */
+.scale-in {
+  animation: scaleDirection var(--duration-normal) var(--ease-out) forwards;
+}
+
+.scale-in--small {
+  --scale-direction: scale(0.5);
+  animation: scaleDirection var(--duration-normal) var(--ease-out) forwards;
+}
+
+.scale-in--large {
+  --scale-direction: scale(1.2);
+  animation: scaleDirection var(--duration-normal) var(--ease-out) forwards;
+}
+
+/* Slide Animation Modifiers */
+.slide-in {
+  animation: slideDirection var(--duration-normal) var(--ease-out) forwards;
+}
+
+.slide-in--left {
+  --slide-direction: translateX(-100%);
+  animation: slideDirection var(--duration-normal) var(--ease-out) forwards;
+}
+
+.slide-in--right {
+  --slide-direction: translateX(100%);
+  animation: slideDirection var(--duration-normal) var(--ease-out) forwards;
+}
+
+.slide-in--up {
+  --slide-direction: translateY(100%);
+  animation: slideDirection var(--duration-normal) var(--ease-out) forwards;
+}
+
+.slide-in--down {
+  --slide-direction: translateY(-100%);
+  animation: slideDirection var(--duration-normal) var(--ease-out) forwards;
+}
+
+/* Animation Speed Modifiers */
+.anim--slow {
+  animation-duration: var(--duration-slow) !important;
+}
+
+.anim--fast {
+  animation-duration: var(--duration-fast) !important;
+}
+
+.anim--instant {
+  animation-duration: var(--duration-instant) !important;
+}
+
+/* Animation Delay Modifiers */
+.anim--delay-sm {
+  animation-delay: var(--duration-fast);
+}
+
+.anim--delay-md {
+  animation-delay: var(--duration-normal);
+}
+
+.anim--delay-lg {
+  animation-delay: var(--duration-slow);
+}
+
+/* Animation Easing Modifiers */
+.anim--ease-in {
+  animation-timing-function: var(--ease-in) !important;
+}
+
+.anim--ease-out {
+  animation-timing-function: var(--ease-out) !important;
+}
+
+.anim--ease-in-out {
+  animation-timing-function: var(--ease-in-out) !important;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .fade-in,
+  .fade-in--up,
+  .fade-in--down,
+  .fade-in--left,
+  .fade-in--right,
+  .scale-in,
+  .scale-in--small,
+  .scale-in--large,
+  .slide-in,
+  .slide-in--left,
+  .slide-in--right,
+  .slide-in--up,
+  .slide-in--down {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 /* Tip Card Click Animation */
 .tip-card-clicked {
   animation: tipCardPulse 0.6s ease-in-out;
@@ -604,6 +767,24 @@
   pointer-events: none;
 }
 
+.encouragement-bubble.d-block {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  animation: bubbleEntrance 0.4s ease-out;
+}
+
+.encouragement-bubble.d-block::before {
+  animation: bubbleShimmer 2s ease-in-out infinite;
+}
+
+.encouragement-bubble.d-none {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.9);
+  pointer-events: none;
+}
+
+/* Legacy class support for tips.js */
 .encouragement-bubble.show {
   opacity: 1;
   transform: translateY(0) scale(1);

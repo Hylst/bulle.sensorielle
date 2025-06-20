@@ -5,6 +5,281 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/spec/v2.0.0.html).
 
+## [2.9.2] - 2024-12-25
+
+### 🔧 Interactive Bubbles Fix
+- **Tips section - Restored interactive bubbles**:
+  - Fixed missing CSS classes `.encouragement-bubble.show` and `.encouragement-bubble.hidden`
+  - Interactive bubbles now appear again when clicking tip cards
+  - Restored encouragement messages for all tip cards (Crée ton espace, Câlin réconfortant, etc.)
+  - Activity cards in feelings section also show interactive bubbles
+  - Personalized messages based on activity content
+- **Files modified**:
+  - `css/modules/_animations.css` - Added missing CSS classes for bubble visibility
+
+## [2.9.1] - 2024-12-25
+
+### ✨ Enhanced Visual Navigation and Timer Features
+- **Fullscreen visual mode enhancements**:
+  - Added discrete bubble icon (🫧) in top-right corner, 50% transparent
+  - Click to return to normal mode (in addition to ESC key)
+  - Smooth hover effects and transitions
+  - Auto-cleanup when exiting fullscreen
+- **Visual effects navigation**:
+  - Arrow key navigation (← →) to switch between visual effects
+  - Touch swipe navigation (left/right) for touch screens
+  - Works only when a visual effect is active
+  - Automatic cycling through 4 effects: breathing → colors → stars → mandala
+  - Smart swipe detection (minimum 50px, more horizontal than vertical)
+- **Timer improvements**:
+  - Added 30-minute preset button
+  - Complete range now: 1, 2, 5, 10, 30 minutes
+- **Technical improvements**:
+  - Touch events with `passive: true` for better performance
+  - Intelligent swipe detection with threshold
+  - Automatic cleanup of fullscreen exit button
+  - Cyclical navigation between visual effects
+- **Cache CSS**: Updated to `?v=2.9.1`
+- **Files modified**:
+  - `js/visuals.js` - New navigation features and fullscreen exit button
+  - `index.html` - Added 30min button and CSS cache update
+  - `changelog.md` - Documentation of new features
+
+## [2.9.0] - 2024-12-25
+
+### 🔧 Final Visual and Grid Fixes
+- **Sound grid - Fixed for all screen sizes**:
+  - Ensured `repeat(3, 1fr)` is maintained at 1200px+ breakpoint
+  - Prevents reverting to 2 columns on very wide screens
+  - Now consistently shows 3 columns on all desktop sizes (≥1024px)
+- **Visual effects - Completely removed outer green zone**:
+  - Removed `background: var(--bg-secondary)` from `.visual-display`
+  - Removed `padding: 15px` that created the green border zone
+  - Removed `border-radius` and `box-shadow` from container
+  - Only the inner canvas border remains (the intended single border)
+- **Verification**: `styles.css` is completely removed from active code
+  - Only referenced in documentation files (README.md, changelog.md)
+  - Application uses exclusively modular CSS architecture
+- **Cache CSS**: Updated to `?v=2.9.0`
+- **Files modified**:
+  - `css/modules/_responsive.css` - Fixed 1200px+ breakpoint
+  - `css/modules/_sections.css` - Removed visual-display background/padding
+  - `index.html` - CSS cache v2.9.0
+
+## [2.8.9] - 2024-12-25
+
+### 🔧 Final Layout Corrections
+- **Sound grid - Fixed 3 columns enforcement**:
+  - Changed from `repeat(auto-fit, minmax(220px, 1fr))` to `repeat(3, 1fr)` for screens ≥1024px
+  - Changed from `repeat(auto-fit, minmax(200px, 1fr))` to `repeat(2, 1fr)` for screens ≥768px
+  - Guarantees exactly 3 columns on large screens and 2 on tablets
+- **Complete CSS conflict elimination**:
+  - Renamed `styles.css` to `styles-old.css` to eliminate all conflicts
+  - Application now uses exclusively the modular CSS architecture
+  - No more conflicting styles from legacy CSS file
+- **Cache CSS**: Updated to `?v=2.8.9`
+- **Files modified**:
+  - `css/modules/_responsive.css` - Fixed grids to use exact column counts
+  - `styles.css` → `styles-old.css` - Eliminated conflicts
+  - `index.html` - CSS cache v2.8.9
+
+## [2.8.7] - 2024-12-25
+
+### 🔧 Critical Bug Fixes and Layout Improvements
+- **Fixed info button modal functionality**:
+  - Resolved conflicting event listeners between `script.js` and `navigation.js`
+  - Info button now properly opens the information modal
+  - Removed duplicate event handler from `navigation.js`
+  - Added missing `.info-modal.show` CSS rule for proper modal display
+- **Updated sound grid layout**:
+  - Changed from 2 columns to 3 columns on desktop and tablet screens
+  - Maintained 2 columns on mobile devices (480px and below)
+  - Improved responsive behavior for better content organization
+- **Fixed CSS syntax errors**:
+  - Added missing media query opening brace in `_responsive.css`
+  - Resolved empty CSS rulesets in `_components.css`
+  - Added proper styles to `.is-active` and `.is-playing` classes
+- **Removed visual double borders**:
+  - Eliminated outer border from `.visual-display` containers
+  - Removed hover border effects for cleaner visual appearance
+  - Fixed visual effects having unnecessary double frame styling
+- **Added cache-busting for CSS**:
+  - Added version parameter to CSS link to force browser cache refresh
+  - Ensures users see the latest styling changes immediately
+- **Files modified**:
+  - `css/modules/_responsive.css` - Fixed media query syntax and updated grid layouts
+  - `css/modules/_components.css` - Fixed empty rulesets and added missing modal rule
+  - `css/modules/_sections.css` - Updated main sound grid to 3 columns and removed visual borders
+  - `js/navigation.js` - Removed conflicting info button event listener
+  - `index.html` - Added CSS version parameter for cache-busting
+
+## [2.8.6] - 2024-12-25
+
+### 🔧 CSS Architecture Refactoring - Phase 5: Responsive Optimization (Completed)
+- **Implemented mobile-first responsive design approach**:
+  - Refactored all base styles to be mobile-optimized by default
+  - Progressive enhancement for larger screens using min-width media queries
+  - Optimized breakpoint system: 480px (small), 768px (tablet), 1024px (desktop), 1200px (large)
+- **Created comprehensive responsive utility classes**:
+  - Visibility utilities: `.hide-mobile`, `.show-mobile`, `.hide-tablet`, `.show-tablet`, `.hide-desktop`, `.show-desktop`
+  - Text alignment: `.text-center-mobile`, `.text-left-tablet`, `.text-right-desktop`
+  - Flexbox utilities: `.flex-col-mobile`, `.flex-row-tablet`, `.justify-center-mobile`
+  - Grid utilities: `.grid-1-mobile`, `.grid-2-tablet`, `.grid-3-desktop`
+  - Width utilities: `.w-full-mobile`, `.w-auto-tablet`, `.w-half-desktop`
+  - Spacing utilities: `.p-sm-mobile`, `.m-lg-tablet`
+- **Added progressive enhancement with CSS `@supports`**:
+  - Container Queries support with Flexbox fallback
+  - CSS Grid support with Flexbox fallback
+  - Custom Properties support with static value fallback
+  - Backdrop Filter support with solid background fallback
+  - Aspect Ratio support with padding-bottom fallback
+  - CSS Clamp support with fixed value fallback
+- **Enhanced accessibility and performance**:
+  - `prefers-reduced-motion` support for all animations
+  - `prefers-color-scheme` dark mode optimizations
+  - Print styles optimization
+  - High contrast mode support
+  - Reduced data mode for performance
+- **Added landscape orientation optimizations**:
+  - Improved layout for mobile landscape mode
+  - Better navigation spacing and touch targets
+  - Optimized visual display for landscape viewing
+
+### 📁 Files Modified
+- `css/modules/_responsive.css` - Complete mobile-first refactor with utility classes and progressive enhancement
+- `changelog.md` - Updated documentation
+
+### 🎯 Benefits Achieved
+- **Mobile-first performance**: Optimized loading and rendering for mobile devices
+- **Centralized responsive logic**: All media queries consolidated in one file
+- **Flexible utility system**: Comprehensive responsive utilities for rapid development
+- **Progressive enhancement**: Modern CSS features with robust fallbacks
+- **Better accessibility**: Support for user preferences and assistive technologies
+- **Improved maintainability**: Clear breakpoint system and organized responsive code
+- **Enhanced developer experience**: Intuitive utility classes and consistent patterns
+
+## [2.8.5] - 2024-12-25
+
+### 🔧 CSS Architecture Refactoring - Phase 1: Variable Consolidation
+- **Completed**: Centralization of all CSS variables in `_variables.css`
+- **Moved breakpoint variables** from `_responsive.css` to `_variables.css` for consistency
+- **Added standardized variables**:
+  - Animation durations: `--duration-instant` to `--duration-slowest`
+  - Grid system gaps: `--grid-gap-xs` to `--grid-gap-xl`
+  - Component heights: `--component-height-sm` to `--component-height-xl`
+  - Container widths: `--container-sm` to `--container-2xl`
+- **Updated transition variables** to use new duration tokens
+- **Enhanced reduced motion support** with centralized duration control
+
+### 📁 Files Modified
+- `css/modules/_variables.css`: Added comprehensive variable system
+- `css/modules/_responsive.css`: Removed duplicate breakpoint variables
+- `changelog.md`: Documentation of Phase 1 completion
+
+### 🎯 Benefits Achieved
+- **Centralized theming**: All design tokens in one location
+- **Better consistency**: Standardized spacing, timing, and sizing
+- **Improved maintainability**: Single source of truth for design values
+- **Enhanced accessibility**: Better reduced motion support
+
+### 🔧 CSS Architecture Refactoring - Phase 4: Component Refactoring with Atomic Design (Completed)
+- **Created atomic button components** following atomic design principles:
+  - Base `.btn` class with reset and consistent component styles
+  - Modifier classes: `.btn--primary`, `.btn--secondary`, `.btn--success`, `.btn--warning`, `.btn--danger`
+  - Size modifiers: `.btn--sm`, `.btn--lg`, `.btn--full`
+  - Integrated with global state classes for consistent behavior
+- **Created atomic card components**:
+  - Base `.card` class with unified styling foundation
+  - Modifier classes: `.card--interactive`, `.card--welcome`, `.card--profile`, `.card--intensity`, `.card--gradient`
+  - Size modifiers: `.card--sm`, `.card--lg`
+  - Integrated with global state classes for consistent behavior
+- **Implemented global state classes**:
+  - `.is-active` - Universal active state for any component
+  - `.is-playing` - For audio/video components with visual pulse indicator
+  - `.is-loading` - Universal loading state with animated spinner
+- **Enhanced component consistency** with unified styling patterns
+- **Maintained backward compatibility** with all existing legacy component classes
+- **Improved state management** with reusable state classes across all components
+
+### 📁 Files Modified
+- `css/modules/_components.css` - Refactored button and card components with atomic design principles
+- `changelog.md` - Updated documentation
+
+### 🎯 Benefits Achieved
+- **Modular component system** following atomic design methodology
+- **Consistent component behavior** and styling across the entire application
+- **Reusable state classes** that work seamlessly with any component
+- **Reduced code duplication** through base + modifier pattern implementation
+- **Enhanced maintainability** with clear component hierarchy and organization
+- **Better scalability** for future component additions and modifications
+- **Improved developer experience** with predictable and intuitive class naming conventions
+
+### 📋 Next Phases (To Do)
+- **Phase 6**: Performance Optimization - Minimize CSS, optimize loading, implement critical CSS
+- **Phase 7**: Documentation - Create comprehensive style guide and component library
+- **Phase 8**: Testing - Cross-browser compatibility, accessibility audit, performance testing
+
+### 🔧 CSS Architecture Refactoring - Phase 3: Animation System Optimization (Completed)
+- **Created parameterizable base animations**:
+  - `@keyframes fadeInDirection` with `--fade-direction` CSS variable
+  - `@keyframes scaleDirection` with `--scale-direction` CSS variable
+  - `@keyframes slideDirection` with `--slide-direction` CSS variable
+- **Added comprehensive modifier classes**:
+  - Fade animations: `.fade-in`, `.fade-in--up`, `.fade-in--down`, `.fade-in--left`, `.fade-in--right`
+  - Scale animations: `.scale-in`, `.scale-in--small`, `.scale-in--large`
+  - Slide animations: `.slide-in`, `.slide-in--left`, `.slide-in--right`, `.slide-in--up`, `.slide-in--down`
+- **Enhanced animation control system**:
+  - Speed modifiers: `.anim--slow`, `.anim--fast`, `.anim--instant`
+  - Delay modifiers: `.anim--delay-sm`, `.anim--delay-md`, `.anim--delay-lg`
+  - Easing modifiers: `.anim--ease-in`, `.anim--ease-out`, `.anim--ease-in-out`
+- **Added comprehensive easing variables**:
+  - `--ease-linear`, `--ease-in`, `--ease-out`, `--ease-in-out`, `--ease-back`, `--ease-bounce`
+- **Improved accessibility**:
+  - Full `prefers-reduced-motion` support for all new animation classes
+  - Maintained backward compatibility with legacy animations
+
+### 📁 Files Modified
+- `css/modules/_animations.css` - Added parameterizable animations and modifier classes
+- `css/modules/_variables.css` - Added easing function variables
+
+### 🎯 Benefits Achieved
+- **Flexible animation system** with CSS variable parameters
+- **Consistent animation patterns** across the application
+- **Reduced code duplication** with reusable base animations
+- **Better developer experience** with intuitive modifier classes
+- **Enhanced accessibility** with comprehensive reduced motion support
+- **Maintainable codebase** with centralized animation logic
+
+### 🔧 CSS Architecture Refactoring - Phase 2: Utility Cleanup (Completed)
+- **Eliminated duplicated utility classes**:
+  - Removed `.hidden` and `.show` classes, standardized on `.d-none` and `.d-block`
+  - Consolidated all flexbox utilities in `_utilities.css`
+  - Updated component-specific classes (`.encouragement-bubble`, `.info-modal`)
+- **Standardized naming conventions**:
+  - All utility classes now use consistent naming with `!important`
+  - Added missing flexbox utilities (`.flex-1`, `.flex-auto`, `.flex-none`)
+  - Added complete justify-content and align-items utilities
+- **Created unified grid system**:
+  - New grid system with `.grid-cols-1` to `.grid-cols-6` for fixed columns
+  - Responsive auto-fit grids (`.grid-auto-xs` to `.grid-auto-xl`)
+  - Standardized gap utilities (`.gap-xs` to `.gap-xl`) using CSS variables
+  - Removed duplicate grid classes from `_layout.css`
+
+### 📁 Files Modified
+- `css/modules/_utilities.css` - Added missing utilities, removed duplicates
+- `css/modules/_layout.css` - Removed duplicate utilities, added unified grid system
+- `css/modules/_animations.css` - Updated to use standardized classes
+- `css/modules/_components.css` - Updated modal classes
+
+### 🎯 Benefits Achieved
+- **Single source of truth** for utility classes
+- **Consistent naming** across all utilities
+- **Better grid system** with responsive capabilities
+- **Reduced CSS duplication** and file size
+- **Improved maintainability** and developer experience
+
+---
+
 ## [2.8.4] - 2024-12-25
 
 ### 🎨 Corrections Visuelles - Section Effets Visuels
