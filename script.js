@@ -1792,14 +1792,57 @@ class BulleSensorielle {
 
 // Fonctions supprimées - maintenant gérées par feelings.js
 
-// Global variable to store the app instance
-let appInstance = null;
+/**
+ * 🏗️ Application Namespace - Encapsulation Pattern
+ * 
+ * Provides controlled access to the application instance and its components
+ * without polluting the global scope with direct variable exposure.
+ */
+const BulleSensorielleApp = {
+    // Private instance storage
+    _instance: null,
+    
+    /**
+     * Get the current application instance
+     * @returns {BulleSensorielle|null} The app instance or null if not initialized
+     */
+    getInstance() {
+        return this._instance;
+    },
+    
+    /**
+     * Get the audio manager instance
+     * @returns {AudioManager|null} The audio manager or null if not available
+     */
+    getAudioManager() {
+        return this._instance?.audioManager || null;
+    },
+    
+    /**
+     * Navigate to a specific section (used by onclick events)
+     * @param {string} sectionId - The section identifier
+     */
+    navigateToSection(sectionId) {
+        if (this._instance) {
+            this._instance.navigateToSection(sectionId);
+        }
+    },
+    
+    /**
+     * Show mascot message (used by other modules)
+     * @param {string} message - The message to display
+     * @param {number} duration - Display duration in milliseconds
+     */
+    showMascotMessage(message, duration = 3000) {
+        if (this._instance) {
+            this._instance.showMascotMessage(message, duration);
+        }
+    }
+};
 
 // Global function for section navigation (used by onclick events)
 function showSection(sectionId) {
-    if (appInstance) {
-        appInstance.navigateToSection(sectionId);
-    }
+    BulleSensorielleApp.navigateToSection(sectionId);
 }
 
 // Initialize the application when DOM is loaded
@@ -1809,16 +1852,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('Base URL for audio files:', window.location.origin + window.location.pathname.replace('index.html', ''));
     
     try {
-        appInstance = new BulleSensorielle();
+        BulleSensorielleApp._instance = new BulleSensorielle();
         
-        // Wait for the app to be fully initialized before exposing globally
+        // Wait for the app to be fully initialized
         await new Promise(resolve => {
             const checkInitialization = () => {
-                if (appInstance && appInstance.audioManager) {
-                    // Expose audioManager globally for debugging only after it's ready
-                    window.audioManager = appInstance.audioManager;
-                    window.appInstance = appInstance;
-                    console.log('✅ AudioManager exposed globally for debugging');
+                if (BulleSensorielleApp._instance && BulleSensorielleApp._instance.audioManager) {
+                    console.log('✅ Application fully initialized');
                     resolve();
                 } else {
                     setTimeout(checkInitialization, 100);
@@ -1826,16 +1866,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
             checkInitialization();
         });
-        
-        // Test automatique après 3 secondes
-        setTimeout(() => {
-            console.log('🔧 Running automatic audio test...');
-            if (window.audioManager && typeof window.audioManager.testAudioLoading === 'function') {
-                window.audioManager.testAudioLoading();
-            } else {
-                console.error('AudioManager not available or testAudioLoading method missing');
-            }
-        }, 3000);
         
     } catch (error) {
         console.error('❌ Error during application initialization:', error);

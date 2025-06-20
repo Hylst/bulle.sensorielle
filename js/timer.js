@@ -171,8 +171,9 @@ class TimerManager {
         this.stop();
         
         // Arrêter tous les sons et visuels
-        if (window.audioManager) {
-            window.audioManager.stopAll();
+        const audioManager = BulleSensorielleApp.getAudioManager();
+        if (audioManager) {
+            audioManager.stopAll();
         }
         
         if (window.visualsManager) {

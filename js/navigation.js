@@ -220,15 +220,17 @@ class NavigationManager {
         if (isPaused) {
             // Reprendre
             pauseIcon.textContent = '⏸️';
-            if (window.audioManager) {
-                window.audioManager.resumeAll();
+            const audioManager = BulleSensorielleApp.getAudioManager();
+        if (audioManager) {
+            audioManager.resumeAll();
             }
             this.showMascotMessage('Sons repris ! 🎵', 2000);
         } else {
             // Mettre en pause
             pauseIcon.textContent = '▶️';
-            if (window.audioManager) {
-                window.audioManager.pauseAll();
+            const audioManager = BulleSensorielleApp.getAudioManager();
+        if (audioManager) {
+            audioManager.pauseAll();
             }
             this.showMascotMessage('Tous les sons en pause 🔇', 2000);
         }
@@ -382,9 +384,10 @@ class NavigationManager {
      */
     initializeAudioSection() {
         // Arrêter tout audio en cours si nécessaire
-        if (window.audioManager) {
+        const audioManager = BulleSensorielleApp.getAudioManager();
+        if (audioManager) {
             // Optionnel: arrêter l'audio actuel
-            // window.audioManager.stopAll();
+            // audioManager.stopAll();
         }
     }
 
@@ -424,8 +427,8 @@ class NavigationManager {
      */
     showMascotMessage(message, duration = 3000) {
         // Déléguer à l'instance principale si elle existe
-        if (typeof window.appInstance !== 'undefined' && window.appInstance.showMascotMessage) {
-            window.appInstance.showMascotMessage(message, duration);
+        if (typeof BulleSensorielleApp !== 'undefined' && BulleSensorielleApp.getInstance()) {
+            BulleSensorielleApp.showMascotMessage(message, duration);
         } else {
             // Fallback vers l'affichage direct
             const mascotMessage = document.getElementById('mascotMessage');

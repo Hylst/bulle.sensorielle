@@ -177,8 +177,9 @@ class ProfilesManager {
         };
 
         // État audio
-        if (window.audioManager) {
-            state.audio = window.audioManager.getState();
+        const audioManager = BulleSensorielleApp.getAudioManager();
+        if (audioManager) {
+            state.audio = audioManager.getState();
         }
 
         // État visuel
@@ -228,9 +229,10 @@ class ProfilesManager {
         }
 
         // Appliquer l'état audio
-        if (state.audio && window.audioManager) {
+        const audioManager = BulleSensorielleApp.getAudioManager();
+        if (state.audio && audioManager) {
             if (state.audio.volume !== undefined) {
-                window.audioManager.setVolume(state.audio.volume);
+                audioManager.setVolume(state.audio.volume);
             }
         }
 

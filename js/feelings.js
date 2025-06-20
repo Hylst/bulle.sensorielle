@@ -574,7 +574,7 @@ class FeelingsManager {
      * @param {Object} activity - Les données de l'activité
      */
     showActivityEncouragement(activityCard, activity) {
-        if (typeof window.appInstance !== 'undefined' && window.appInstance.showMascotMessage) {
+        if (typeof BulleSensorielleApp !== 'undefined' && BulleSensorielleApp.getInstance()) {
             const encouragements = [
                 `${activity.title} est une excellente idée !`,
                 `Essaie ${activity.title}, ça peut t'aider !`,
@@ -589,7 +589,7 @@ class FeelingsManager {
             this.positionSpeechBubble(activityCard);
             
             // Afficher le message dans la bulle de speech ET dans la mascotte en haut à droite
-            window.appInstance.showMascotMessage(randomEncouragement, 2000);
+            BulleSensorielleApp.showMascotMessage(randomEncouragement, 2000);
             this.showInTopRightMascot(randomEncouragement, 4000);
         }
     }
@@ -705,8 +705,8 @@ class FeelingsManager {
         
         // Afficher un message de confirmation
         const confirmationMessage = `Parfait ! ${activity.title} va t'aider à te sentir mieux !`;
-        if (typeof window.appInstance !== 'undefined' && window.appInstance.showMascotMessage) {
-            window.appInstance.showMascotMessage(confirmationMessage, 3000);
+        if (typeof BulleSensorielleApp !== 'undefined' && BulleSensorielleApp.getInstance()) {
+            BulleSensorielleApp.showMascotMessage(confirmationMessage, 3000);
             this.showInTopRightMascot(confirmationMessage, 4000);
         }
     }
@@ -764,8 +764,8 @@ class FeelingsManager {
         
         // Afficher un message de redémarrage
         const restartMessage = 'On recommence ! Dis-moi comment tu te sens.';
-        if (typeof window.appInstance !== 'undefined' && window.appInstance.showMascotMessage) {
-            window.appInstance.showMascotMessage(restartMessage, 2000);
+        if (typeof BulleSensorielleApp !== 'undefined' && BulleSensorielleApp.getInstance()) {
+            BulleSensorielleApp.showMascotMessage(restartMessage, 2000);
             this.showInTopRightMascot(restartMessage, 4000);
         }
     }

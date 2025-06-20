@@ -5,6 +5,176 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/spec/v2.0.0.html).
 
+## [2.11.1] - 2024-12-25
+
+### 🧹 NETTOYAGE - Suppression de Code Obsolète
+
+#### ✅ Suppression de styles-old.css
+- **SUPPRIMÉ** : `styles-old.css` (2728 lignes obsolètes)
+- **Impact** : Réduction significative de la taille du projet
+- **Risque** : Aucun - fichier obsolète sans références actives
+- **Vérification** : Aucune référence trouvée dans le code actif
+- **Bénéfices** :
+  - Nettoyage du répertoire de travail
+  - Élimination de la confusion entre anciens et nouveaux styles
+  - Réduction de la complexité du projet
+
+#### ✅ Optimisation des Imports CSS
+- **SUPPRIMÉ** : `styles-backup.css` (fichier de sauvegarde redondant)
+- **OPTIMISÉ** : Structure d'imports CSS dans `main.css`
+- **VÉRIFICATION** : Aucun import redondant détecté
+- **Impact** : Réduction du temps de chargement et élimination des conflits
+- **Structure optimale confirmée** :
+  ```
+  main.css → 9 modules CSS dans l'ordre correct
+  ├── _variables.css (variables CSS)
+  ├── _base.css (reset et styles de base)
+  ├── _layout.css (mise en page)
+  ├── _navigation.css (navigation)
+  ├── _components.css (composants)
+  ├── _sections.css (sections)
+  ├── _animations.css (animations)
+  ├── _responsive.css (responsive)
+  └── _utilities.css (utilitaires)
+  ```
+- **Bénéfices** :
+  - Cascade CSS optimale respectée
+  - Aucune duplication d'imports
+  - Chargement efficace des styles
+  - Maintenabilité améliorée
+
+#### ✅ Suppression du Bouton 'Test Audio'
+- **SUPPRIMÉ** : Bouton 'Test Audio' de la page d'accueil
+- **Fichier modifié** : `index.html` (lignes 217-219)
+- **Impact** : Interface plus propre et professionnelle
+- **Bénéfices** :
+  - Suppression d'un élément de débogage en production
+  - Interface utilisateur simplifiée
+  - Réduction du code HTML
+
+#### ✅ Nettoyage des Variables Globales
+- **ENCAPSULÉ** : `window.audioManager` et `window.appInstance`
+- **CRÉÉ** : Namespace `BulleSensorielleApp` avec pattern d'encapsulation
+- **MODIFIÉS** : Tous les fichiers JS utilisant les variables globales
+- **Fichiers mis à jour** :
+  - `script.js` : Création du namespace et suppression des variables globales
+  - `feelings.js` : Migration vers `BulleSensorielleApp.showMascotMessage()`
+  - `timer.js` : Migration vers `BulleSensorielleApp.getAudioManager()`
+  - `profiles.js` : Migration vers `BulleSensorielleApp.getAudioManager()`
+  - `navigation.js` : Migration vers les méthodes encapsulées
+- **Nouvelle API** :
+  ```javascript
+  BulleSensorielleApp.getInstance()        // Accès à l'instance
+  BulleSensorielleApp.getAudioManager()    // Accès à AudioManager
+  BulleSensorielleApp.navigateToSection()  // Navigation
+  BulleSensorielleApp.showMascotMessage()  // Messages mascotte
+  ```
+- **Bénéfices** :
+  - Meilleure encapsulation et sécurité
+  - Réduction de la pollution du scope global
+  - API plus claire et contrôlée
+  - Facilite les tests et la maintenance
+
+#### ✅ Vérification des Conventions de Nommage
+- **ANALYSÉ** : Cohérence des conventions dans tout le codebase
+- **CONFIRMÉ** : Conventions déjà optimales
+  - **HTML** : kebab-case pour les attributs data (data-sound, data-visual)
+  - **JavaScript** : camelCase pour variables et fonctions
+  - **CSS** : kebab-case pour les classes et IDs
+- **Résultat** : Aucune modification nécessaire, conventions déjà standardisées
+
+---
+
+## [2.11.0] - 2024-12-25
+
+### 🔍 ANALYSE COMPLÈTE DE L'APPLICATION - Audit de Code et Refactorisation
+
+#### 📊 PROBLÈMES IDENTIFIÉS
+
+##### 🚨 CRITIQUE - Fichiers Volumineux (>600 lignes)
+- **`script.js`** : 1843 lignes - NÉCESSITE REFACTORISATION URGENTE
+  - Classe monolithique `BulleSensorielle` avec trop de responsabilités
+  - Mélange de logique métier, UI et gestion d'état
+  - Méthodes de rendu visuel (400+ lignes) à extraire
+- **`js/managers/AudioManager.js`** : 1138 lignes - PARTIELLEMENT MODULAIRE
+  - Bonne séparation mais encore trop volumineux
+  - Logique de création de sons à séparer
+- **`styles-old.css`** : 2728 lignes - FICHIER OBSOLÈTE À SUPPRIMER
+- **`css/_animations.css`** : 815 lignes - À DIVISER PAR CATÉGORIES
+- **`index.html`** : 607 lignes - STRUCTURE COMPLEXE À SIMPLIFIER
+
+##### ⚠️ MAJEUR - Duplication et Conflits de Code
+- **Double implémentation AudioManager** :
+  - `js/audio.js` (523 lignes) - ANCIEN SYSTÈME
+  - `js/managers/AudioManager.js` (1138 lignes) - NOUVEAU SYSTÈME
+  - **CONFLIT RÉSOLU** : Ancien système supprimé, nouveau système utilisé
+- **Gestionnaires multiples non coordonnés** :
+  - NavigationManager, ProfilesManager, TimerManager, VisualsManager
+  - Pas de système de communication inter-modules
+  - Dépendances circulaires potentielles
+
+##### 🔧 MODÉRÉ - Problèmes de Structure
+- **Initialisation non coordonnée** : Chaque module s'initialise indépendamment
+- **Variables globales** : `window.audioManager`, `appInstance` exposées globalement
+- **Gestion d'état dispersée** : État partagé entre plusieurs classes
+- **Pas de système d'événements centralisé**
+- **CSS redondant** : Multiples fichiers de styles avec chevauchements
+
+#### 📋 RECOMMANDATIONS DE REFACTORISATION
+
+##### 🎯 PRIORITÉ 1 - Refactorisation de script.js (1843 lignes)
+```
+📁 Nouvelle structure proposée :
+├── core/
+│   ├── Application.js (orchestrateur principal)
+│   ├── EventBus.js (système d'événements centralisé)
+│   └── StateManager.js (gestion d'état globale)
+├── ui/
+│   ├── VisualRenderer.js (animations canvas)
+│   ├── ThemeManager.js (gestion thèmes)
+│   └── UIController.js (interactions UI)
+├── managers/ (existant, à améliorer)
+│   ├── AudioManager.js (à optimiser)
+│   ├── NavigationManager.js
+│   └── ...
+```
+
+##### 🎯 PRIORITÉ 2 - Optimisation AudioManager (1138 lignes)
+- **Séparer** la logique de création de sons
+- **Extraire** les générateurs Tone.js dans des modules dédiés
+- **Créer** des factories pour les différents types de sons
+
+##### 🎯 PRIORITÉ 3 - Architecture Modulaire
+- Implémenter un EventBus pour la communication inter-modules
+- Créer un StateManager centralisé
+- Définir des interfaces claires entre modules
+
+##### 🎯 PRIORITÉ 4 - Nettoyage CSS
+- **Consolider** les fichiers CSS redondants
+- **Diviser** `_animations.css` par catégories d'animations
+- **Supprimer** `styles-old.css` obsolète
+
+#### 🧹 NETTOYAGE NÉCESSAIRE
+- **SUPPRIMER** : `styles-old.css` (2728 lignes obsolètes)
+- **RÉVISER** : Toutes les variables globales
+- **OPTIMISER** : Imports CSS redondants
+- **SIMPLIFIER** : Structure HTML complexe
+
+#### 📈 MÉTRIQUES DE QUALITÉ
+- **Complexité cyclomatique** : Élevée dans script.js
+- **Couplage** : Fort entre modules
+- **Cohésion** : Faible dans les gros fichiers
+- **Maintenabilité** : Difficile avec les fichiers >1000 lignes
+
+#### 🎯 OBJECTIFS DE REFACTORISATION
+1. **Réduire** la taille des fichiers à <500 lignes
+2. **Améliorer** la séparation des responsabilités
+3. **Implémenter** un système d'événements centralisé
+4. **Optimiser** les performances et la maintenabilité
+5. **Standardiser** l'architecture modulaire
+
+---
+
 ## [2.10.0] - 2024-12-25
 
 ### 🎛️ MAJOR: Volume Control System Overhaul (FINALLY WORKING!)
@@ -1510,6 +1680,58 @@ Tone.js (Synthesized):
   - [ ] Web Workers pour audio
   - [ ] Lazy loading des ressources
   - [ ] Optimisation des animations Canvas
+
+---
+
+## 📋 TODO - REFACTORISATION PRIORITAIRE (Suite à l'analyse v2.11.0)
+
+### 🚨 URGENT - Refactorisation des Gros Fichiers
+- [ ] **script.js (1843 lignes)** :
+  - [ ] Extraire VisualRenderer.js (animations canvas)
+  - [ ] Créer ThemeManager.js (gestion thèmes)
+  - [ ] Séparer UIController.js (interactions UI)
+  - [ ] Implémenter Application.js (orchestrateur)
+  - [ ] Créer EventBus.js (communication inter-modules)
+
+- [ ] **AudioManager.js (1138 lignes)** :
+  - [ ] Extraire SoundFactory.js
+  - [ ] Créer ToneGenerators.js
+  - [ ] Séparer VolumeController.js
+  - [ ] Optimiser la structure des classes
+
+- [ ] **CSS volumineux** :
+  - [x] ~~Supprimer styles-old.css (2728 lignes)~~ ✅ FAIT v2.11.1
+  - [ ] Diviser _animations.css (815 lignes) par catégories
+  - [x] ~~Consolider les imports CSS redondants~~ ✅ FAIT v2.11.1
+
+### ⚠️ MAJEUR - Architecture Modulaire
+- [ ] **Système d'événements centralisé** :
+  - [ ] Implémenter EventBus pattern
+  - [x] ~~Remplacer les variables globales~~ ✅ FAIT v2.11.1
+  - [ ] Coordonner l'initialisation des modules
+
+- [ ] **Gestion d'état centralisée** :
+  - [ ] Créer StateManager.js
+  - [ ] Migrer l'état dispersé vers un store central
+  - [ ] Implémenter des observateurs d'état
+
+### 🔧 MODÉRÉ - Nettoyage et Optimisation
+- [ ] **Suppression de code obsolète** :
+  - [ ] Nettoyer les commentaires TODO anciens
+  - [ ] Supprimer les fonctions non utilisées
+  - [ ] Optimiser les sélecteurs CSS
+
+- [ ] **Amélioration de la maintenabilité** :
+  - [ ] Ajouter des tests unitaires
+  - [ ] Documenter les APIs des modules
+  - [x] ~~Standardiser les conventions de nommage~~ ✅ FAIT v2.11.1
+
+### 📊 MÉTRIQUES CIBLES POST-REFACTORISATION
+- [ ] **Taille des fichiers** : <500 lignes par fichier
+- [ ] **Complexité cyclomatique** : <10 par fonction
+- [ ] **Couplage** : Faible entre modules
+- [ ] **Cohésion** : Forte dans chaque module
+- [ ] **Couverture de tests** : >80%
 - [ ] **Compatibilité** :
   - [ ] Support navigateurs plus anciens
   - [ ] Fallbacks pour fonctionnalités avancées
