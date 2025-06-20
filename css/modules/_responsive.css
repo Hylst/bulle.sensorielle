@@ -996,6 +996,14 @@
     padding: var(--spacing-sm);
   }
   
+  /* Mobile Grids */
+  .needs-grid,
+  .activities-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    max-width: 100%;
+  }
+  
   /* Mobile Cards */
   .tip-card {
     padding: var(--spacing-lg);
@@ -1065,8 +1073,8 @@
   
   .needs-grid,
   .activities-grid {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-sm);
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-md);
   }
 }
 
