@@ -59,19 +59,14 @@ class BulleSensorielle {
         // 🏠 Navigation et état de l'interface
         this.currentSection = 'home';
         
-        // 🎵 Gestion audio thérapeutique
-        this.sounds = new Map();              // Collection des objets audio Tone.js
-        this.activeSounds = new Set();        // Sons actuellement en lecture
-        this.soundStates = new Map();         // États individuels de chaque son
-        this.pausedSounds = new Set();        // Sons mis en pause par l'utilisateur
-        this.audioInitialized = false;       // État d'initialisation du contexte audio
+        // 🎵 Gestion audio thérapeutique via AudioManager
+        this.audioManager = null;             // Instance du gestionnaire audio
         
         // ✨ Système visuel apaisant
         this.currentVisual = 'breathing';     // Visual actuel (respiration par défaut)
         this.visualsPaused = false;          // État de pause des animations
         
         // ⏸️ Contrôle global de l'application
-        this.globalPaused = false;           // Pause générale de tous les éléments
         this.lastClickedIcon = null;         // Dernier élément interagi pour feedback
         
         // 💾 Système de profils sensoriels personnalisés
@@ -115,7 +110,7 @@ class BulleSensorielle {
     async init() {
         this.setupTheme();           // 🎨 Configuration du thème visuel
         this.setupEventListeners();  // 👂 Mise en place des interactions
-        this.setupAudio();           // 🎵 Initialisation du système audio
+        await this.initializeAudioManager(); // 🎵 Initialisation du gestionnaire audio
         this.setupVisuals();         // ✨ Configuration des animations visuelles
         this.setupInfoBubble();      // ℹ️ Préparation de la bulle d'information
         this.loadProfiles();         // 💾 Chargement des profils sauvegardés
@@ -172,33 +167,18 @@ class BulleSensorielle {
             });
         }
 
-        // Enhanced sound controls with better event handling and audio context initialization
+        // Sound buttons are now handled by AudioManager
+        // Track last clicked sound for profile saving
         document.querySelectorAll('.sound-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
+            btn.addEventListener('click', (e) => {
                 const soundId = btn.getAttribute('data-sound');
-                console.log(`Sound button clicked: ${soundId}`);
-                
-                // Track last clicked sound for profile saving
                 this.lastClickedSound = soundId;
-                
-                await this.toggleSound(soundId);
             });
         });
         
-        // Add visual playing indicator
-        this.addPlayingIndicators();
+        // Visual playing indicators will be handled by AudioManager
 
-        // Volume controls
-        document.querySelectorAll('.volume-slider').forEach(slider => {
-            slider.addEventListener('input', (e) => {
-                const soundId = e.target.dataset.sound;
-                const volume = e.target.value;
-                this.setVolume(soundId, volume);
-                e.target.nextElementSibling.textContent = `${volume}%`;
-            });
-        });
+        // Volume controls are now handled by AudioManager
 
         // Visual controls
         document.querySelectorAll('.visual-btn').forEach(btn => {
@@ -268,10 +248,10 @@ class BulleSensorielle {
         });
 
         // Global pause/play button
-        document.getElementById('globalPauseBtn').addEventListener('click', (e) => {
+        document.getElementById('globalPauseBtn').addEventListener('click', async (e) => {
             e.preventDefault();
             e.stopPropagation();
-            this.toggleGlobalPlayPause();
+            await this.toggleGlobalPlayPause();
         });
 
         // App symbol button
@@ -312,244 +292,32 @@ class BulleSensorielle {
     }
 
     /**
-     * Setup audio system using Tone.js
-     * Note: Audio context will be initialized on first user interaction
+     * 🎵 Initialise le gestionnaire audio
+     * 
+     * Crée et configure l'instance AudioManager qui gère tous les aspects
+     * audio de l'application de manière modulaire et optimisée.
+     * 
+     * @method initializeAudioManager
+     * @description Remplace l'ancien système audio monolithique par une
+     *              architecture modulaire plus maintenable
+     * @returns {Promise<void>} Promesse résolue une fois l'AudioManager initialisé
      */
-    async setupAudio() {
+    async initializeAudioManager() {
         try {
-            // Create sound generators (without starting audio context)
-            this.createNoiseGenerators();
-            await this.createNatureSounds();
-            await this.createMelodies();
-            console.log('Audio setup completed successfully');
+            // Créer l'instance du gestionnaire audio
+            this.audioManager = new AudioManager();
+            
+            // Attendre que l'initialisation soit complète
+            await this.audioManager.waitForInitialization();
+            
+            console.log('AudioManager initialized and ready');
         } catch (error) {
-            console.error('Error during audio setup:', error);
-            // Continue with app initialization even if some audio fails
+            console.error('Error initializing AudioManager:', error);
+            // Continuer l'initialisation même si l'audio échoue
         }
     }
 
-    /**
-     * Initialize audio context on first user interaction
-     * This is required for Chrome's autoplay policy compliance
-     */
-    async initializeAudioContext() {
-        if (!this.audioInitialized) {
-            try {
-                await Tone.start();
-                this.audioInitialized = true;
-                
-                // Start melody patterns now that audio context is active
-                if (this.melodyPatterns) {
-                    this.melodyPatterns.piano.start(0);
-                    this.melodyPatterns.lofi.start(0);
-                    Tone.Transport.start();
-                    console.log('Melody patterns started with audio context');
-                }
-                
-                console.log('Audio context initialized successfully');
-                return true;
-            } catch (error) {
-                console.error('Failed to initialize audio context:', error);
-                return false;
-            }
-        }
-        return true;
-    }
 
-    /**
-     * Create noise generators (white, pink, brown noise)
-     */
-    createNoiseGenerators() {
-        // White Noise
-        const whiteNoise = new Tone.Noise('white').toDestination();
-        whiteNoise.volume.value = -20;
-        this.sounds.set('white-noise', whiteNoise);
-
-        // Pink Noise
-        const pinkNoise = new Tone.Noise('pink').toDestination();
-        pinkNoise.volume.value = -20;
-        this.sounds.set('pink-noise', pinkNoise);
-
-        // Brown Noise
-        const brownNoise = new Tone.Noise('brown').toDestination();
-        brownNoise.volume.value = -20;
-        this.sounds.set('brown-noise', brownNoise);
-    }
-
-    /**
-     * Create HTML5 Audio element with proper error handling
-     * @param {string} src - Audio file path
-     * @param {boolean} loop - Whether to loop the audio
-     * @param {number} volume - Volume level (0-1)
-     * @param {string} name - Sound name for logging
-     * @returns {HTMLAudioElement|null} Audio element or null if failed
-     */
-    createAudioElement(src, loop = true, volume = 0.1, name = 'unknown') {
-        try {
-            const audio = new Audio(src);
-            audio.loop = loop;
-            audio.volume = volume;
-            audio.preload = 'auto';
-            
-            // Add event listeners for better error handling
-            audio.addEventListener('canplaythrough', () => {
-                console.log(`${name} loaded successfully`);
-            });
-            
-            audio.addEventListener('error', (e) => {
-                console.warn(`${name} failed to load:`, e.target.error);
-            });
-            
-            // Add custom methods to match Tone.js interface
-            audio.start = () => {
-                if (audio.paused) {
-                    audio.play().catch(e => console.warn(`Failed to start ${name}:`, e));
-                }
-            };
-            
-            audio.stop = () => {
-                if (!audio.paused) {
-                    audio.pause();
-                    audio.currentTime = 0;
-                }
-            };
-            
-            return audio;
-        } catch (error) {
-            console.warn(`Failed to create ${name} audio element:`, error);
-            return null;
-        }
-    }
-
-    /**
-     * Create nature sounds using HTML5 Audio API for better file:// protocol support
-     */
-    async createNatureSounds() {
-        // Campagne sound (audio file)
-        const campagnePlayer = this.createAudioElement('./sons/campagne.mp3', true, 0.5, 'Campagne');
-        if (campagnePlayer) {
-            this.sounds.set('campagne', campagnePlayer);
-        }
-
-        // Forest sound (audio file)
-        const forestPlayer = this.createAudioElement('./sons/forest.mp3', true, 0.1, 'Forest');
-        if (forestPlayer) {
-            this.sounds.set('forest', forestPlayer);
-        }
-
-        // Ocean sound (audio file)
-        const oceanPlayer = this.createAudioElement('./sons/ocean.mp3', true, 0.1, 'Ocean');
-        if (oceanPlayer) {
-            this.sounds.set('ocean', oceanPlayer);
-        }
-
-        // Rain sound (audio file)
-        const rainPlayer = this.createAudioElement('./sons/rain.mp3', true, 0.1, 'Rain');
-        if (rainPlayer) {
-            this.sounds.set('rain', rainPlayer);
-        }
-
-        // Chat sound (audio file)
-        const chatPlayer = this.createAudioElement('./sons/chat.mp3', true, 0.1, 'Chat');
-        if (chatPlayer) {
-            this.sounds.set('chat', chatPlayer);
-        }
-
-        // Feu sound (audio file)
-        const feuPlayer = this.createAudioElement('./sons/feu.mp3', true, 0.1, 'Feu');
-        if (feuPlayer) {
-            this.sounds.set('feu', feuPlayer);
-        }
-
-        // Underwater sound (audio file)
-        const underwaterPlayer = this.createAudioElement('./sons/underwater.mp3', true, 0.1, 'Underwater');
-        if (underwaterPlayer) {
-            this.sounds.set('underwater', underwaterPlayer);
-        }
-
-        // Bubble sound for UI feedback (non-looping)
-        const bubblePlayer = this.createAudioElement('./sons/bubble.mp3', false, 0.3, 'Bubble');
-        if (bubblePlayer) {
-            this.sounds.set('bubble', bubblePlayer);
-        }
-    }
-
-    /**
-     * Create melodic synthesizers
-     */
-    async createMelodies() {
-        // Soft piano
-        const piano = new Tone.PolySynth(Tone.Synth, {
-            oscillator: { type: 'sine' },
-            envelope: { attack: 0.5, decay: 0.3, sustain: 0.8, release: 2 }
-        }).toDestination();
-        piano.volume.value = -15;
-        this.sounds.set('piano', piano);
-
-        // Lo-fi synth
-        const lofi = new Tone.PolySynth(Tone.Synth, {
-            oscillator: { type: 'triangle' },
-            envelope: { attack: 0.8, decay: 0.5, sustain: 0.6, release: 3 }
-        }).toDestination();
-        lofi.volume.value = -18;
-        this.sounds.set('lofi', lofi);
-
-        // Berceuse melody (HTML5 Audio)
-        console.log('Creating Berceuse player...');
-        const berceuse = this.createAudioElement('./sons/berceuse.mp3', true, 0.3, 'Berceuse');
-        if (berceuse) {
-            this.sounds.set('berceuse', berceuse);
-            console.log('Berceuse player created and added to sounds map');
-        }
-
-        // Ballade melody (HTML5 Audio)
-        console.log('Creating Ballade player...');
-        const ballade = this.createAudioElement('./sons/ballade.mp3', true, 0.3, 'Ballade');
-        if (ballade) {
-            this.sounds.set('ballade', ballade);
-            console.log('Ballade player created and added to sounds map');
-        }
-        
-        // Log the sounds map after adding MP3s
-        console.log('All sounds in map after MP3 creation:', Array.from(this.sounds.keys()));
-
-        // Start gentle melodies
-        this.startMelodyPatterns();
-    }
-
-    /**
-     * Start gentle melody patterns
-     * Note: Transport will only start after user interaction
-     */
-    startMelodyPatterns() {
-        try {
-            // Piano melody pattern
-            const pianoPattern = new Tone.Pattern((time, note) => {
-                if (this.activeSounds.has('piano')) {
-                    this.sounds.get('piano').triggerAttackRelease(note, '2n', time);
-                }
-            }, ['C4', 'E4', 'G4', 'C5', 'G4', 'E4'], 'up');
-            pianoPattern.interval = '2n';
-            
-            // Lo-fi melody pattern
-            const lofiPattern = new Tone.Pattern((time, note) => {
-                if (this.activeSounds.has('lofi')) {
-                    this.sounds.get('lofi').triggerAttackRelease(note, '4n', time);
-                }
-            }, ['A3', 'C4', 'E4', 'A4', 'E4', 'C4'], 'upDown');
-            lofiPattern.interval = '4n';
-            
-            // Store patterns for later use
-            this.melodyPatterns = { piano: pianoPattern, lofi: lofiPattern };
-            
-            // Configure transport but don't start yet
-            Tone.Transport.bpm.value = 60;
-            
-            console.log('Melody patterns configured successfully');
-        } catch (error) {
-            console.warn('Error configuring melody patterns:', error);
-        }
-    }
 
     /**
      * Setup visual animations
@@ -1276,7 +1044,7 @@ class BulleSensorielle {
         }
 
         // Check if this sound is currently active
-        const isCurrentlyActive = this.activeSounds.has(soundId);
+        const isCurrentlyActive = this.audioManager ? this.audioManager.activeSounds.has(soundId) : false;
         
         if (isCurrentlyActive) {
             // Stop the current sound
@@ -1306,9 +1074,6 @@ class BulleSensorielle {
         soundBtn.classList.add('active');
         soundControl.classList.add('playing');
         
-        // Update state
-        this.activeSounds.add(soundId);
-        
         // Update global pause/play button to show pause mode when sound starts
         this.updateGlobalPauseButtonState(false); // false = not paused, show pause icon
         
@@ -1318,7 +1083,7 @@ class BulleSensorielle {
             this.setLastClickedIcon(iconElement.textContent);
         }
         
-        console.log(`Sound ${soundId} activated. Active sounds:`, Array.from(this.activeSounds));
+        console.log(`Sound ${soundId} activated.`);
     }
 
     /**
@@ -1344,56 +1109,34 @@ class BulleSensorielle {
             indicator.style.display = 'none';
         }
         
-        // Update state
-        this.activeSounds.delete(soundId);
-        
         // Update global pause/play button based on remaining active sounds
-        if (this.activeSounds.size === 0) {
+        if (this.audioManager && this.audioManager.activeSounds.size === 0) {
             // No more active sounds, show play mode
             this.updateGlobalPauseButtonState(true); // true = paused/stopped, show play icon
         }
         
-        console.log(`Sound ${soundId} deactivated. Active sounds:`, Array.from(this.activeSounds));
+        console.log(`Sound ${soundId} deactivated.`);
     }
 
     /**
-     * Deactivate all currently playing sounds
+     * 🔇 Désactive tous les sons actuellement en cours de lecture
+     * 
+     * Délègue la gestion à AudioManager et met à jour l'interface utilisateur
+     * pour refléter l'arrêt de tous les sons.
      */
     deactivateAllSounds() {
-        console.log('Deactivating all sounds');
+        if (this.audioManager) {
+            this.audioManager.stopAllSounds();
+        }
         
-        // Create a copy of active sounds to avoid modification during iteration
-        const soundsToStop = Array.from(this.activeSounds);
-        
-        soundsToStop.forEach(soundId => {
-            this.deactivateSound(soundId);
-        });
-        
-        // Ensure global pause button shows play mode when all sounds are stopped
-        this.updateGlobalPauseButtonState(true);
-        
-        // Ensure all visual states are cleared
-        document.querySelectorAll('.sound-btn.active').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        
-        document.querySelectorAll('.sound-control.playing').forEach(control => {
-            control.classList.remove('playing');
-        });
-        
-        // Hide all playing indicators
-        document.querySelectorAll('.playing-indicator').forEach(indicator => {
-            indicator.style.display = 'none';
-        });
-        
-        // Clear the set
-        this.activeSounds.clear();
-        
-        console.log('All sounds deactivated');
+        console.log('All sounds deactivated via AudioManager');
     }
 
     /**
-     * Legacy function for compatibility
+     * 🔇 Fonction héritée pour la compatibilité
+     * 
+     * Appelle deactivateAllSounds pour maintenir la compatibilité
+     * avec l'ancien code.
      */
     stopAllSounds() {
         this.deactivateAllSounds();
@@ -1485,13 +1228,15 @@ class BulleSensorielle {
     /**
      * Enhanced toggle global pause/play with improved state management
      */
-    toggleGlobalPlayPause() {
-        this.globalPaused = !this.globalPaused;
+    async toggleGlobalPlayPause() {
+        if (!this.audioManager) return;
+        
+        this.audioManager.globalPaused = !this.audioManager.globalPaused;
         
         const pauseBtn = document.getElementById('globalPauseBtn');
         const pauseIcon = pauseBtn.querySelector('.pause-icon');
         
-        if (this.globalPaused) {
+        if (this.audioManager.globalPaused) {
             // Pause all sounds with enhanced methods
             this.pauseAllSounds();
             // Pause visuals
@@ -1503,7 +1248,7 @@ class BulleSensorielle {
             console.log('Global pause activated with enhanced methods');
         } else {
             // Resume all sounds with enhanced methods
-            this.resumeAllSounds();
+            await this.resumeAllSounds();
             // Resume visuals
             this.visualsPaused = false;
             
@@ -1522,154 +1267,31 @@ class BulleSensorielle {
         }
         
         // Update last clicked icon for app symbol
-        this.setLastClickedIcon(this.globalPaused ? '▶️' : '⏸️');
+        this.setLastClickedIcon(this.audioManager.globalPaused ? '▶️' : '⏸️');
     }
 
     /**
-     * SOLUTION 1: Enhanced pause/resume with proper state tracking
-     * Pause all currently playing sounds with unified handling
+     * ⏸️ Met en pause tous les sons actuellement en cours de lecture
+     * 
+     * Délègue la gestion à AudioManager pour une pause unifiée
+     * de tous les sons actifs.
      */
     pauseAllSounds() {
-        this.activeSounds.forEach(soundId => {
-            this.pauseSound(soundId);
-        });
-    }
-
-    /**
-     * Resume all paused sounds with unified handling
-     */
-    resumeAllSounds() {
-        this.activeSounds.forEach(soundId => {
-            this.resumeSound(soundId);
-        });
-    }
-
-    /**
-     * SOLUTION 2: Individual sound pause with type detection
-     */
-    pauseSound(soundId) {
-        const sound = this.sounds.get(soundId);
-        if (!sound) return false;
-
-        try {
-            // Handle piano and lofi melody patterns specifically
-            if ((soundId === 'piano' || soundId === 'lofi') && this.melodyPatterns && this.melodyPatterns[soundId]) {
-                this.melodyPatterns[soundId].stop();
-                this.soundStates.set(soundId, 'paused');
-                this.pausedSounds.add(soundId);
-                console.log(`Melody pattern ${soundId} paused`);
-                return true;
-            }
-            // Handle Tone.js Player objects
-            else if (sound.state && sound.state === 'started') {
-                sound.stop();
-                this.soundStates.set(soundId, 'paused');
-                this.pausedSounds.add(soundId);
-                console.log(`Tone.js sound ${soundId} paused`);
-                return true;
-            }
-            // Handle Tone.js Noise generators
-            else if (sound.state !== undefined) {
-                sound.stop();
-                this.soundStates.set(soundId, 'paused');
-                this.pausedSounds.add(soundId);
-                console.log(`Tone.js noise ${soundId} paused`);
-                return true;
-            }
-            // Handle HTML5 Audio objects
-            else if (sound.pause && !sound.paused) {
-                sound.pause();
-                this.soundStates.set(soundId, 'paused');
-                this.pausedSounds.add(soundId);
-                console.log(`HTML5 audio ${soundId} paused`);
-                return true;
-            }
-        } catch (error) {
-            console.error(`Error pausing sound ${soundId}:`, error);
+        if (this.audioManager) {
+            this.audioManager.pauseAllSounds();
         }
-        return false;
     }
 
     /**
-     * SOLUTION 3: Individual sound resume with type detection
+     * ▶️ Reprend tous les sons mis en pause
+     * 
+     * Délègue la gestion à AudioManager pour une reprise unifiée
+     * de tous les sons en pause.
      */
-    resumeSound(soundId) {
-        const sound = this.sounds.get(soundId);
-        if (!sound || !this.pausedSounds.has(soundId)) return false;
-
-        try {
-            // Handle piano and lofi melody patterns specifically
-            if ((soundId === 'piano' || soundId === 'lofi') && this.melodyPatterns && this.melodyPatterns[soundId]) {
-                this.melodyPatterns[soundId].start();
-                this.soundStates.set(soundId, 'playing');
-                this.pausedSounds.delete(soundId);
-                console.log(`Melody pattern ${soundId} resumed`);
-                return true;
-            }
-            // Handle Tone.js Player objects
-            else if (sound.start && this.soundStates.get(soundId) === 'paused') {
-                sound.start();
-                this.soundStates.set(soundId, 'playing');
-                this.pausedSounds.delete(soundId);
-                console.log(`Tone.js sound ${soundId} resumed`);
-                return true;
-            }
-            // Handle HTML5 Audio objects
-            else if (sound.play && sound.paused) {
-                sound.play().catch(console.error);
-                this.soundStates.set(soundId, 'playing');
-                this.pausedSounds.delete(soundId);
-                console.log(`HTML5 audio ${soundId} resumed`);
-                return true;
-            }
-        } catch (error) {
-            console.error(`Error resuming sound ${soundId}:`, error);
+    async resumeAllSounds() {
+        if (this.audioManager) {
+            await this.audioManager.resumeAllSounds();
         }
-        return false;
-    }
-
-    /**
-     * SOLUTION 4: Smart sound state detection
-     */
-    isSoundPlaying(soundId) {
-        const sound = this.sounds.get(soundId);
-        if (!sound) return false;
-
-        // Check Tone.js objects
-        if (sound.state !== undefined) {
-            return sound.state === 'started';
-        }
-        // Check HTML5 Audio objects
-        else if (sound.paused !== undefined) {
-            return !sound.paused && sound.currentTime > 0;
-        }
-        return false;
-    }
-
-    /**
-     * Comprehensive debugging method for sound states
-     */
-    debugSoundStates() {
-        console.log('=== SOUND STATE DEBUG ===');
-        console.log('Active sounds:', Array.from(this.activeSounds));
-        console.log('Paused sounds:', Array.from(this.pausedSounds));
-        console.log('Global paused:', this.globalPaused);
-        
-        this.sounds.forEach((sound, soundId) => {
-            const isActive = this.activeSounds.has(soundId);
-            const isPaused = this.pausedSounds.has(soundId);
-            const state = this.soundStates.get(soundId) || 'unknown';
-            const actuallyPlaying = this.isSoundPlaying(soundId);
-            
-            console.log(`Sound ${soundId}:`, {
-                active: isActive,
-                paused: isPaused,
-                trackedState: state,
-                actuallyPlaying: actuallyPlaying,
-                soundType: sound.state !== undefined ? 'Tone.js' : 'HTML5'
-            });
-        });
-        console.log('========================');
     }
 
     /**
@@ -1677,10 +1299,9 @@ class BulleSensorielle {
      */
     resetAllSoundStates() {
         console.log('Resetting all sound states...');
-        this.soundStates.clear();
-        this.pausedSounds.clear();
-        this.activeSounds.clear();
-        this.globalPaused = false;
+        if (this.audioManager) {
+            this.audioManager.resetAllSoundStates();
+        }
         
         // Update UI
         const pauseBtn = document.getElementById('globalPauseBtn');
@@ -1708,12 +1329,16 @@ class BulleSensorielle {
             // Show play icon (▶️) when no sounds are playing or all are paused
             pauseIcon.textContent = '▶️';
             pauseBtn.setAttribute('title', 'Reprendre la lecture');
-            this.globalPaused = true;
+            if (this.audioManager) {
+                this.audioManager.globalPaused = true;
+            }
         } else {
             // Show pause icon (⏸️) when sounds are playing
             pauseIcon.textContent = '⏸️';
             pauseBtn.setAttribute('title', 'Mettre en pause');
-            this.globalPaused = false;
+            if (this.audioManager) {
+                this.audioManager.globalPaused = false;
+            }
         }
         
         // Update last clicked icon for app symbol
@@ -1783,138 +1408,37 @@ class BulleSensorielle {
     }
 
     /**
-     * Enhanced start sound function with better error handling and state tracking
+     * 🔊 Démarre un son spécifique via AudioManager
+     * 
+     * Délègue la gestion du démarrage du son à AudioManager
+     * qui gère tous les types audio de manière unifiée.
+     * 
+     * @param {string} soundId - Identifiant du son à démarrer
+     * @returns {boolean} true si le son a été démarré avec succès
      */
     startSound(soundId) {
-        const sound = this.sounds.get(soundId);
-        if (!sound) {
-            console.error(`Sound not found: ${soundId}`);
-            return false;
+        if (this.audioManager) {
+            return this.audioManager.startSound(soundId);
         }
-
-        try {
-            // Handle piano and lofi melody patterns specifically
-            if ((soundId === 'piano' || soundId === 'lofi') && this.melodyPatterns && this.melodyPatterns[soundId]) {
-                this.melodyPatterns[soundId].start();
-                this.soundStates.set(soundId, 'playing');
-                this.pausedSounds.delete(soundId);
-                console.log(`Melody pattern ${soundId} started`);
-            }
-            // Check if it's an HTML5 Audio element (has play method but not Tone.js start)
-            else if (sound instanceof HTMLAudioElement || (sound.play && !sound.start)) {
-                // Handle HTML5 Audio objects
-                sound.play().catch(e => console.warn(`Failed to play ${soundId}:`, e));
-                this.soundStates.set(soundId, 'playing');
-                this.pausedSounds.delete(soundId);
-            } else if (sound.start) {
-                // Check if it's a Tone.Player and if it's loaded
-                if (sound.loaded !== undefined) {
-                    if (sound.loaded) {
-                        sound.start();
-                        // Track state for Tone.js objects
-                        this.soundStates.set(soundId, 'playing');
-                        this.pausedSounds.delete(soundId);
-                    } else {
-                        console.warn(`Sound ${soundId} is not loaded yet. Waiting for load...`);
-                        // Wait for the sound to load, then start
-                        const checkLoaded = () => {
-                            if (sound.loaded) {
-                                sound.start();
-                                this.soundStates.set(soundId, 'playing');
-                                this.pausedSounds.delete(soundId);
-                                console.log(`Sound ${soundId} loaded and started`);
-                            } else {
-                                setTimeout(checkLoaded, 100);
-                            }
-                        };
-                        checkLoaded();
-                    }
-                } else {
-                    // Regular Tone.js synth objects
-                    sound.start();
-                    this.soundStates.set(soundId, 'playing');
-                    this.pausedSounds.delete(soundId);
-                }
-            } else if (sound.noise && sound.lfo) {
-                // For complex synthesized sounds (legacy)
-                sound.noise.start();
-                sound.lfo.start();
-                this.soundStates.set(soundId, 'playing');
-                this.pausedSounds.delete(soundId);
-            }
-            
-            // Show playing indicator
-            const control = document.querySelector(`.sound-control[data-sound="${soundId}"]`);
-            const indicator = control?.querySelector('.playing-indicator');
-            if (indicator) {
-                indicator.style.display = 'block';
-            }
-            
-            // Start icon animation
-            this.startIconAnimation(soundId);
-            
-            console.log(`Sound ${soundId} started successfully with state tracking`);
-            return true;
-        } catch (error) {
-            console.error(`Error starting sound ${soundId}:`, error);
-            return false;
-        }
+        console.error('AudioManager not initialized');
+        return false;
     }
 
     /**
-     * Enhanced stop sound function with indicator management and state tracking
+     * 🔇 Arrête un son spécifique via AudioManager
+     * 
+     * Délègue la gestion de l'arrêt du son à AudioManager
+     * qui gère tous les types audio de manière unifiée.
+     * 
+     * @param {string} soundId - Identifiant du son à arrêter
+     * @returns {boolean} true si le son a été arrêté avec succès
      */
     stopSound(soundId) {
-        const sound = this.sounds.get(soundId);
-        if (!sound) {
-            console.error(`Sound not found: ${soundId}`);
-            return false;
+        if (this.audioManager) {
+            return this.audioManager.stopSound(soundId);
         }
-
-        try {
-            // Handle piano and lofi melody patterns specifically
-            if ((soundId === 'piano' || soundId === 'lofi') && this.melodyPatterns && this.melodyPatterns[soundId]) {
-                this.melodyPatterns[soundId].stop();
-                this.soundStates.set(soundId, 'stopped');
-                this.pausedSounds.delete(soundId);
-                console.log(`Melody pattern ${soundId} stopped`);
-            }
-            // Check if it's an HTML5 Audio element
-            else if (sound instanceof HTMLAudioElement || (sound.pause && !sound.stop)) {
-                // Handle HTML5 Audio objects
-                sound.pause();
-                sound.currentTime = 0;
-                this.soundStates.set(soundId, 'stopped');
-                this.pausedSounds.delete(soundId);
-            } else if (sound.stop) {
-                sound.stop();
-                // Track state for Tone.js objects
-                this.soundStates.set(soundId, 'stopped');
-                this.pausedSounds.delete(soundId);
-            } else if (sound.noise && sound.lfo) {
-                // For complex synthesized sounds (legacy)
-                sound.noise.stop();
-                sound.lfo.stop();
-                this.soundStates.set(soundId, 'stopped');
-                this.pausedSounds.delete(soundId);
-            }
-            
-            // Hide playing indicator
-            const control = document.querySelector(`.sound-control[data-sound="${soundId}"]`);
-            const indicator = control?.querySelector('.playing-indicator');
-            if (indicator) {
-                indicator.style.display = 'none';
-            }
-            
-            // Stop icon animation
-            this.stopIconAnimation(soundId);
-            
-            console.log(`Sound ${soundId} stopped successfully with state tracking`);
-            return true;
-        } catch (error) {
-            console.error(`Error stopping sound ${soundId}:`, error);
-            return false;
-        }
+        console.error('AudioManager not initialized');
+        return false;
     }
 
     /**
@@ -1944,72 +1468,33 @@ class BulleSensorielle {
     }
 
     /**
-     * Play bubble sound for UI feedback
+     * 🫧 Joue le son de bulle pour le feedback UI
+     * 
+     * Délègue la lecture du son de bulle à AudioManager
+     * pour un feedback sonore cohérent dans l'interface.
      */
     async playBubbleSound() {
-        try {
-            // Ensure audio context is initialized
-            await this.initializeAudioContext();
-            
-            const bubbleSound = this.sounds.get('bubble');
-            if (bubbleSound) {
-                // Stop the sound if it's already playing
-                if (bubbleSound.state === 'started') {
-                    bubbleSound.stop();
-                }
-                // Start the bubble sound
-                bubbleSound.start();
-                console.log('Bubble sound played');
-            } else {
-                console.warn('Bubble sound not found');
-            }
-        } catch (error) {
-            console.error('Error playing bubble sound:', error);
+        if (this.audioManager) {
+            await this.audioManager.playBubbleSound();
+        } else {
+            console.error('AudioManager not initialized');
         }
     }
 
     /**
-     * Set volume for a specific sound
+     * 🔊 Définit le volume pour un son spécifique
+     * 
+     * Délègue la gestion du volume à AudioManager qui gère
+     * tous les types audio de manière unifiée.
+     * 
+     * @param {string} soundId - Identifiant du son
+     * @param {number} volume - Volume de 0 à 100
      */
     setVolume(soundId, volume) {
-        const sound = this.sounds.get(soundId);
-        if (!sound) {
-            console.warn(`Sound not found: ${soundId}`);
-            return;
-        }
-
-        // Store volume preference for this sound
-        const volumeKey = `volume_${soundId}`;
-        localStorage.setItem(volumeKey, volume);
-        
-        // Handle HTML5 Audio elements (campagne, feu, chat, berceuse, ballade, etc.)
-        if (sound instanceof HTMLAudioElement || (sound.volume !== undefined && typeof sound.volume === 'number')) {
-            sound.volume = volume / 100; // HTML5 Audio uses 0.0 to 1.0
-            console.log(`Set HTML5 audio volume for ${soundId}: ${volume}%`);
-        }
-        // Handle Tone.js objects with volume.value property
-        else if (sound.volume && sound.volume.value !== undefined) {
-            const dbValue = -40 + (volume / 100) * 40; // Convert 0-100 to -40db to 0db
-            sound.volume.value = dbValue;
-            console.log(`Set Tone.js volume for ${soundId}: ${dbValue}db`);
-        }
-        // Handle complex synthesized sounds with noise property
-        else if (sound.noise && sound.noise.volume) {
-            const dbValue = -40 + (volume / 100) * 40;
-            sound.noise.volume.value = dbValue;
-            console.log(`Set synthesized sound volume for ${soundId}: ${dbValue}db`);
-        }
-        else {
-            console.warn(`Unable to set volume for sound ${soundId} - unknown audio type`);
-        }
-        
-        // Update the volume display
-        const slider = document.querySelector(`.volume-slider[data-sound="${soundId}"]`);
-        if (slider) {
-            const volumeDisplay = slider.nextElementSibling;
-            if (volumeDisplay) {
-                volumeDisplay.textContent = `${volume}%`;
-            }
+        if (this.audioManager) {
+            this.audioManager.setVolume(soundId, volume);
+        } else {
+            console.error('AudioManager not initialized');
         }
     }
 
@@ -2048,227 +1533,91 @@ class BulleSensorielle {
     }
 
     /**
-     * Set timer duration
+     * Timer methods - delegated to TimerManager
      */
     setTimerDuration(minutes) {
-        this.timer.duration = minutes * 60;
-        this.timer.remaining = this.timer.duration;
-        this.updateTimerDisplay();
-        
-        document.getElementById('customMinutes').value = minutes;
-    }
-
-    /**
-     * Start timer
-     */
-    startTimer() {
-        if (this.timer.remaining <= 0) {
-            const minutes = parseInt(document.getElementById('customMinutes').value) || 5;
-            this.setTimerDuration(minutes);
+        if (window.timerManager) {
+            window.timerManager.setTime(minutes);
         }
-
-        this.timer.isRunning = true;
-        this.timer.interval = setInterval(() => {
-            this.timer.remaining--;
-            this.updateTimerDisplay();
-            this.updateTimerCircle();
-
-            if (this.timer.remaining <= 0) {
-                this.timerComplete();
-                return; // Exit the interval callback
-            }
-        }, 1000);
-
-        document.getElementById('startTimer').disabled = true;
-        document.getElementById('pauseTimer').disabled = false;
-        document.getElementById('stopTimer').disabled = false;
-        
-        this.showMascotMessage('Minuteur démarré ! Profite de ta pause.', 2000);
     }
 
-    /**
-     * Pause timer
-     */
+    startTimer() {
+        if (window.timerManager) {
+            window.timerManager.start();
+            this.showMascotMessage('Minuteur démarré ! Profite de ta pause.', 2000);
+        }
+    }
+
     pauseTimer() {
-        this.timer.isRunning = false;
-        clearInterval(this.timer.interval);
-
-        document.getElementById('startTimer').disabled = false;
-        document.getElementById('pauseTimer').disabled = true;
-        
-        this.showMascotMessage('Minuteur en pause.', 1500);
+        if (window.timerManager) {
+            window.timerManager.pause();
+            this.showMascotMessage('Minuteur en pause.', 1500);
+        }
     }
 
-    /**
-     * Stop timer
-     */
     stopTimer() {
-        this.timer.isRunning = false;
-        clearInterval(this.timer.interval);
-        this.timer.remaining = this.timer.duration;
-        this.updateTimerDisplay();
-        this.updateTimerCircle();
-
-        document.getElementById('startTimer').disabled = false;
-        document.getElementById('pauseTimer').disabled = true;
-        document.getElementById('stopTimer').disabled = true;
-        
-        this.showMascotMessage('Minuteur arrêté.', 1500);
+        if (window.timerManager) {
+            window.timerManager.stop();
+            this.showMascotMessage('Minuteur arrêté.', 1500);
+        }
     }
 
     /**
-     * Timer completion
-     */
-    timerComplete() {
-        this.timer.isRunning = false;
-        clearInterval(this.timer.interval);
-        
-        // Stop all sounds and visuals when timer completes
-        this.stopAllSounds();
-        this.stopAllVisuals();
-        
-        // Play gentle completion sound
-        const completionTone = new Tone.Synth({
-            oscillator: { type: 'sine' },
-            envelope: { attack: 0.5, decay: 1, sustain: 0, release: 2 }
-        }).toDestination();
-        completionTone.triggerAttackRelease('C5', '2n');
-
-        // Visual notification
-        const timerCircle = document.getElementById('timerCircle');
-        timerCircle.style.animation = 'breathe 1s ease-in-out 3';
-        
-        setTimeout(() => {
-            timerCircle.style.animation = '';
-        }, 3000);
-
-        document.getElementById('startTimer').disabled = false;
-        document.getElementById('pauseTimer').disabled = true;
-        document.getElementById('stopTimer').disabled = true;
-        
-        this.showMascotMessage('Temps écoulé ! Bravo pour ta pause !', 4000);
-    }
-
-    /**
-     * Update timer display
-     */
-    updateTimerDisplay() {
-        // Prevent negative time display
-        const timeRemaining = Math.max(0, this.timer.remaining);
-        const minutes = Math.floor(timeRemaining / 60);
-        const seconds = timeRemaining % 60;
-        const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        document.getElementById('timerTime').textContent = display;
-    }
-
-    /**
-     * Update timer circle progress
-     */
-    updateTimerCircle() {
-        const progress = (this.timer.duration - this.timer.remaining) / this.timer.duration;
-        const degrees = progress * 360;
-        const circle = document.getElementById('timerCircle');
-        circle.style.background = `conic-gradient(var(--accent-blue) ${degrees}deg, var(--bg-accent) ${degrees}deg)`;
-    }
-
-    /**
-     * Show save profile modal
+     * Profile methods - delegated to ProfilesManager
      */
     showSaveModal() {
-        document.getElementById('saveModal').classList.add('active');
-        document.getElementById('profileName').focus();
+        if (window.profilesManager) {
+            window.profilesManager.showSaveModal();
+        }
     }
 
-    /**
-     * Hide save profile modal
-     */
     hideSaveModal() {
-        document.getElementById('saveModal').classList.remove('active');
-        document.getElementById('profileName').value = '';
+        if (window.profilesManager) {
+            window.profilesManager.hideSaveModal();
+        }
     }
 
-    /**
-     * Save current profile - only saves last clicked elements from each section
-     */
     saveCurrentProfile() {
-        const name = document.getElementById('profileName').value.trim();
-        if (!name) {
-            this.showMascotMessage('Donne un nom à ta bulle !', 2000);
-            return;
+        if (window.profilesManager) {
+            window.profilesManager.saveCurrentProfile();
         }
-
-        const profile = {
-            id: Date.now(),
-            name: name,
-            sound: this.lastClickedSound || null,
-            soundVolume: null,
-            visual: this.lastClickedVisual || null,
-            timerDuration: this.lastClickedTimerDuration || null,
-            created: new Date().toLocaleDateString()
-        };
-
-        // Save volume only for the last clicked sound
-        if (this.lastClickedSound) {
-            const slider = document.querySelector(`.volume-slider[data-sound="${this.lastClickedSound}"]`);
-            if (slider) {
-                profile.soundVolume = parseInt(slider.value);
-            }
-        }
-
-        this.profiles.push(profile);
-        localStorage.setItem('sensoryProfiles', JSON.stringify(this.profiles));
-        
-        // Play bubble sound for feedback
-        this.playBubbleSound();
-        
-        this.hideSaveModal();
-        this.loadProfiles();
-        
-        // Create summary message
-        let savedElements = [];
-        if (profile.sound) savedElements.push(`Son: ${profile.sound}`);
-        if (profile.visual) savedElements.push(`Visuel: ${profile.visual}`);
-        if (profile.timerDuration) savedElements.push(`Minuteur: ${profile.timerDuration}min`);
-        
-        const summary = savedElements.length > 0 ? savedElements.join(', ') : 'Aucun élément';
-        this.showMascotMessage(`🎵 Bulle "${name}" sauvegardée !\n✨ Éléments: ${summary}`, 4000);
     }
 
-    /**
-     * Load and display saved profiles
-     */
     loadProfiles() {
+        // This method is now handled by ProfilesManager
+        // Keep for backward compatibility but delegate to the module
+        if (window.profilesManager) {
+            const profiles = window.profilesManager.getAllProfiles();
+            this.displayProfiles(profiles);
+        }
+    }
+
+    displayProfiles(profiles) {
         const profilesList = document.getElementById('profilesList');
         const profilesGrid = document.getElementById('profilesGrid');
         
-        profilesList.innerHTML = '';
-        profilesGrid.innerHTML = '';
+        if (profilesList) profilesList.innerHTML = '';
+        if (profilesGrid) profilesGrid.innerHTML = '';
 
-        if (this.profiles.length === 0) {
-            profilesList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Aucune bulle sauvegardée pour le moment.</p>';
-            profilesGrid.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Aucune bulle sauvegardée</p>';
+        if (profiles.length === 0) {
+            if (profilesList) profilesList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Aucune bulle sauvegardée pour le moment.</p>';
+            if (profilesGrid) profilesGrid.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Aucune bulle sauvegardée</p>';
             return;
         }
 
-        this.profiles.forEach(profile => {
-            // Solution 1: Create separate cards for each container to avoid DOM conflicts
-            const homeCard = this.createProfileCard(profile, 'home');
-            const profilesCard = this.createProfileCard(profile, 'profiles');
+        profiles.forEach((profile, index) => {
+            const homeCard = this.createProfileCard(profile, index, 'home');
+            const profilesCard = this.createProfileCard(profile, index, 'profiles');
             
-            profilesGrid.appendChild(homeCard);
-            profilesList.appendChild(profilesCard);
+            if (profilesGrid) profilesGrid.appendChild(homeCard);
+            if (profilesList) profilesList.appendChild(profilesCard);
         });
     }
 
-    /**
-     * Create profile card element
-     * @param {Object} profile - The profile data
-     * @param {string} location - Location where card will be displayed ('home' or 'profiles')
-     */
-    createProfileCard(profile, location = 'profiles') {
+    createProfileCard(profile, index, location = 'profiles') {
         const card = document.createElement('div');
         card.className = 'profile-card';
-        card.setAttribute('data-profile-id', profile.id);
+        card.setAttribute('data-profile-index', index);
         card.setAttribute('data-location', location);
         
         // Handle both old and new profile formats for backward compatibility
@@ -2285,8 +1634,8 @@ class BulleSensorielle {
                 <p><strong>Créé le:</strong> ${profile.created}</p>
             </div>
             <div class="profile-actions-buttons">
-                <button type="button" class="profile-btn load" data-id="${profile.id}">Charger</button>
-                <button type="button" class="profile-btn delete" data-id="${profile.id}">Supprimer</button>
+                <button type="button" class="profile-btn load" data-index="${index}">Charger</button>
+                <button type="button" class="profile-btn delete" data-index="${index}">Supprimer</button>
             </div>
         `;
 
@@ -2295,18 +1644,17 @@ class BulleSensorielle {
             e.preventDefault();
             e.stopPropagation();
             
-            // Visual feedback for loading
             const loadBtn = e.target;
             const originalText = loadBtn.textContent;
             loadBtn.textContent = 'Chargement...';
             loadBtn.disabled = true;
             loadBtn.classList.add('loading');
             
-            // Load the profile with proper error handling
             try {
-                this.loadProfile(profile.id);
+                if (window.profilesManager) {
+                    window.profilesManager.loadProfile(index);
+                }
                 
-                // Reset button after successful load
                 setTimeout(() => {
                     if (loadBtn && loadBtn.parentNode) {
                         loadBtn.textContent = originalText;
@@ -2316,7 +1664,6 @@ class BulleSensorielle {
                 }, 1500);
             } catch (error) {
                 console.error('Error loading profile:', error);
-                // Reset button immediately on error
                 loadBtn.textContent = originalText;
                 loadBtn.disabled = false;
                 loadBtn.classList.remove('loading');
@@ -2328,212 +1675,53 @@ class BulleSensorielle {
             e.preventDefault();
             e.stopPropagation();
             
-            // Visual feedback for deletion
             const deleteBtn = e.target;
             const originalText = deleteBtn.textContent;
             deleteBtn.textContent = 'Suppression...';
             deleteBtn.disabled = true;
             deleteBtn.classList.add('deleting');
             
-            // Small delay to show feedback before confirmation
             setTimeout(() => {
-                this.deleteProfile(profile.id);
-                // Button will be removed with the card, no need to reset
+                if (window.profilesManager) {
+                    window.profilesManager.deleteProfile(index);
+                    // Refresh the display after deletion
+                    this.loadProfiles();
+                }
             }, 300);
         });
 
         return card;
     }
 
-    /**
-     * Load a saved profile - handles new selective loading behavior
-     */
+    // Profile methods are now handled by ProfilesManager module
+    // These methods are kept for backward compatibility but delegate to ProfilesManager
+    
     loadProfile(profileId) {
-        const profile = this.profiles.find(p => p.id === profileId);
-        if (!profile) {
-            console.error(`Profile not found: ${profileId}`);
-            this.showMascotMessage('Erreur: Bulle introuvable', 2000);
-            return;
+        // Deprecated: Use ProfilesManager instead
+        console.warn('loadProfile is deprecated. Use ProfilesManager.loadProfile instead.');
+        if (window.profilesManager) {
+            // Convert ID to index for ProfilesManager compatibility
+            const profiles = window.profilesManager.getAllProfiles();
+            const index = profiles.findIndex(p => p.id === profileId);
+            if (index !== -1) {
+                window.profilesManager.loadProfile(index);
+            }
         }
-
-        console.log(`Loading profile: ${profile.name}`, profile);
-
-        // Play bubble sound for feedback
-        this.playBubbleSound();
-
-        // Stop all current sounds and timer first
-        this.activeSounds.forEach(soundId => {
-            this.stopSound(soundId);
-            const soundBtn = document.querySelector(`[data-sound="${soundId}"]`);
-            if (soundBtn) {
-                soundBtn.classList.remove('active');
-            }
-        });
-        this.activeSounds.clear();
-        
-        // Stop current timer if running
-        if (this.timer.isRunning) {
-            this.stopTimer();
-        }
-        
-        // Clear all visual states from sound buttons
-        document.querySelectorAll('.sound-btn.active').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.querySelectorAll('.sound-control.playing').forEach(control => {
-            control.classList.remove('playing');
-        });
-        document.querySelectorAll('.playing-indicator').forEach(indicator => {
-            indicator.style.display = 'none';
-        });
-
-        // Navigate to visuals section first if visual is saved
-        if (profile.visual) {
-            console.log(`Navigating to visuals section for visual: ${profile.visual}`);
-            this.navigateToSection('visuals');
-        }
-
-        // Increased delay to ensure section is loaded before applying changes
-        setTimeout(() => {
-            let loadedElements = [];
-            
-            // Load sound if saved (backward compatibility with old format)
-            const soundToLoad = profile.sound || (profile.sounds && profile.sounds[0]);
-            if (soundToLoad) {
-                console.log(`Loading sound: ${soundToLoad}`);
-                try {
-                    this.activeSounds.add(soundToLoad);
-                    this.startSound(soundToLoad);
-                    const soundBtn = document.querySelector(`[data-sound="${soundToLoad}"]`);
-                    if (soundBtn) {
-                        soundBtn.classList.add('active');
-                        loadedElements.push(`Son: ${soundToLoad}`);
-                        console.log(`Sound button activated for: ${soundToLoad}`);
-                    } else {
-                        console.warn(`Sound button not found for: ${soundToLoad}`);
-                        loadedElements.push(`Son: ${soundToLoad} (bouton introuvable)`);
-                    }
-                } catch (error) {
-                    console.error(`Error starting sound ${soundToLoad}:`, error);
-                }
-                
-                // Load volume (backward compatibility)
-                const volume = profile.soundVolume || (profile.volumes && profile.volumes[soundToLoad]);
-                if (volume) {
-                    const slider = document.querySelector(`.volume-slider[data-sound="${soundToLoad}"]`);
-                    if (slider) {
-                        slider.value = volume;
-                        const valueDisplay = slider.nextElementSibling;
-                        if (valueDisplay) {
-                            valueDisplay.textContent = `${volume}%`;
-                        }
-                        this.setVolume(soundToLoad, volume);
-                        console.log(`Volume set for ${soundToLoad}: ${volume}%`);
-                    }
-                }
-            }
-
-            // Load visual if saved
-            if (profile.visual) {
-                try {
-                    this.setVisual(profile.visual);
-                    loadedElements.push(`Visuel: ${profile.visual}`);
-                    console.log(`Visual set: ${profile.visual}`);
-                } catch (error) {
-                    console.error(`Error setting visual ${profile.visual}:`, error);
-                    loadedElements.push(`Visuel: ${profile.visual} (erreur)`);
-                }
-            }
-
-            // Load and start timer if saved
-            if (profile.timerDuration) {
-                try {
-                    this.setTimerDuration(profile.timerDuration);
-                    // Auto-start the timer
-                    this.startTimer();
-                    loadedElements.push(`Minuteur: ${profile.timerDuration}min (démarré)`);
-                    console.log(`Timer duration set and started: ${profile.timerDuration} minutes`);
-                } catch (error) {
-                    console.error(`Error setting timer ${profile.timerDuration}:`, error);
-                    loadedElements.push(`Minuteur: ${profile.timerDuration}min (erreur)`);
-                }
-            }
-
-            // Update global pause button state
-            this.updateGlobalPauseButtonState(false);
-
-            const summary = loadedElements.length > 0 ? loadedElements.join(', ') : 'Aucun élément';
-            this.showMascotMessage(`🎵 Bulle "${profile.name}" chargée !\n✨ ${summary}`, 4000);
-        }, 100);
     }
 
-    /**
-     * Delete a saved profile - Solution 2: Enhanced deletion with DOM cleanup
-     */
     deleteProfile(profileId) {
-        const profile = this.profiles.find(p => p.id === profileId);
-        if (!profile) {
-            console.error(`Profile not found for deletion: ${profileId}`);
-            return;
-        }
-
-        if (confirm(`Supprimer la bulle "${profile.name}" ?`)) {
-            console.log(`Deleting profile: ${profile.name} (${profileId})`);
-            
-            // Solution 2: Remove DOM elements immediately before data update
-            this.removeProfileFromDOM(profileId);
-            
-            // Remove from profiles array
-            this.profiles = this.profiles.filter(p => p.id !== profileId);
-            
-            // Update localStorage
-            localStorage.setItem('sensoryProfiles', JSON.stringify(this.profiles));
-            
-            // Solution 3: Selective reload only if DOM removal failed
-            const remainingCards = document.querySelectorAll(`[data-profile-id="${profileId}"]`);
-            if (remainingCards.length > 0) {
-                console.warn('Some profile cards still exist, forcing full reload');
-                this.loadProfiles();
+        // Deprecated: Use ProfilesManager instead
+        console.warn('deleteProfile is deprecated. Use ProfilesManager.deleteProfile instead.');
+        if (window.profilesManager) {
+            // Convert ID to index for ProfilesManager compatibility
+            const profiles = window.profilesManager.getAllProfiles();
+            const index = profiles.findIndex(p => p.id === profileId);
+            if (index !== -1) {
+                window.profilesManager.deleteProfile(index);
+                this.loadProfiles(); // Refresh display
             }
-            
-            // Show confirmation message
-            this.showMascotMessage(`Bulle "${profile.name}" supprimée.`, 2000);
-            
-            console.log(`Profile deleted successfully. Remaining profiles:`, this.profiles.length);
-        } else {
-            console.log('Profile deletion cancelled by user');
         }
     }
-
-    /**
-     * Remove profile cards from DOM - Solution 2 helper method
-     */
-    removeProfileFromDOM(profileId) {
-        const profileCards = document.querySelectorAll(`[data-profile-id="${profileId}"]`);
-        console.log(`Removing ${profileCards.length} profile cards from DOM`);
-        
-        profileCards.forEach((card, index) => {
-            const location = card.getAttribute('data-location');
-            console.log(`Removing card ${index + 1} from ${location}`);
-            card.remove();
-        });
-        
-        // Update empty state if no profiles remain
-        this.updateEmptyState();
-    }
-
-    /**
-     * Update empty state for profile containers - Solution 3 helper
-     */
-    updateEmptyState() {
-        const profilesList = document.getElementById('profilesList');
-        const profilesGrid = document.getElementById('profilesGrid');
-        
-        if (this.profiles.length === 0) {
-             profilesList.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Aucune bulle sauvegardée pour le moment.</p>';
-             profilesGrid.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Aucune bulle sauvegardée</p>';
-         }
-     }
 
      /**
       * Setup info bubble functionality
@@ -2615,6 +1803,41 @@ function showSection(sectionId) {
 }
 
 // Initialize the application when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    appInstance = new BulleSensorielle();
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🫧 Initialisation de Bulle Sensorielle...');
+    console.log('Current URL:', window.location.href);
+    console.log('Base URL for audio files:', window.location.origin + window.location.pathname.replace('index.html', ''));
+    
+    try {
+        appInstance = new BulleSensorielle();
+        
+        // Wait for the app to be fully initialized before exposing globally
+        await new Promise(resolve => {
+            const checkInitialization = () => {
+                if (appInstance && appInstance.audioManager) {
+                    // Expose audioManager globally for debugging only after it's ready
+                    window.audioManager = appInstance.audioManager;
+                    window.appInstance = appInstance;
+                    console.log('✅ AudioManager exposed globally for debugging');
+                    resolve();
+                } else {
+                    setTimeout(checkInitialization, 100);
+                }
+            };
+            checkInitialization();
+        });
+        
+        // Test automatique après 3 secondes
+        setTimeout(() => {
+            console.log('🔧 Running automatic audio test...');
+            if (window.audioManager && typeof window.audioManager.testAudioLoading === 'function') {
+                window.audioManager.testAudioLoading();
+            } else {
+                console.error('AudioManager not available or testAudioLoading method missing');
+            }
+        }, 3000);
+        
+    } catch (error) {
+        console.error('❌ Error during application initialization:', error);
+    }
 });

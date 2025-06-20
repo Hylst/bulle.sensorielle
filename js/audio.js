@@ -76,26 +76,19 @@ class AudioManager {
      * Lie les événements aux boutons audio
      */
     bindEvents() {
-        // Attendre que le DOM soit chargé
+        // Note: Les boutons audio sont maintenant gérés par AudioManager
+        // On configure seulement le bouton stop global ici
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.setupAudioButtons());
+            document.addEventListener('DOMContentLoaded', () => this.setupStopButton());
         } else {
-            this.setupAudioButtons();
+            this.setupStopButton();
         }
     }
 
     /**
-     * Configure les boutons audio
+     * Configure uniquement le bouton stop global
      */
-    setupAudioButtons() {
-        const audioButtons = document.querySelectorAll('[data-sound]');
-        audioButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                const soundKey = e.currentTarget.getAttribute('data-sound');
-                this.toggleSound(soundKey, e.currentTarget);
-            });
-        });
-
+    setupStopButton() {
         // Bouton stop global
         const stopButton = document.getElementById('stopAudio');
         if (stopButton) {

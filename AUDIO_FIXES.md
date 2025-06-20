@@ -65,9 +65,35 @@ This document outlines the comprehensive fixes and enhancements made to the audi
 - Improved debugging capabilities
 - More robust audio system overall
 
+### 4. Volume Control Event Conflicts (RESOLVED) - v2.10.0
+**Problem**: Volume sliders were triggering sound activation/deactivation when adjusted, causing frustrating user experience.
+
+**Root Cause Analysis**:
+- `setupAudioButtons()` was selecting ALL elements with `[data-sound]` attribute, including volume sliders
+- Event propagation from volume sliders was bubbling up to parent containers
+- Lack of event isolation between volume controls and sound buttons
+- Missing event prevention on volume control containers
+
+**Solution**:
+- **Improved CSS Selectors**: Changed from `[data-sound]` to `.sound-btn[data-sound]` to target only buttons
+- **Event Isolation**: Added `stopPropagation()` and `preventDefault()` to volume slider events
+- **Container Protection**: Added event listeners to `.volume-control` containers to prevent bubbling
+- **Comprehensive Event Handling**: Added listeners for `input`, `click`, and `mousedown` events
+
+### 5. Volume Persistence and Loading Issues (RESOLVED) - v2.10.0
+**Problem**: Volume preferences were not properly loaded from localStorage and applied to sounds.
+
+**Solution**:
+- **Improved localStorage Handling**: Added proper null checks with fallback to 50% default
+- **Initialization Timing**: Volume preferences now applied during sound initialization
+- **Real-time Application**: Volume changes apply immediately to currently playing sounds
+- **Better Conversion**: Enhanced percentage to decibel conversion for Tone.js compatibility
+
 ## Usage Notes
 
 - The application must be served via HTTP server (not file://) for audio to work
 - Audio will initialize on first user interaction (clicking any sound button)
+- Volume controls now work independently from sound activation (FIXED in v2.10.0!)
+- Volume preferences are automatically saved and restored between sessions
 - If individual audio files fail to load, the app continues to function
 - Console logs provide detailed information for debugging audio issues

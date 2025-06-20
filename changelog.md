@@ -5,6 +5,151 @@ Tous les changements notables de ce projet seront documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/fr/1.0.0/),
 et ce projet adhère au [Versioning Sémantique](https://semver.org/spec/v2.0.0.html).
 
+## [2.10.0] - 2024-12-25
+
+### 🎛️ MAJOR: Volume Control System Overhaul (FINALLY WORKING!)
+- **Fixed volume slider event conflicts** (after 18 attempts!):
+  - Volume sliders no longer trigger sound activation when adjusted
+  - Fixed event propagation issues between volume controls and sound buttons
+  - Added proper event isolation with `stopPropagation()` and `preventDefault()`
+  - Improved CSS selectors to target only `.sound-btn[data-sound]` instead of all `[data-sound]` elements
+- **Enhanced volume persistence and loading**:
+  - Fixed localStorage volume loading with proper null checks and fallback to 50%
+  - Volume preferences now properly applied to sounds during initialization
+  - Improved volume conversion for Tone.js objects (percentage → linear → decibels)
+  - Added immediate volume application to currently playing sounds
+- **Improved volume control UX**:
+  - Volume changes now apply instantly without requiring sound restart
+  - Better visual feedback with real-time percentage display updates
+  - Added event listeners to `.volume-control` containers to prevent unwanted interactions
+  - Enhanced logging for volume operations and debugging
+- **Technical improvements**:
+  - Separated volume slider initialization from sound button setup
+  - Added comprehensive event handling for click, mousedown, and input events
+  - Improved error handling for missing sounds during volume operations
+  - Better memory management with proper volume state tracking
+- **Files modified**:
+  - `js/managers/AudioManager.js`: Complete volume control system rewrite
+
+## [2.9.9] - 2024-12-25
+
+### 🔧 Critical Audio Initialization Timing Fix
+- **Fixed asynchronous initialization synchronization**:
+  - AudioManager constructor now properly handles async initialization
+  - Added `waitForInitialization()` method to ensure complete setup before use
+  - Fixed timing issues where main application proceeded before AudioManager was ready
+  - Resolved race conditions between audio object creation and DOM element access
+- **Enhanced DOM readiness handling**:
+  - Added `document.readyState` checks before accessing DOM elements
+  - Separated volume slider initialization with proper DOM timing
+  - Fixed premature access to volume controls before DOM was ready
+  - Added comprehensive logging for initialization process tracking
+- **Improved initialization architecture**:
+  - Implemented promise-based initialization waiting system
+  - Better error handling during async initialization phases
+  - Ensured proper sequencing of audio setup, volume controls, and event binding
+- **Files modified**:
+  - `script.js`: Added proper await for AudioManager initialization
+  - `js/managers/AudioManager.js`: Added initialization synchronization methods
+
+## [2.9.8] - 2024-12-25
+
+### 🔧 Critical Volume Control Fix for Tone.js Objects
+- **Fixed volume initialization for synthesized sounds**:
+  - Tone.js objects (white-noise, pink-noise, brown-noise, piano, lofi) now properly load saved volume from localStorage
+  - Replaced hardcoded defaultVolumes with dynamic volume loading during object creation
+  - Fixed volume conversion from percentage to decibels for Tone.js compatibility
+  - Added comprehensive logging for volume initialization and changes
+- **Enhanced volume debugging**:
+  - Added detailed console logging for volume slider events
+  - Added sound object existence validation during volume changes
+  - Added debugAudioObjects() method for troubleshooting audio objects
+  - Improved error handling for missing sounds during volume operations
+- **Volume persistence improvements**:
+  - Ensured all Tone.js objects respect saved volume preferences on initialization
+  - Fixed disconnect between slider position and actual audio volume
+  - Proper decibel conversion: percentage → linear → decibels for Tone.js
+- **Files modified**:
+  - `js/managers/AudioManager.js`: Fixed volume initialization and added debugging
+
+## [2.9.7] - 2024-12-25
+
+### 🔧 Audio Event Listeners Duplication Fix
+- **Resolved duplicate event listeners causing audio malfunction**:
+  - Removed duplicate sound button event listeners from `script.js`
+  - Removed duplicate volume slider event listeners from `script.js`
+  - Audio control now exclusively managed by `AudioManager.js`
+  - Fixed issue where sounds would toggle on/off immediately due to double event firing
+  - Improved audio system reliability and user experience
+- **Enhanced audio architecture**:
+  - Clean separation of audio event handling responsibilities
+  - Single source of truth for audio button and volume control events
+  - Eliminated conflicting event listeners between modules
+- **Files modified**:
+  - `script.js`: Removed duplicate audio event listeners
+  - `js/managers/AudioManager.js`: Now sole handler for audio events
+
+## [2.9.6] - 2024-12-25
+
+### 🔧 Critical Audio Fix
+- **Fixed AudioManager import issue**:
+  - Added missing `AudioManager.js` script import in `index.html`
+  - Resolved "AudioManager is not defined" ReferenceError
+  - Audio functionality fully restored for all sound mixing features
+  - Fixed MP3 playbook and synthesized sound generation
+- **Files modified**:
+  - `index.html`: Added AudioManager.js script import
+
+## [2.9.5] - 2024-12-25
+
+### ✅ Audio Module Modularization Complete + CSS Fix
+- **Complete audio state management delegation to AudioManager**:
+  - Removed duplicate audio state properties (`globalPaused`, `activeSounds`, `soundStates`, `pausedSounds`) from `script.js`
+  - All audio state management now centralized in `AudioManager.js`
+  - Updated all audio-related methods to delegate to `AudioManager` instance
+  - Added proper null checks for `audioManager` instance
+- **Enhanced audio architecture**:
+  - Clean separation between UI logic and audio management
+  - Consistent delegation pattern for all audio operations
+  - Maintained backward compatibility with existing functionality
+  - Improved error handling and state consistency
+- **Code cleanup and optimization**:
+  - Removed redundant audio state initialization from `script.js`
+  - Updated method implementations to use `this.audioManager` properties
+  - Simplified audio state management with single source of truth
+  - Enhanced console logging for better debugging
+- **CSS Quality Improvements**:
+  - Fixed empty CSS ruleset in `_sections.css` (line 287)
+  - Removed unnecessary `.visual-display:hover` empty rule
+  - Improved CSS code quality and linting compliance
+- **Files modified**:
+  - `script.js` - Removed duplicate audio state, updated delegation
+  - `js/managers/AudioManager.js` - Centralized audio state management
+  - `css/modules/_sections.css` - Fixed empty CSS ruleset
+  - `changelog.md` - Documentation of completed audio modularization
+
+## [2.9.4] - 2024-12-25
+
+### ✅ Feelings Module Modularization Complete
+- **Complete modularization of feelings functionality**:
+  - All feelings logic successfully moved from `script.js` to `js/feelings.js`
+  - Implemented `FeelingsManager` class for centralized emotion management
+  - Implemented `FeelingsState` class with Observer pattern for state management
+  - Clean separation of concerns with no code duplication
+- **Enhanced architecture**:
+  - Modular design following single responsibility principle
+  - Global functions maintained for HTML onclick compatibility
+  - Proper initialization and DOM ready handling
+  - Export functionality for potential module usage
+- **Code cleanup**:
+  - Removed all duplicate feelings code from `script.js`
+  - Added clear documentation comments indicating modularization
+  - Maintained backward compatibility with existing HTML structure
+- **Files modified**:
+  - `js/feelings.js` - Complete modular implementation
+  - `script.js` - Cleaned up with modularization comments
+  - `changelog.md` - Documentation of completed modularization
+
 ## [2.9.3] - 2024-12-25
 
 ### ✨ Enhanced Interactive Feelings Section

@@ -212,12 +212,52 @@ css/
 - ✅ Points critiques identifiés et priorisés
 - ✅ Structure modulaire définie
 
-**Prochaine Phase : Phase 2 - Création de la Structure**
+**Phase 1.5 : Modularisation Audio** ✅ **TERMINÉE** (v2.10.0)
+- ✅ AudioManager.js complètement modularisé et fonctionnel
+- ✅ Système de contrôle de volume entièrement refondu
+- ✅ Séparation claire entre logique UI et gestion audio
+- ✅ Gestion d'événements optimisée et sans conflits
+- ✅ Persistance des préférences utilisateur améliorée
+
+**Prochaine Phase : Phase 2 - Création de la Structure CSS**
 - 🔄 Test de la baseline
 - 🔄 Création du dossier css/modules/
 - 🔄 Extraction des variables CSS
 - 🔄 Premier test de régression
 
+## 🎯 TODO - Améliorations Futures
+
+### 🎵 Audio System (Priorité: MOYENNE)
+- [ ] **Presets de mixage** : Sauvegarder des combinaisons de sons avec volumes
+- [ ] **Fade in/out** : Transitions douces lors de l'activation/désactivation
+- [ ] **Égaliseur simple** : Contrôles graves/aigus pour certains sons
+- [ ] **Mode focus** : Preset optimisé pour la concentration
+- [ ] **Mode détente** : Preset optimisé pour la relaxation
+
+### 🎨 Interface Utilisateur (Priorité: HAUTE)
+- [ ] **Thème sombre amélioré** : Meilleur contraste et accessibilité
+- [ ] **Animations micro-interactions** : Feedback visuel sur les contrôles
+- [ ] **Mode haute accessibilité** : Contrastes renforcés, textes agrandis
+- [ ] **Indicateurs visuels** : Meilleure signalisation des états actifs
+
+### 📱 Responsive & Mobile (Priorité: HAUTE)
+- [ ] **Optimisation tactile** : Zones de touch plus grandes
+- [ ] **Orientation landscape** : Adaptation pour tablettes en mode paysage
+- [ ] **Gestes swipe** : Navigation par glissement sur mobile
+- [ ] **Vibration haptique** : Feedback tactile sur appareils compatibles
+
+### 🔧 Performance & Technique (Priorité: MOYENNE)
+- [ ] **Service Worker** : Cache intelligent pour utilisation hors-ligne
+- [ ] **Lazy loading** : Chargement différé des ressources audio
+- [ ] **Compression audio** : Optimisation de la taille des fichiers
+- [ ] **Analytics anonymes** : Mesure d'usage pour améliorer l'UX
+
+### 🧠 Fonctionnalités Thérapeutiques (Priorité: BASSE)
+- [ ] **Journal d'humeur** : Suivi simple de l'état émotionnel
+- [ ] **Rappels de pause** : Notifications pour prendre des pauses
+- [ ] **Exercices de respiration** : Guides visuels synchronisés avec l'audio
+- [ ] **Mode parent/thérapeute** : Tableau de bord pour le suivi
+
 *Document créé le : Phase 1*
-*Dernière mise à jour : Audit complet terminé*
-*Statut : ✅ Phase 1 TERMINÉE - Prêt pour Phase 2*
+*Dernière mise à jour : v2.10.0 - Audio fixes completed*
+*Statut : ✅ Phase 1 TERMINÉE - Audio Module STABLE - Prêt pour Phase 2*

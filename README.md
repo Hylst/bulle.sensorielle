@@ -2,7 +2,7 @@
 
 > *"Pour tous ceux qui cherchent un moment de paix dans leur journée"*
 
-[![Version](https://img.shields.io/badge/version-2.9.1-blue.svg)](./changelog.md)
+[![Version](https://img.shields.io/badge/version-2.10.0-blue.svg)](./changelog.md)
 [![Licence](https://img.shields.io/badge/licence-MIT-green.svg)](#licence)
 [![PWA](https://img.shields.io/badge/PWA-Ready-purple.svg)](./manifest.json)
 [![Accessibilité](https://img.shields.io/badge/accessibilité-AAA-brightgreen.svg)](#accessibilité)
@@ -55,10 +55,14 @@ Un système audio avancé basé sur **Tone.js** pour créer des paysages sonores
 - **Ballade** : Progression harmonique apaisante
 
 **Fonctionnalités Avancées :**
-- 🎚️ Contrôles de volume individuels précis
+- 🎚️ **Contrôles de volume individuels précis** *(v2.10.0 - ENFIN FONCTIONNELS!)*
+  - Réglage indépendant sans activation accidentelle des sons
+  - Sauvegarde automatique des préférences de volume
+  - Application instantanée aux sons en cours de lecture
 - 🔄 Superposition intelligente de plusieurs sons
 - 💾 Sauvegarde des mélanges favoris
 - 🎯 Optimisation pour casques et haut-parleurs
+- ⚡ Système audio robuste basé sur Tone.js et HTML5 Audio
 
 ### ✨ Visuels Thérapeutiques Interactifs
 Animations **Canvas** fluides conçues pour la régulation sensorielle :

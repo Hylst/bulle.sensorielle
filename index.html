@@ -88,7 +88,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/main.css?v=2.9.3">
-    <script src="https://unpkg.com/tone@14.7.77/build/Tone.js"></script>
+    <script src="https://unpkg.com/tone@latest/build/Tone.js"></script>
 </head>
 <body>
     <!-- Mascot -->
@@ -213,6 +213,10 @@
                         <button type="button" class="quick-btn" data-action="timer">
                             <span class="quick-icon">⏰</span>
                             <span>Prendre une pause</span>
+                        </button>
+                        <button type="button" class="quick-btn" onclick="audioManager.testAudioLoading()" style="background: #ff6b6b;">
+                            <span class="quick-icon">🔧</span>
+                            <span>Test Audio</span>
                         </button>
                     </div>
                 </div>
@@ -619,6 +623,7 @@
 
     <script src="js/feelings.js"></script>
     <script src="js/tips.js"></script>
+    <script src="js/managers/AudioManager.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
